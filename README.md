@@ -81,7 +81,7 @@ $ python manage.py test
 [Pep8](https://www.python.org/dev/peps/pep-0008/) standards are followed in project.
 
 ```
-$ pep8 app --count
+$ pep8 api --count
 ```
 
 ## Deployment 🚀
