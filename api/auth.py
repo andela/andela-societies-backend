@@ -1,3 +1,10 @@
+"""
+Authorisation Module.
+
+This module contains the authorisation required by the client to
+communicate with the API.
+"""
+
 import random
 from functools import wraps
 
@@ -9,6 +16,7 @@ from .models import Society, User
 
 # authorization decorator
 def token_required(f):
+    """Authenticate that a valid Token is present."""
     @wraps(f)
     def decorated(*args, **kwargs):
         # check that the Authorization header is set
@@ -85,6 +93,7 @@ def token_required(f):
 
 
 def roles_required(roles):  # roles should be a list
+    """Ensure only authorised roles may access sensitive data."""
     def check_user_role(f):
         @wraps(f)
         def decorated(*args, **kwargs):
