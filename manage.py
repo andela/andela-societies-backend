@@ -1,6 +1,9 @@
 """Entry point for app, contain commands to configure and run the app."""
 
 import os
+import unittest
+import coverage
+import pytest
 
 from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager, Shell, prompt_bool
@@ -64,6 +67,35 @@ def shell():
 
 manager.add_command("shell", Shell(make_context=shell))
 manager.add_command("db", MigrateCommand)
+
+
+# Testing vonfigurations
+COV = coverage.coverage(
+    branch=True,
+    omit=[
+        '*/tests/*',
+        'manage.py',
+        '*/.virtualenvs/*',
+        '*/venv/*',
+        'config.py'
+    ]
+)
+COV.start()
+
+
+@manager.command
+def test():
+    """Run tests with coverage."""
+    tests_failed = pytest.main(['-x', 'tests'])
+    if not tests_failed:
+        COV.stop()
+        COV.save()
+        print('Coverage Summary: .')
+        COV.report()
+        COV.html_report()
+        COV.erase()
+        return 0
+    return 1
 
 
 if __name__ == "__main__":
