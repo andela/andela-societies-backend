@@ -1,3 +1,8 @@
+"""
+Sample Data for Initial Run.
+
+This contains the sample initial data required for the test run of the system.
+"""
 from .models import Activity, Point, Society, User
 
 # activities
