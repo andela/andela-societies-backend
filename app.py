@@ -1,4 +1,4 @@
-""" Main app module. """
+"""Main app module."""
 import os
 
 from api.endpoints.activities import ActivitiesAPI
