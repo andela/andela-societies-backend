@@ -64,18 +64,10 @@ user = User(
     name="Test User",
     photo="https://lh6.googleusercontent.com/-1DhBLOJentg/AAAAAAAAA"
           "AI/AAAAAAAAABc/ImM13eP_cAI/photo.jpg?sz=50",
-<<<<<<< HEAD:api/initial_data.py
     email="lawrence.wachira@andela.com",
     country=kenya,
     society=phoenix
     )
-=======
-    email="test.user@andela.com",
-    country="Kenya",
-    society=phoenix
-)
-user.activities.extend([blog, interview, open_saturdays])
->>>>>>> [Chore] Refactor and clean up authorization decorator:api/utils/initial_data.py
 
 # test activities
 python_blog = Activity(name="TDD For The Lazy Programmer", activity_type=blog)

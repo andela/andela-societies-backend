@@ -3,6 +3,7 @@ import uuid
 from datetime import datetime
 
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.exc import SQLAlchemyError
 
 db = SQLAlchemy()
 
@@ -54,15 +55,13 @@ class Base(db.Model):
         Returns:
             saved(boolean) true if saved, false otherwise
         """
-        saved = None
         try:
             db.session.add(self)
             db.session.commit()
-            saved = True
-        except Exception:
-            saved = False
+            return True
+        except SQLAlchemyError:
             db.session.rollback()
-        return saved
+            return False
 
     def delete(self):
         """Delete the object in DB.
@@ -117,7 +116,8 @@ class User(Base):
     """Models Users."""
 
     __tablename__ = 'users'
-    email = db.Column(db.String)
+    name= db.Column(db.String, nullable=False)
+    email = db.Column(db.String, nullable=False, unique=True)
     role = db.Column(db.String, default="member")
 
     society_id = db.Column(db.String, db.ForeignKey('societies.uuid'))
