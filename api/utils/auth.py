@@ -1,6 +1,5 @@
 """
 Authorisation Module.
-
 This module contains the authorisation required by the client to
 communicate with the API.
 """
@@ -39,16 +38,16 @@ def token_required(f):
         try:
             # decode token
             public_key = base64.b64decode(
-                            current_app.config['PUBLIC_KEY']).decode("utf-8")
+                current_app.config['PUBLIC_KEY']).decode("utf-8")
 
             payload = jwt.decode(authorization_token,
-                               public_key,
-                                algorithms=['RS256'],
-                                options={
-                                    'verify_signature': True,
-                                    'verify_exp': True
-                                }
-                                )
+                                 public_key,
+                                 algorithms=['RS256'],
+                                 options={
+                                     'verify_signature': True,
+                                     'verify_exp': True
+                                 }
+                                 )
 
         except ExpiredSignatureError:
             expired_response = "The authorization token supplied is expired"
@@ -81,6 +80,7 @@ def token_required(f):
             return f(*args, **kwargs)
     return decorated
 
+
 def roles_required(roles):  # roles should be a list
     """Ensure only authorised roles may access sensitive data."""
     def check_user_role(f):
@@ -92,6 +92,7 @@ def roles_required(roles):  # roles should be a list
             return f(*args, **kwargs)
         return decorated
     return check_user_role
+
 
 def store_user_details(payload):
     uuid = payload["UserInfo"]["id"]

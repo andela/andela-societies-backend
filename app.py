@@ -1,6 +1,7 @@
 """Main app module."""
 import os
 
+from api.endpoints.activity_types import ActivityTypesAPI
 from api.endpoints.activities import ActivitiesAPI
 from api.endpoints.societies import SocietyResource
 from api.endpoints.users import UserAPI
@@ -48,6 +49,12 @@ def create_app(environment="Development"):
     api.add_resource(
         ActivitiesAPI, '/api/v1/activities', '/api/v1/activities/',
         endpoint='activities'
+    )
+
+    # activity types endpoints
+    api.add_resource(
+        ActivityTypesAPI, '/api/v1/activity-types',
+        '/api/v1/activity-types/', endpoint='get_activity_types'
     )
 
     # user endpoints
