@@ -43,6 +43,11 @@ class BaseTestCase(TestCase):
         self.header = {
             "Authorization": self.generate_token(self.test_payload)
         }
+        self.bad_token_header = {
+            "Authorization": self.generate_token(
+                {"I don't know": "what to put here"}
+            )
+        }
 
         # test countries
         self.kenya = Country(name='Kenya')

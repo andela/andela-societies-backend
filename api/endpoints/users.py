@@ -2,7 +2,7 @@
 from flask import g, jsonify
 from flask_restplus import Resource
 
-from ..auth import token_required
+from ..utils.auth import token_required
 
 
 class UserAPI(Resource):

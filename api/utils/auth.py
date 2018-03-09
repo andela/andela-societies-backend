@@ -11,7 +11,15 @@ from functools import wraps
 from flask import g, jsonify, request
 from jose import ExpiredSignatureError, JWTError, jwt
 
-from .models import Society, User
+from ..models import Society, User
+
+
+def auth_response(status_code, message):
+    response = jsonify({
+        "message": message
+    })
+    response.status_code = status_code
+    return response
 
 
 # authorization decorator
@@ -22,31 +30,22 @@ def token_required(f):
         # check that the Authorization header is set
         authorization_token = request.headers.get('Authorization')
         if not authorization_token:
-            response = jsonify({
-                "message": "Bad request. Header does not contain authorization"
-                           " token"
-            })
-            response.status_code = 400
-            return response
+            message = "Bad request. Header does not contain authorization"
+            " token"
+            return auth_response(400, message)
 
-        unauthorized_response = jsonify({
-            "message": "Unauthorized. The authorization token supplied is"
-                       " invalid"
-        })
-        unauthorized_response.status_code = 401
-        expired_response = jsonify({
-            "message": "The authorization token supplied is expired"
-        })
-        expired_response.status_code = 401
+        unauthorized_message = "Unauthorized. The authorization token"
+        " supplied is invalid"
 
         try:
             # decode token
             payload = jwt.decode(authorization_token, 'secret',
                                  options={"verify_signature": False})
         except ExpiredSignatureError:
-            return expired_response
+            expired_response = "The authorization token supplied is expired"
+            return auth_response(401, expired_response)
         except JWTError:
-            return unauthorized_response
+            return auth_response(401, unauthorized_message)
 
         expected_user_info_format = {
             "id": "user_id",
@@ -62,9 +61,10 @@ def token_required(f):
         }
 
         # confirm that payload and UserInfo has required keys
-        if ("UserInfo" and "exp") not in payload.keys() and payload[
-                "UserInfo"].keys() != expected_user_info_format.keys():
-            return unauthorized_response
+        if ("UserInfo" and "exp") not in payload.keys():
+            return auth_response(401, unauthorized_message)
+        elif payload["UserInfo"].keys() != expected_user_info_format.keys():
+            return auth_response(401, unauthorized_message)
         else:
             uuid = payload["UserInfo"]["id"]
             name = payload["UserInfo"]["name"]
@@ -79,8 +79,6 @@ def token_required(f):
                 user = User(
                     uuid=uuid, name=name, email=email, photo=photo
                 )
-
-                user.society = random.choice(Society.query.all())
                 user.save()
 
             # set current user in flask global variable, g
@@ -98,9 +96,8 @@ def roles_required(roles):  # roles should be a list
         @wraps(f)
         def decorated(*args, **kwargs):
             if g.current_user.society_position not in roles:
-                return {
-                    "message": "You're unauthorized to perform this operation"
-                }, 401
+                message = "You're unauthorized to perform this operation"
+                return auth_response(401, message)
             return f(*args, **kwargs)
         return decorated
     return check_user_role
