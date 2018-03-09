@@ -50,7 +50,7 @@ class UserTestCase(BaseTestCase):
         self.test_user.save()
 
         user_activity = LoggedActivity.query.filter_by(
-                            name="my logged activity").first()
+            name="my logged activity").first()
         self.assertTrue(user_activity == self.log_alibaba_challenge)
 
     def test_user_can_participate_activity(self):
@@ -58,7 +58,7 @@ class UserTestCase(BaseTestCase):
         self.test_user.save()
 
         user_activity = Activity.query.filter_by(
-                            name='Nairobi Js meetup').first()
+            name='Nairobi Js meetup').first()
 
         self.assertEqual(self.js_meet_up, user_activity)
 
@@ -171,7 +171,7 @@ class LoggedActivityTestCase(BaseTestCase):
         self.log_alibaba_challenge.save()
 
         logged_activity = LoggedActivity.query.filter_by(
-                name="my logged activity").first()
+            name="my logged activity").first()
 
         self.assertEqual(logged_activity, self.log_alibaba_challenge)
 

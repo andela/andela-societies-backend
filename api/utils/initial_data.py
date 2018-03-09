@@ -1,10 +1,9 @@
 """
 Sample Data for Initial Run.
-
 This contains the sample initial data required for the test run of the system.
 """
 from api.models import (ActivityType, Activity, Country, LoggedActivity, Society,
-                     User)
+                        User)
 
 # activity types
 interview = ActivityType(name="Bootcamp Interviews",
@@ -67,7 +66,7 @@ user = User(
     email="lawrence.wachira@andela.com",
     country=kenya,
     society=phoenix
-    )
+)
 
 # test activities
 python_blog = Activity(name="TDD For The Lazy Programmer", activity_type=blog)
