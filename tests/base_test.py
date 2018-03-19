@@ -67,11 +67,11 @@ class BaseTestCase(TestCase):
                               logo="url/image",
                               color_scheme="#00ff4567")
 
-        self.phenix = Society(name="phenix",
+        self.phoenix = Society(name="Phoenix",
                               photo="url/imgae",
                               logo="url/image",
                               color_scheme="#00ff4567")
-        self.phenix.save()
+        self.phoenix.save()
 
         # mock points
         self.point = Point(value=2500,
@@ -83,6 +83,8 @@ class BaseTestCase(TestCase):
             value=50,
             description="members earn 50 points per activity",
             photo="cool/icon/url")
+
+        self.activity.save()
 
     @staticmethod
     def generate_token(payload):

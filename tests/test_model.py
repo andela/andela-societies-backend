@@ -9,7 +9,7 @@ class UserTestCase(BaseTestCase):
 
     def test_models(self):
         society = Society(
-            name="Phoenix",
+            name="Sparks",
             color_scheme="#333333",
             logo="https://logo.png",
             photo="http://photo.url2"
@@ -43,7 +43,7 @@ class SocietyTestCase(BaseTestCase):
     def test_society_instance(self):
         """Test society properties/relationships."""
         new_society = Society(name="istelle",
-                              photo="url/imgae",
+                              photo="url/image",
                               logo="url/image",
                               color_scheme="#00ff4567")
         self.assertTrue(new_society.save())
@@ -72,13 +72,13 @@ class ActivityTestCase(BaseTestCase):
 
     def test_activity_instance(self):
         """Test activity properties/relationships."""
-        activity = Activity(name="Interview",
-                            value=50,
-                            description="members eran 50 points per activity",
+        activity = Activity(name="Tech Event",
+                            value=2500,
+                            description="Organizing a tech event",
                             photo="cool/icon/url")
 
         self.assertTrue(activity.save())
 
-        querty_activity = Activity.query.filter_by(name="Interview").first()
+        query_activity = Activity.query.filter_by(name="Tech Event").first()
 
-        self.assertTrue(activity == querty_activity)
+        self.assertTrue(activity == query_activity)
