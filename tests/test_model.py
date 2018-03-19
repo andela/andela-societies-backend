@@ -1,84 +1,191 @@
 """Models TestSuite."""
 
-from api.models import Activity, Point, Society, User
+from api.models import (Activity, ActivityType, Cohort, Country,
+                        LoggedActivity, Society, User)
 from tests.base_test import BaseTestCase
 
 
 class UserTestCase(BaseTestCase):
     """Test models."""
 
-    def test_models(self):
-        society = Society(
-            name="Phoenix",
-            color_scheme="#333333",
-            logo="https://logo.png",
-            photo="http://photo.url2"
-        )
+    def test_create_user(self):
+        """Test we can create user objects."""
+        test_user = User(
+            uuid="-KdQsMt2U0ixIy_-yJEH",
+            name="Larry Wachira",
+            photo="https://lh6.googleusercontent.com/-1DhBLOJentg/AAAAAAAAA"
+                  "AI/AAAAAAAAABc/ImM13eP_cAI/photo.jpg?sz=50",
+            email="lawrence.wachira@andela.com",
+            country=self.kenya,
+            cohort=self.cohort_12_Ke)
 
-        user = User(
-            uuid="-Ktest",
-            name="dan",
-            email="user@mail.com",
-            country="Kenya",
-            society=society
-        )
-        self.assertTrue(user.save())
+        self.assertTrue(test_user.save())
 
-    def test_user_instance(self):
-        """Test user properties/relationships."""
-        new_user = User(email="someonecool.andela.com",
-                        name="thecoolest",
-                        uuid="-Ksomeid",
-                        role="member",
-                        country="ke/ug/niger/ny/sa/tz/rw")
-        self.assertTrue(new_user.save())
+    def test_get_user(self):
+        self.test_user.save()
 
-        query_user = User.query.filter_by(uuid="-Ksomeid").first()
-        self.assertTrue(query_user == new_user)
+        user = User.query.filter_by(uuid="-KdQsMt2U0ixIy_-yWTSZ").first()
+        self.assertEqual(self.test_user, user)
+
+    def get_all_users(self):
+        test_user = User(
+            uuid="-KdQsMt2U0ixIy_-yJEH",
+            name="Larry Wachira",
+            photo="https://lh6.googleusercontent.com/-1DhBLOJentg/AAAAAAAAA"
+                  "AI/AAAAAAAAABc/ImM13eP_cAI/photo.jpg?sz=50",
+            email="lawrence.wachira@andela.com",
+            country=self.kenya,
+            cohort=self.cohort_12_Ke)
+
+        test_user.save()
+        self.test_user()
+
+        users = User.query.all()
+
+        self.assertListEqual([test_user, self.test_user], users)
+
+    def test_user_can_log_activity(self):
+
+        self.test_user.logged_activities.append(self.log_alibaba_challenge)
+        self.test_user.save()
+
+        user_activity = LoggedActivity.query.filter_by(
+                            name="my logged activity").first()
+        self.assertTrue(user_activity == self.log_alibaba_challenge)
+
+    def test_user_can_participate_activity(self):
+        self.test_user.activities.append(self.js_meet_up)
+        self.test_user.save()
+
+        user_activity = Activity.query.filter_by(
+                            name='Nairobi Js meetup').first()
+
+        self.assertEqual(self.js_meet_up, user_activity)
 
 
 class SocietyTestCase(BaseTestCase):
     """Test Society model."""
 
-    def test_society_instance(self):
-        """Test society properties/relationships."""
-        new_society = Society(name="istelle",
-                              photo="url/imgae",
-                              logo="url/image",
-                              color_scheme="#00ff4567")
-        self.assertTrue(new_society.save())
+    def test_create_society(self):
+        istelle = Society(name="iStelle")
 
-        query_society = Society.query.filter_by(name="istelle").first()
-        self.assertTrue(query_society == new_society)
+        self.assertTrue(istelle.save())
 
+    def test_adding_members(self):
+        self.istelle.members.append(self.test_user)
+        self.istelle.save()
 
-class PointTestCase(BaseTestCase):
-    """Test Point model."""
+        user = User.query.filter_by(society=self.istelle).first()
 
-    def test_points_instance(self):
-        """Test point properties/relationships."""
-        point = Point(value=2500,
-                      name="interview-2017-sep-23rd")
+        self.assertEqual(user, self.test_user)
 
-        self.assertTrue(point.save())
+    def test_get_all_members(self):
+        test_user = User(
+            uuid="-KdQsMt2U0ixIy_-yJEH",
+            name="Larry Wachira",
+            photo="https://lh6.googleusercontent.com/-1DhBLOJentg/AAAAAAAAA"
+                  "AI/AAAAAAAAABc/ImM13eP_cAI/photo.jpg?sz=50",
+            email="lawrence.wachira@andela.com",
+            country=self.kenya,
+            cohort=self.cohort_12_Ke)
 
-        query_point = Point.query.filter_by(
-            name="interview-2017-sep-23rd").first()
-        self.assertTrue(query_point == point)
+        self.phoenix.members.extend([test_user, self.test_user])
+        self.phoenix.save()
+
+        users = User.query.filter_by(society=self.phoenix).all()
+        self.assertListEqual(users, [self.test_user, test_user])
+
+    def test_get_society(self):
+        self.phoenix.save()
+
+        society = Society.query.filter_by(name="Phoenix").first()
+
+        self.assertEqual(self.phoenix, society)
+
+    def test_get_all_societies(self):
+        self.phoenix.save()
+        self.istelle.save()
+        self.sparks.save()
+        self.invictus.save()
+
+        societies = Society.query.all()
+
+        self.assertListEqual(
+            societies,
+            [self.phoenix, self.istelle,  self.sparks, self.invictus])
 
 
 class ActivityTestCase(BaseTestCase):
     """Test Activity model."""
 
-    def test_activity_instance(self):
-        """Test activity properties/relationships."""
-        activity = Activity(name="Interview",
-                            value=50,
-                            description="members eran 50 points per activity",
-                            photo="cool/icon/url")
+    def test_create_activity(self):
+        google_hash_code = Activity(name='Google Tough hackathon',
+                                    activity_type=self.hackathon)
+        self.assertTrue(google_hash_code.save())
 
-        self.assertTrue(activity.save())
+    def test_get_activity(self):
+        self.alibaba_ai_challenge.save()
 
-        querty_activity = Activity.query.filter_by(name="Interview").first()
+        activity = Activity.query.filter_by(name='Fashion challenge').first()
 
-        self.assertTrue(activity == querty_activity)
+        self.assertEqual(self.alibaba_ai_challenge, activity)
+
+
+class ActivityTypeTestCase(BaseTestCase):
+    """Test suite for ActivityType model."""
+
+    def test_create_activityType(self):
+        hackathon = ActivityType(name="Hackathon",
+                                 description="Participating in a Hackathon",
+                                 value=100)
+        tech_event = ActivityType(name="Tech Event",
+                                  description="Organize a tech event",
+                                  value=2500)
+
+        self.assertTrue(hackathon.save() and tech_event.save())
+
+
+class LoggedActivityTestCase(BaseTestCase):
+    """Tests suite for LoggedActivity model."""
+
+    def test_create_logged_activity(self):
+        log_alibaba_challenge = LoggedActivity(
+            name="my logged activity",
+            description="Participated in this event",
+            value=2500,
+            user=self.test_user,
+            activity=self.alibaba_ai_challenge,
+            society=self.phoenix)
+
+        self.assertTrue(log_alibaba_challenge.save())
+
+    def test_get_user_logged_activity(self):
+        self.log_alibaba_challenge.save()
+
+        logged_activity = LoggedActivity.query.filter_by(
+                name="my logged activity").first()
+
+        self.assertEqual(logged_activity, self.log_alibaba_challenge)
+
+    def test_get_society_logged_activities(self):
+        self.log_alibaba_challenge.save()
+
+        self.assertListEqual(
+            self.phoenix.logged_activities, [self.log_alibaba_challenge])
+
+
+class CohortTestCase(BaseTestCase):
+    """Tests suite for Cohort model."""
+
+    def test_create_cohort(self):
+        cohort_1_Nig = Cohort(name="cohort-1", country=self.nigeria)
+        self.assertTrue(cohort_1_Nig.save())
+
+
+class CountryTestCase(BaseTestCase):
+    """Tests suite for Country model."""
+
+    def test_create_country(self):
+        self.uganda = Country(name='Uganda')
+
+        self.assertTrue(self.uganda.save())

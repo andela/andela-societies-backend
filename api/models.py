@@ -37,6 +37,7 @@ class Base(db.Model):
     name = db.Column(db.String)
     photo = db.Column(db.String)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    modified_at = db.Column(db.DateTime, default=datetime.utcnow)
     description = db.Column(db.String)
 
     def __repr__(self):
@@ -91,19 +92,45 @@ class Base(db.Model):
         return dictionary_mapping
 
 
+class Country(Base):
+    """Models different centres in Andela."""
+
+    __tablename__ = 'countries'
+    members = db.relationship('User',
+                              backref='country',
+                              lazy='dynamic')
+    cohorts = db.relationship('Cohort',
+                              backref='country',
+                              lazy='dynamic')
+
+
+class Cohort(Base):
+    """Models cohorts available in Andela."""
+
+    __tablename__ = 'cohorts'
+    country_id = db.Column(db.String, db.ForeignKey('countries.uuid'))
+
+    members = db.relationship('User', backref='cohort')
+
+
 class User(Base):
     """Models Users."""
 
     __tablename__ = 'users'
     email = db.Column(db.String)
     role = db.Column(db.String, default="member")
-    country = db.Column(db.String)
 
     society_id = db.Column(db.String, db.ForeignKey('societies.uuid'))
+    country_id = db.Column(db.String, db.ForeignKey('countries.uuid'))
+    cohort_id = db.Column(db.String, db.ForeignKey('cohorts.uuid'))
 
-    points = db.relationship('Point', backref='user', lazy='dynamic')
-    activities = db.relationship('Activity', secondary='user_activity',
-                                 lazy='dynamic', backref='users')
+    logged_activities = db.relationship('LoggedActivity',
+                                        backref='user',
+                                        lazy='dynamic')
+    activities = db.relationship('Activity',
+                                 secondary='user_activity',
+                                 lazy='dynamic',
+                                 backref='participants')
 
 
 class Society(Base):
@@ -116,7 +143,7 @@ class Society(Base):
     _total_points = db.Column(db.Integer, default=0)
 
     members = db.relationship('User', backref='society', lazy='dynamic')
-    points = db.relationship('Point', backref='society', lazy='dynamic')
+    logged_activities = db.relationship('LoggedActivity', backref='society')
 
     @property
     def total_points(self):
@@ -128,30 +155,35 @@ class Society(Base):
         self._total_points += point.value
 
 
+class ActivityType(Base):
+    """Models activity types."""
+
+    __tablename__ = 'activitiyTypes'
+    value = db.Column(db.Integer)
+
+    activity_id = db.Column(db.String, db.ForeignKey('activities.uuid'))
+
+
 class Activity(Base):
     """Model activities available for points."""
 
     __tablename__ = 'activities'
-    value = db.Column(db.Integer)
-    description = db.Column(db.String, nullable=False)
+    activity_type = db.relationship('ActivityType',
+                                    backref='activities',
+                                    uselist=False)
 
-    points = db.relationship('Point', backref='activity', lazy='dynamic')
 
+class LoggedActivity(Base):
+    """Models Activities logged by fellows."""
 
-class Point(Base):
-    """To contain points fields."""
-
-    __tablename__ = 'points'
+    __tablename__ = 'loggedActivities'
     value = db.Column(db.Integer, nullable=False)
     status = db.Column(db.String, default='pending')
-    approved_at = db.Column(db.DateTime)
     approver_id = db.Column(db.String)
-
-    approve_date = db.Column(db.DateTime)
+    approved_at = db.Column(db.DateTime)
 
     user_id = db.Column(db.String, db.ForeignKey('users.uuid'))
     society_id = db.Column(db.String, db.ForeignKey('societies.uuid'))
     activity_id = db.Column(db.String, db.ForeignKey('activities.uuid'))
 
-    def __repr__(self):
-        return '<Point by {}>'.format(self.user)
+    activity = db.relationship('Activity', uselist=False)
