@@ -103,6 +103,6 @@ ENV/
 .mypy_cache/
 
 .vscode/
-test_db.sqlite
+*.sqlite
 
 migrations/*
