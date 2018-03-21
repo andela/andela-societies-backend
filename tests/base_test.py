@@ -116,6 +116,7 @@ class BaseTestCase(TestCase):
         self.tech_event = ActivityType(name="Tech Event",
                                        description="Organize a tech event",
                                        value=2500)
+        self.tech_event.save()
 
         # test Activity
         self.alibaba_ai_challenge = Activity(name='Fashion challenge',

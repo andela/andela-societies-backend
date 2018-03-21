@@ -122,6 +122,21 @@ class SocietyTestCase(BaseTestCase):
             societies,
             [self.phoenix, self.istelle,  self.sparks, self.invictus])
 
+    def test_save_null_values(self):
+        """Test for false return if society name is null."""
+        test_society = Society(name=None)
+        self.assertFalse(test_society.save())
+
+    def test_delete_existing_society(self):
+        """Test if society has been deleted successfully."""
+        self.invictus.save()
+        self.assertTrue(self.invictus.delete())
+
+    def test_delete_nonexistent_society(self):
+        """Test for false return if nonexistent society is deleted."""
+        test_society = Society(name="Persia")
+        self.assertFalse(test_society.delete())
+
 
 class ActivityTestCase(BaseTestCase):
     """Test Activity model."""

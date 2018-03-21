@@ -127,6 +127,10 @@ class User(Base):
     logged_activities = db.relationship('LoggedActivity',
                                         backref='user',
                                         lazy='dynamic')
+
+    created_activities = db.relationship('Activity',
+                                         backref='added_by',
+                                         lazy='dynamic')
     activities = db.relationship('Activity',
                                  secondary='user_activity',
                                  lazy='dynamic',
@@ -170,6 +174,9 @@ class Activity(Base):
     __tablename__ = 'activities'
     activity_type_id = db.Column(db.String,
                                  db.ForeignKey('activity_types.uuid'))
+    activity_date = db.Column(db.Date)
+    added_by_id = db.Column(db.String,
+                            db.ForeignKey('users.uuid'))
 
 
 class LoggedActivity(Base):
