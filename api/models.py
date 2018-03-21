@@ -158,7 +158,7 @@ class Society(Base):
 class ActivityType(Base):
     """Models activity types."""
 
-    __tablename__ = 'activitiyTypes'
+    __tablename__ = 'activityTypes'
     value = db.Column(db.Integer)
 
     activity_id = db.Column(db.String, db.ForeignKey('activities.uuid'))

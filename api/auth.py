@@ -80,7 +80,6 @@ def token_required(f):
                     uuid=uuid, name=name, email=email, photo=photo
                 )
 
-                user.society = random.choice(Society.query.all())
                 user.save()
 
             # set current user in flask global variable, g
