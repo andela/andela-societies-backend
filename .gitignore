@@ -5,6 +5,11 @@ __pycache__/
 
 migrations/
 
+Mac generated files
+*.DS_Store
+
+
+
 # C extensions
 *.so
 
@@ -103,6 +108,8 @@ ENV/
 .mypy_cache/
 
 .vscode/
+
+# Databases(SQLite)
 *.sqlite
 
 migrations/*
