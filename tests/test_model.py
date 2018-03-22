@@ -1,7 +1,7 @@
 """Models TestSuite."""
 
 from api.models import (Activity, ActivityType, Cohort, Country,
-                        LoggedActivity, Society, User)
+                        LoggedActivity, Society, User, Role)
 from tests.base_test import BaseTestCase
 
 
@@ -62,6 +62,13 @@ class UserTestCase(BaseTestCase):
 
         self.assertEqual(self.js_meet_up, user_activity)
 
+    def test_payload_has_null_values(self):
+        new_user = User(email=None,
+                        name=None,
+                        uuid="-Ksomeid")
+
+        self.assertFalse(new_user.save())
+
 
 class SocietyTestCase(BaseTestCase):
     """Test Society model."""
@@ -115,22 +122,20 @@ class SocietyTestCase(BaseTestCase):
             [self.phoenix, self.istelle,  self.sparks, self.invictus])
 
     def test_save_null_values(self):
-        """ Test for false return if society name is null """
+        """Test for false return if society name is null."""
         test_society = Society(name=None)
-
         self.assertFalse(test_society.save())
 
     def test_delete_existing_society(self):
-        """ Test if society has been deleted successfully """
+        """Test if society has been deleted successfully."""
         self.invictus.save()
-
         self.assertTrue(self.invictus.delete())
 
     def test_delete_nonexistent_society(self):
-        """ Test for false return if nonexistent society is deleted """
+        """Test for false return if nonexistent society is deleted."""
         test_society = Society(name="Persia")
-        
         self.assertFalse(test_society.delete())
+
 
 class ActivityTestCase(BaseTestCase):
     """Test Activity model."""
@@ -206,3 +211,13 @@ class CountryTestCase(BaseTestCase):
         self.uganda = Country(name='Uganda')
 
         self.assertTrue(self.uganda.save())
+
+
+class RoleTestCase(BaseTestCase):
+    """Test suite for Role Model."""
+
+    def test_create_role(self):
+        self.success_ops = Role(uuid="-KkLwgbeJUO0dQKsEk1i",
+                                name="Success Ops")
+
+        self.assertTrue(self.success_ops.save())

@@ -2,18 +2,17 @@
 from flask import jsonify, request
 from flask_restplus import Resource
 
-from api.auth import token_required
+from api.utils.auth import (token_required, roles_required)
 from api.models import Activity
 
 
 class ActivitiesAPI(Resource):
-    """Activity Resource to contain
-    CRUD endpoints for activities"""
+    """Activity Resource to contain CRUD endpoints for activities."""
 
     @token_required
+    @roles_required(["Fellow"])
     def post(self):
-        """ Create an activity """
-
+        """Create an activity."""
         payload = request.get_json()
 
         if not payload:

@@ -3,8 +3,8 @@ Sample Data for Initial Run.
 
 This contains the sample initial data required for the test run of the system.
 """
-from .models import (ActivityType, Activity, Country, LoggedActivity, Society,
-                     User)
+from api.models import (ActivityType, Activity, Country, LoggedActivity,
+                        Society, User, Role)
 
 # activity types
 interview = ActivityType(name="Bootcamp Interviews",
@@ -49,7 +49,7 @@ outside_mentoring = ActivityType(name="External Mentoring",
                                  " Andela e.g. via SheLovesCode",
                                  value=250)
 
-# socities
+# societies
 phoenix = Society(name="Phoenix")
 istelle = Society(name="iStelle")
 sparks = Society(name="Sparks")
@@ -58,16 +58,25 @@ invictus = Society(name="Invictus")
 # test countries
 kenya = Country(name='Kenya')
 
+# roles available
+role = [Role(uuid="-KXGy1EB1oimjQgFim6F", name="Success"),
+        Role(uuid="-KXGy1EB1oimjQgFim6L", name="Finance"),
+        Role(uuid="-KXGy1EB1oimjQgFim6C", name="Fellow"),
+        Role(uuid="-KkLwgbeJUO0dQKsEk1i", name="Success Ops"),
+        Role(uuid="-KiihfZoseQeqC6bWTau", name="Andelan")]
+
 # test user
 user = User(
     uuid="-KdQsMt2U0ixIy_-yJEH",
-    name="Larry Wachira",
+    name="Test User",
     photo="https://lh6.googleusercontent.com/-1DhBLOJentg/AAAAAAAAA"
           "AI/AAAAAAAAABc/ImM13eP_cAI/photo.jpg?sz=50",
     email="lawrence.wachira@andela.com",
     country=kenya,
     society=phoenix
     )
+user.roles.append(role[2])
+
 
 # test activities
 python_blog = Activity(name="TDD For The Lazy Programmer", activity_type=blog)

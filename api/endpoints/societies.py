@@ -1,6 +1,7 @@
 from flask import g, jsonify, request, current_app, url_for
 from flask_restplus import Resource
 
+from api.utils.auth import token_required
 from ..models import Society
 
 
@@ -38,6 +39,7 @@ class SocietyResource(Resource):
             response.status_code = 201
             return response
 
+    @token_required
     def get(self, society_id=None):
         if society_id:
             society = Society.query.get(society_id)

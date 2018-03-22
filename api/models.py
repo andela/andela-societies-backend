@@ -3,6 +3,7 @@ import uuid
 from datetime import datetime
 
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.exc import SQLAlchemyError
 
 db = SQLAlchemy()
 
@@ -27,6 +28,14 @@ user_activity = db.Table('user_activity',
                          db.Column('activity_uuid', db.String,
                                    db.ForeignKey('activities.uuid'),
                                    nullable=False))
+
+user_role = db.Table('user_role',
+                     db.Column('user_uuid', db.String,
+                               db.ForeignKey('users.uuid'), nullable=False
+                               ),
+                     db.Column('role_uuid', db.String,
+                               db.ForeignKey('roles.uuid'),
+                               nullable=False))
 
 
 class Base(db.Model):
@@ -54,15 +63,13 @@ class Base(db.Model):
         Returns:
             saved(boolean) true if saved, false otherwise
         """
-        saved = None
         try:
             db.session.add(self)
             db.session.commit()
-            saved = True
-        except Exception:
-            saved = False
+            return True
+        except SQLAlchemyError:
             db.session.rollback()
-        return saved
+            return False
 
     def delete(self):
         """Delete the object in DB.
@@ -117,8 +124,8 @@ class User(Base):
     """Models Users."""
 
     __tablename__ = 'users'
-    email = db.Column(db.String)
-    role = db.Column(db.String, default="member")
+    name = db.Column(db.String, nullable=False)
+    email = db.Column(db.String, nullable=False, unique=True)
 
     society_id = db.Column(db.String, db.ForeignKey('societies.uuid'))
     country_id = db.Column(db.String, db.ForeignKey('countries.uuid'))
@@ -131,6 +138,14 @@ class User(Base):
                                  secondary='user_activity',
                                  lazy='dynamic',
                                  backref='participants')
+    roles = db.relationship('Role', secondary='user_role', backref='user')
+
+
+class Role(Base):
+    """Models Roles to which all Andelans have."""
+
+    __tablename__ = 'roles'
+    users = db.relationship('User', secondary='user_role', backref='role')
 
 
 class Society(Base):
