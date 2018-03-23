@@ -2,7 +2,6 @@
 import os
 
 from api.endpoints.activities import ActivitiesAPI
-from api.endpoints.point import PointResource
 from api.endpoints.societies import SocietyResource
 from api.endpoints.users import UserAPI
 from api.models import db
@@ -69,11 +68,6 @@ def create_app(environment="Development"):
         "/api/v1/societies/<string:society_id>/",
         endpoint="society_detail"
     )
-
-    # points endpoints
-    api.add_resource(
-        PointResource, '/api/v1/points', '/api/v1/points/',
-        endpoint="point")
 
     # handle default 404 exceptions with a custom response
     @app.errorhandler(404)

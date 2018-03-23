@@ -3,7 +3,8 @@
 import datetime
 from unittest import TestCase
 
-from api.models import Activity, Point, Society, User, db
+from api.models import (Activity, ActivityType, Cohort, Country,
+                        LoggedActivity, Society, User, db)
 from app import create_app
 from jose import jwt
 
@@ -43,46 +44,55 @@ class BaseTestCase(TestCase):
             "Authorization": self.generate_token(self.test_payload)
         }
 
-        # mock user
-        self.member = User(email="someonecool.andela.com",
-                           name="thecoolest",
-                           uuid="-Ksomeid",
-                           role="member",
-                           country="ke/ug/niger/ny/sa/tz/rw")
+        # test countries
+        self.kenya = Country(name='Kenya')
+        self.uganda = Country(name='Uganda')
+        self.nigeria = Country(name='Nigeria')
 
-        self.admin = User(email="coolAdmin.andela.com",
-                          name="thecoolestAdmin",
-                          uuid="-KsomeidAdmin",
-                          role="admin",
-                          country="ke/ug/niger/ny/sa/tz/rw")
+        # test societies
+        self.phoenix = Society(name="Phoenix")
+        self.istelle = Society(name="iStelle")
+        self.sparks = Society(name="Sparks")
+        self.invictus = Society(name="Invictus")
 
-        # mock societies
-        self.istelle = Society(name="istelle",
-                               photo="url/imgae",
-                               logo="url/image",
-                               color_scheme="#00ff4567")
+        # test cohorts
+        self.cohort_12_Ke = Cohort(name="cohort-12", country=self.kenya)
+        self.cohort_12_Ug = Cohort(name="cohort-12", country=self.uganda)
+        self.cohort_1_Nig = Cohort(name="cohort-1", country=self.nigeria)
 
-        self.sparks = Society(name="sparks",
-                              photo="url/imgae",
-                              logo="url/image",
-                              color_scheme="#00ff4567")
+        # test Users
+        self.test_user = User(
+            uuid="-KdQsMt2U0ixIy_-yWTSZ",
+            name="Test User",
+            photo="https://lh6.googleusercontent.com/-1DhBLOJentg/AAAAAAAAA"
+                  "AI/AAAAAAAAABc/ImM13eP_cAI/photo.jpg?sz=50",
+            email="test.user@andela.com",
+            country=self.nigeria,
+            cohort=self.cohort_1_Nig,
+            society=self.phoenix)
 
-        self.phenix = Society(name="phenix",
-                              photo="url/imgae",
-                              logo="url/image",
-                              color_scheme="#00ff4567")
-        self.phenix.save()
+        # test ActivityType
+        self.hackathon = ActivityType(name="Hackathon",
+                                      description="A Hackathon",
+                                      value=100)
+        self.tech_event = ActivityType(name="Tech Event",
+                                       description="Organize a tech event",
+                                       value=2500)
 
-        # mock points
-        self.point = Point(value=2500,
-                           name="interview-2017-sep-23rd")
+        # test Activity
+        self.alibaba_ai_challenge = Activity(name='Fashion challenge',
+                                             activity_type=self.hackathon)
+        self.js_meet_up = Activity(name='Nairobi Js meetup',
+                                   activity_type=self.tech_event)
 
-        # mock interview
-        self.activity = Activity(
-            name="Interview",
-            value=50,
-            description="members earn 50 points per activity",
-            photo="cool/icon/url")
+        # test LoggedActivity
+        self.log_alibaba_challenge = LoggedActivity(
+            name="my logged activity",
+            description="Participated in this event",
+            value=2500,
+            user=self.test_user,
+            activity=self.alibaba_ai_challenge,
+            society=self.phoenix)
 
     @staticmethod
     def generate_token(payload):

@@ -9,7 +9,7 @@ from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager, Shell, prompt_bool
 
 from api.initial_data import all_data
-from api.models import Activity, Point, Society, User, db
+from api.models import Activity, Society, User, db
 from app import create_app
 
 app = create_app(environment=os.environ.get('APP_SETTINGS', "Development"))
@@ -61,8 +61,7 @@ def shell():
                 db=db,
                 User=User,
                 Society=Society,
-                Activity=Activity,
-                Point=Point)
+                Activity=Activity)
 
 
 manager.add_command("shell", Shell(make_context=shell))
@@ -86,7 +85,7 @@ COV.start()
 @manager.command
 def test():
     """Run tests with coverage."""
-    tests_failed = pytest.main(['-x', 'tests'])
+    tests_failed = pytest.main(['-x', '-v', 'tests'])
     if not tests_failed:
         COV.stop()
         COV.save()
