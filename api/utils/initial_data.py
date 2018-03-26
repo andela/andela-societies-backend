@@ -3,7 +3,7 @@ Sample Data for Initial Run.
 
 This contains the sample initial data required for the test run of the system.
 """
-from .models import (ActivityType, Activity, Country, LoggedActivity, Society,
+from api.models import (ActivityType, Activity, Country, LoggedActivity, Society,
                      User)
 
 # activity types
@@ -49,7 +49,7 @@ outside_mentoring = ActivityType(name="External Mentoring",
                                  " Andela e.g. via SheLovesCode",
                                  value=250)
 
-# socities
+# societies
 phoenix = Society(name="Phoenix")
 istelle = Society(name="iStelle")
 sparks = Society(name="Sparks")
@@ -61,7 +61,7 @@ kenya = Country(name='Kenya')
 # test user
 user = User(
     uuid="-KdQsMt2U0ixIy_-yJEH",
-    name="Larry Wachira",
+    name="Test User",
     photo="https://lh6.googleusercontent.com/-1DhBLOJentg/AAAAAAAAA"
           "AI/AAAAAAAAABc/ImM13eP_cAI/photo.jpg?sz=50",
     email="lawrence.wachira@andela.com",

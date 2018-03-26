@@ -21,6 +21,7 @@ class Config(object):
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
     PAGE_LIMIT = 10
     DEFAULT_PAGE = 1
+    PUBLIC_KEY=os.environ.get('PUBLIC_KEY')
 
 
 class Development(Config):
@@ -33,6 +34,7 @@ class Development(Config):
     SQLALCHEMY_TRACK_MODIFICATIONS = True
 
 
+
 class Testing(Config):
     """Model Testing enviroment config object."""
 
@@ -41,6 +43,7 @@ class Testing(Config):
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     SQLALCHEMY_DATABASE_URI = os.environ.get('TEST_DATABASE') or \
         "sqlite:///" + Config.BASE_DIR + "/tests/test_db.sqlite"
+    PUBLIC_KEY=os.environ.get('PUBLIC_KEY_TEST')
 
 
 class Staging(Development):

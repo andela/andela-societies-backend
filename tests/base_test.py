@@ -1,6 +1,9 @@
 """Module to house setup, teardown and utility class for testing."""
 
+
+import os
 import datetime
+import base64
 from unittest import TestCase
 
 from api.models import (Activity, ActivityType, Cohort, Country,
@@ -29,6 +32,36 @@ class BaseTestCase(TestCase):
         "exp": exp_date + datetime.timedelta(days=1)
     }
 
+    expired_payload = {
+        "UserInfo": {
+            "email": "test.test@andela.com",
+            "first_name": "test",
+            "id": "-Ktest_id",
+            "last_name": "test",
+            "name": "test test",
+            "picture": "https://www.link.com",
+            "roles": {
+                    "Andelan": "-Ktest_andelan_id",
+                    "Fellow": "-Ktest_fellow_id"
+            }
+        },
+        "exp": exp_date + datetime.timedelta(seconds=1)
+    }
+
+    incomplete_payload = {
+        "UserInfo": {
+            "first_name": "test",
+            "last_name": "test",
+            "name": "test test",
+            "picture": "https://www.link.com",
+            "roles": {
+                    "Andelan": "-Ktest_andelan_id",
+                    "Fellow": "-Ktest_fellow_id"
+            }
+        },
+        "exp": exp_date + datetime.timedelta(days=1)
+    }
+
     def setUp(self):
         """Setup function to configure test enviroment."""
         self.app = create_app("Testing")
@@ -42,6 +75,11 @@ class BaseTestCase(TestCase):
 
         self.header = {
             "Authorization": self.generate_token(self.test_payload)
+        }
+        self.bad_token_header = {
+            "Authorization": self.generate_token(
+                {"I don't know": "what to put here"}
+            )
         }
 
         # test countries
@@ -97,7 +135,9 @@ class BaseTestCase(TestCase):
     @staticmethod
     def generate_token(payload):
         """Generate token."""
-        token = jwt.encode(payload, "secret", algorithm="HS256")
+        env_key = os.environ['PRIVATE_KEY_TEST']
+        decoded_key = base64.b64decode(env_key).decode("utf-8")
+        token = jwt.encode(payload, decoded_key, algorithm="RS256")
         return token
 
     def tearDown(self):

@@ -8,7 +8,7 @@ import pytest
 from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager, Shell, prompt_bool
 
-from api.initial_data import all_data
+from api.utils.initial_data import all_data
 from api.models import Activity, Society, User, db
 from app import create_app
 
@@ -57,7 +57,7 @@ def seed():
 
 def shell():
     """Make a shell/REPL context available."""
-    return dict(app=create_app(),
+    return dict(app=app,
                 db=db,
                 User=User,
                 Society=Society,

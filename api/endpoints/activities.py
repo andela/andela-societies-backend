@@ -2,8 +2,8 @@
 from flask import jsonify
 from flask_restplus import Resource
 
-from ..auth import token_required
-from ..models import Activity
+from api.utils.auth import token_required
+from api.models import Activity
 
 
 class ActivitiesAPI(Resource):

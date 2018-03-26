@@ -62,6 +62,14 @@ class UserTestCase(BaseTestCase):
 
         self.assertEqual(self.js_meet_up, user_activity)
 
+    def test_payload_has_null_values(self):
+        new_user = User(email=None,
+                        name=None,
+                        uuid="-Ksomeid",
+                        role="member")
+
+        self.assertFalse(new_user.save())
+
 
 class SocietyTestCase(BaseTestCase):
     """Test Society model."""
