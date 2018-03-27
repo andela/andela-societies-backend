@@ -1,11 +1,9 @@
 [![CircleCI](https://circleci.com/gh/AndelaOSP/andela-societies-backend.svg?style=svg)](https://circleci.com/gh/AndelaOSP/andela-societies-backend)
-
 [![Maintainability](https://api.codeclimate.com/v1/badges/f5db32ea8acc28bd7790/maintainability)](https://codeclimate.com/github/AndelaOSP/andela-societies-backend/maintainability)
-
 [![Coverage Status](https://coveralls.io/repos/github/AndelaOSP/andela-societies-backend/badge.svg?branch=setup-circle-ci)](https://coveralls.io/github/AndelaOSP/andela-societies-backend?branch=setup-circle-ci)
 
-# Society-platform ✍
-API for an Andela Societies.
+# Andela Societies ✍
+API for the Andela Societies Webapp Project.
 
 ```Insert Description here```
 
