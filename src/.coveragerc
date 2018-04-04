@@ -1,9 +1,19 @@
+[run]
+omit =
+    */tests/*
+    manage.py
+    */.virtualenvs/*
+    */venv/*
+    config.py
+    */site-packages/*
+
 [report]
 omit =
- */python?.?/*
- */site-packages/*
- */venv/*
- */tests/*
- */migrations/*
- */.virtualenvs/*
- config.py
+    */python?.?/*
+    */site-packages/*
+    */venv/*
+    */tests/*
+    */migrations/*
+    */.virtualenvs/*
+    config.py
+    manage.py

@@ -124,9 +124,10 @@ class User(Base):
     country_id = db.Column(db.String, db.ForeignKey('countries.uuid'))
     cohort_id = db.Column(db.String, db.ForeignKey('cohorts.uuid'))
 
-    logged_activities = db.relationship('LoggedActivity',
-                                        backref='user',
-                                        lazy='dynamic')
+    logged_activities = db.relationship(
+        'LoggedActivity', backref='user', lazy = 'dynamic',
+        order_by = 'desc(LoggedActivity.created_at)'
+    )
 
     created_activities = db.relationship('Activity',
                                          backref='added_by',
@@ -147,7 +148,8 @@ class Society(Base):
     _total_points = db.Column(db.Integer, default=0)
 
     members = db.relationship('User', backref='society', lazy='dynamic')
-    logged_activities = db.relationship('LoggedActivity', backref='society')
+    logged_activities = db.relationship('LoggedActivity', backref='society',
+                                        lazy='dynamic')
 
     @property
     def total_points(self):
@@ -185,11 +187,19 @@ class LoggedActivity(Base):
     __tablename__ = 'logged_activities'
     value = db.Column(db.Integer, nullable=False)
     status = db.Column(db.String, default='pending')
-    approver_id = db.Column(db.String)
     approved_at = db.Column(db.DateTime)
+    activity_date = db.Column(db.Date)
+    redeemed = db.Column(db.Boolean, nullable=False, default=False)
 
-    user_id = db.Column(db.String, db.ForeignKey('users.uuid'))
-    society_id = db.Column(db.String, db.ForeignKey('societies.uuid'))
+    approver_id = db.Column(db.String)
+    activity_type_id = db.Column(
+        db.String, db.ForeignKey('activity_types.uuid'), nullable=False
+    )
+    user_id = db.Column(db.String, db.ForeignKey('users.uuid'), nullable=False)
+    society_id = db.Column(
+        db.String, db.ForeignKey('societies.uuid'), nullable=False,
+    )
     activity_id = db.Column(db.String, db.ForeignKey('activities.uuid'))
 
     activity = db.relationship('Activity', uselist=False)
+    activity_type = db.relationship('ActivityType', uselist=False)
