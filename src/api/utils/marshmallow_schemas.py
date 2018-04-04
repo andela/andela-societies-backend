@@ -8,8 +8,8 @@ from api.models import User, Activity, ActivityType
 class BaseSchema(Schema):
     """Creates a base validation schema."""
 
-    uuid = fields.String(dump_only=True, validate=[
-        validate.Length(max=36)])
+    uuid = fields.String(dump_only=True, dump_to='id',
+                         validate=[validate.Length(max=36)])
     name = fields.String(
         required=True,
         error_messages={
@@ -41,16 +41,18 @@ class ActivityTypesSchema(BaseSchema):
 class LoggedActivitySchema(BaseSchema):
     """Creates a validation schema for logged activities."""
 
-    status = fields.String(dump_only=True)
-    value = fields.Integer(
-        required=True,
-        error_messages={
-            'required': 'Please send the activity points value'
-        }
-    )
-    user = fields.String(dump_only=True, attribute='user.name')
-    society = fields.String(dump_only=True, attribute='society.name')
-    approved_by = fields.Method('get_approver', dump_only=True)
+    status = fields.String()
+    points = fields.Integer(attribute='value')
+    date = fields.Date(attribute='activity_date')
+    user = fields.String(attribute='user.name')
+    activity_id = fields.String()
+    activity = fields.String(attribute='activity.name')
+    category = fields.String(attribute='activity_type.name')
+    redeemed = fields.Boolean()
+    activity_type_id = fields.String()
+    society_id = fields.String()
+    society = fields.String(attribute='society.name')
+    approved_by = fields.Method('get_approver')
 
     @staticmethod
     def get_approver(obj):
@@ -115,6 +117,8 @@ class ActivitySchema(BaseSchema):
             return value
 
 
-get_activity_types_schema = ActivityTypesSchema(many=True)
-get_logged_activities_schema = LoggedActivitySchema(many=True)
+activity_types_schema = ActivityTypesSchema(many=True)
+user_logged_activities_schema = LoggedActivitySchema(
+    many=True, exclude=('society', 'society_id')
+)
 activity_schema = ActivitySchema()

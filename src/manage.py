@@ -68,32 +68,34 @@ manager.add_command("shell", Shell(make_context=shell))
 manager.add_command("db", MigrateCommand)
 
 
-# Testing vonfigurations
-COV = coverage.coverage(
-    branch=True,
-    omit=[
-        '*/tests/*',
-        'manage.py',
-        '*/.virtualenvs/*',
-        '*/venv/*',
-        'config.py'
-    ]
-)
-COV.start()
-
-
 @manager.command
 def test():
     """Run tests with coverage."""
-    tests_failed = pytest.main(['-x', '-v', 'tests'])
+    # Testing configurations
+    COV = coverage.coverage(
+        branch=True,
+        omit=[
+            '*/tests/*',
+            'manage.py',
+            '*/.virtualenvs/*',
+            '*/venv/*',
+            'config.py',
+            '*/site-packages/*'
+        ]
+    )
+    COV.start()
+
+    tests_failed = pytest.main(['-x', '-v', '-s', 'tests'])
+    COV.save()
     if not tests_failed:
-        COV.stop()
-        COV.save()
         print('Coverage Summary: .')
         COV.report()
         COV.html_report()
+        COV.stop()
         COV.erase()
         return 0
+    COV.stop()
+    COV.erase()
     return 1
 
 

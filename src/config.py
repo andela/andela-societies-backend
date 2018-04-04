@@ -21,7 +21,7 @@ class Config(object):
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
     PAGE_LIMIT = 10
     DEFAULT_PAGE = 1
-    PUBLIC_KEY=os.environ.get('PUBLIC_KEY')
+    PUBLIC_KEY = os.environ.get('PUBLIC_KEY')
 
 
 class Development(Config):

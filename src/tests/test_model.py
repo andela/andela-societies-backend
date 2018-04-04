@@ -120,7 +120,7 @@ class SocietyTestCase(BaseTestCase):
 
         self.assertListEqual(
             societies,
-            [self.phoenix, self.istelle,  self.sparks, self.invictus])
+            [self.phoenix, self.sparks, self.istelle, self.invictus])
 
     def test_save_null_values(self):
         """Test for false return if society name is null."""
@@ -178,7 +178,9 @@ class LoggedActivityTestCase(BaseTestCase):
             value=2500,
             user=self.test_user,
             activity=self.alibaba_ai_challenge,
-            society=self.phoenix)
+            society=self.phoenix,
+            activity_type=self.hackathon
+        )
 
         self.assertTrue(log_alibaba_challenge.save())
 
@@ -194,7 +196,8 @@ class LoggedActivityTestCase(BaseTestCase):
         self.log_alibaba_challenge.save()
 
         self.assertListEqual(
-            self.phoenix.logged_activities, [self.log_alibaba_challenge])
+            self.phoenix.logged_activities.all(), [self.log_alibaba_challenge]
+        )
 
 
 class CohortTestCase(BaseTestCase):

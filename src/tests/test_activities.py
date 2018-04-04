@@ -177,4 +177,3 @@ class ActivitiesTestCase(BaseTestCase):
         activity_type_id = activity_type.uuid
 
         return activity_type_id
-
