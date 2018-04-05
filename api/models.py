@@ -116,7 +116,7 @@ class User(Base):
     """Models Users."""
 
     __tablename__ = 'users'
-    name= db.Column(db.String, nullable=False)
+    name = db.Column(db.String, nullable=False)
     email = db.Column(db.String, nullable=False, unique=True)
     role = db.Column(db.String, default="member")
 
@@ -158,25 +158,24 @@ class Society(Base):
 class ActivityType(Base):
     """Models activity types."""
 
-    __tablename__ = 'activitiyTypes'
+    __tablename__ = 'activity_types'
     value = db.Column(db.Integer)
 
-    activity_id = db.Column(db.String, db.ForeignKey('activities.uuid'))
+    activities = db.relationship('Activity', backref='activity_type')
 
 
 class Activity(Base):
     """Model activities available for points."""
 
     __tablename__ = 'activities'
-    activity_type = db.relationship('ActivityType',
-                                    backref='activities',
-                                    uselist=False)
+    activity_type_id = db.Column(db.String,
+                                 db.ForeignKey('activity_types.uuid'))
 
 
 class LoggedActivity(Base):
     """Models Activities logged by fellows."""
 
-    __tablename__ = 'loggedActivities'
+    __tablename__ = 'logged_activities'
     value = db.Column(db.Integer, nullable=False)
     status = db.Column(db.String, default='pending')
     approver_id = db.Column(db.String)
