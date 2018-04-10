@@ -19,9 +19,9 @@ class ActivitiesTestCase(BaseTestCase):
         """Test that an activity has been created successfully."""
         new_activity = dict(name="tech congress",
                             description="all about tech",
-                            activity_type_id=self.get_activity_type_id(
+                            activityTypeId=self.get_activity_type_id(
                                 "Tech Event"),
-                            activity_date='2020-11-20')
+                            activityDate='2020-11-20')
 
         response = self.client.post('/api/v1/activities',
                                     data=json.dumps(new_activity),
@@ -38,9 +38,9 @@ class ActivitiesTestCase(BaseTestCase):
     def test_description_not_given(self):
         """Test for where description isn't provided in request object."""
         new_activity = dict(name="hackathon",
-                            activity_type_id=self.get_activity_type_id(
+                            activityTypeId=self.get_activity_type_id(
                                 "Tech Event"),
-                            activity_date='2020-11-20')
+                            activityDate='2020-11-20')
 
         response = self.client.post('/api/v1/activities',
                                     data=json.dumps(new_activity),
@@ -58,7 +58,7 @@ class ActivitiesTestCase(BaseTestCase):
     def test_name_not_given(self):
         """Test for where name is not provided in request object."""
         new_activity = dict(description="all about tech",
-                            activity_date='2020-11-20')
+                            activityDate='2020-11-20')
 
         response = self.client.post('/api/v1/activities',
                                     data=json.dumps(new_activity),
@@ -81,9 +81,9 @@ class ActivitiesTestCase(BaseTestCase):
         existing_activity = dict(
             name="Nairobi Js meetup",
             description="all about js",
-            activity_type_id=self.get_activity_type_id(
+            activityTypeId=self.get_activity_type_id(
                 "Tech Event"),
-            activity_date='2020-11-20')
+            activityDate='2020-11-20')
 
         # attempt to save the already existing activity
         response = self.client.post('/api/v1/activities',
@@ -102,9 +102,9 @@ class ActivitiesTestCase(BaseTestCase):
         """Test if activity type does not exist."""
         new_activity = dict(name="Tech Festival",
                             description="learn new things in tech",
-                            activity_type_id=(
+                            activityTypeId=(
                                 "da6321920@#$$911e8691232c4b301d34123"),
-                            activity_date="2020-11-20")
+                            activityDate="2020-11-20")
 
         response = self.client.post('/api/v1/activities',
                                     data=json.dumps(new_activity),
@@ -121,7 +121,7 @@ class ActivitiesTestCase(BaseTestCase):
         """Test of activity date is not provided."""
         new_activity = dict(name="tech congress",
                             description="all about tech",
-                            activity_type_id=self.get_activity_type_id(
+                            activityTypeId=self.get_activity_type_id(
                                 "Tech Event"))
 
         response = self.client.post('/api/v1/activities',
@@ -135,15 +135,15 @@ class ActivitiesTestCase(BaseTestCase):
         self.assertEqual(response.status_code, 400)
 
 
-        self.assertEqual(message, response_details["activity_date"]["message"])
+        self.assertEqual(message, response_details["activityDate"]["message"])
 
     def test_past_activity_date(self):
         """Test if activity date given is in the past."""
         new_activity = dict(name="tech congress",
                             description="all about tech",
-                            activity_type_id=self.get_activity_type_id(
+                            activityTypeId=self.get_activity_type_id(
                                 "Tech Event"),
-                            activity_date="2016-1-20")
+                            activityDate="2016-1-20")
 
         response = self.client.post('/api/v1/activities',
                                     data=json.dumps(new_activity),
@@ -161,9 +161,9 @@ class ActivitiesTestCase(BaseTestCase):
         """Test if the activity name given is a valid activity."""
         new_activity = dict(name="Open Source App",
                             description="open source project",
-                            activity_type_id=self.get_activity_type_id(
+                            activityTypeId=self.get_activity_type_id(
                                 "Tech Event"),
-                            activity_date="2020-1-20")
+                            activityDate="2020-1-20")
 
         response = self.client.post('/api/v1/activities',
                                     data=json.dumps(new_activity),
