@@ -31,7 +31,7 @@ class ActivitiesAPI(Resource):
                                 )
             activity.save()
 
-            response = jsonify({'message': 'Activity created succesfully.',
+            response = jsonify({'message': 'Activity created successfully.',
                                 'data': result})
             response.status_code = 201
 

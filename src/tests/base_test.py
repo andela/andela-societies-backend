@@ -16,13 +16,29 @@ class BaseTestCase(TestCase):
     """Contain utility required for testing."""
 
     exp_date = datetime.datetime.utcnow()
-    test_payload = {
+    test_user_payload = {
         "UserInfo": {
-            "email": "test.test@andela.com",
-            "first_name": "test",
-            "id": "-Ktest_id",
-            "last_name": "test",
-            "name": "test test",
+            "email": "test.user.societies@andela.com",
+            "first_name": "Test",
+            "id": "-KdQsMt2U0ixIy_-yWTSZ",
+            "last_name": "User",
+            "name": "Test User",
+            "picture": "https://www.link.com",
+            "roles": {
+                    "Andelan": "-Ktest_andelan_id",
+                    "Fellow": "-Ktest_fellow_id"
+            }
+        },
+        "exp": exp_date + datetime.timedelta(days=1)
+    }
+
+    test_user2_payload = {
+        "UserInfo": {
+            "email": "test.user2.societies@andela.com",
+            "first_name": "Test",
+            "id": "-KdQsawesome_useridZ",
+            "last_name": "User2",
+            "name": "Test User2",
             "picture": "https://www.link.com",
             "roles": {
                     "Andelan": "-Ktest_andelan_id",
@@ -38,14 +54,14 @@ class BaseTestCase(TestCase):
             "first_name": "test",
             "id": "-Ktest_id",
             "last_name": "test",
-            "name": "test test",
+            "name": "Test User",
             "picture": "https://www.link.com",
             "roles": {
                     "Andelan": "-Ktest_andelan_id",
                     "Fellow": "-Ktest_fellow_id"
             }
         },
-        "exp": exp_date + datetime.timedelta(seconds=1)
+        "exp": exp_date - datetime.timedelta(days=1)
     }
 
     incomplete_payload = {
@@ -74,7 +90,8 @@ class BaseTestCase(TestCase):
         self.client = self.app.test_client()
 
         self.header = {
-            "Authorization": self.generate_token(self.test_payload)
+            "Authorization": self.generate_token(self.test_user_payload),
+            "Content-Type": "application/json"
         }
         self.bad_token_header = {
             "Authorization": self.generate_token(
@@ -98,26 +115,37 @@ class BaseTestCase(TestCase):
         self.cohort_12_Ug = Cohort(name="cohort-12", country=self.uganda)
         self.cohort_1_Nig = Cohort(name="cohort-1", country=self.nigeria)
 
-        # test Users
+        # test users
         self.test_user = User(
             uuid="-KdQsMt2U0ixIy_-yWTSZ",
             name="Test User",
-            photo="https://lh6.googleusercontent.com/-1DhBLOJentg/AAAAAAAAA"
-                  "AI/AAAAAAAAABc/ImM13eP_cAI/photo.jpg?sz=50",
-            email="test.user@andela.com",
+            photo="https://www.link.com",
+            email="test.user.societies@andela.com",
             country=self.nigeria,
             cohort=self.cohort_1_Nig,
             society = self.phoenix)
 
         self.test_user_2 = User(
             uuid="-KdQsawesome_useridZ",
-            name="Test User 2",
+            name="Test User2",
+            photo="https://www.link.com",
+            email="test.user2.societies@andela.com",
+            country=self.uganda,
+            cohort=self.cohort_12_Ug,
+            society=self.sparks
+        )
+
+        self.president = User(
+            uuid="-KdQsMtixG4U0y_-yJEH",
+            name="Test President",
             photo="https://lh6.googleusercontent.com/-1DhBLOJentg/AAAAAAAAA"
-                  "AI/AAAAAAAAABc/ImM13eP_cAI/photo.jpg?sz=50",
-            email="test.user2@andela.com",
-            country=self.nigeria,
+                "AI/AAAAAAnAABc/ImeP_cAI/photo.jpg?sz=50",
+            email="test.president.societies@andela.com",
+            role="president",
+            country=self.kenya,
             cohort=self.cohort_12_Ke,
-            society=self.sparks)
+            society=self.phoenix
+        )
 
         # test ActivityType
         self.hackathon = ActivityType(name="Hackathon",
@@ -126,13 +154,32 @@ class BaseTestCase(TestCase):
         self.tech_event = ActivityType(name="Tech Event",
                                        description="Organize a tech event",
                                        value=2500)
-        self.tech_event.save()
+        self.interview = ActivityType(
+            name="Bootcamp Interviews",
+            description="Interviewing candidate for a fellow"
+            " recruiting event",
+            value=20
+        )
 
         # test Activity
-        self.alibaba_ai_challenge = Activity(name='Fashion challenge',
-                                             activity_type=self.hackathon)
-        self.js_meet_up = Activity(name='Nairobi Js meetup',
-                                   activity_type=self.tech_event)
+        self.alibaba_ai_challenge = Activity(
+            name='Fashion challenge',
+            activity_type=self.hackathon,
+            activity_date = datetime.date.today() + datetime.timedelta(days=21),
+            added_by=self.president
+        )
+        self.js_meet_up = Activity(
+            name='Nairobi Js meetup',
+            activity_type=self.tech_event,
+            activity_date=datetime.date.today() + datetime.timedelta(days=14),
+            added_by=self.president
+        )
+        self.bootcamp_xiv = Activity(
+            name='Bootcamp XIV Interviews - Kenya',
+            activity_type=self.interview,
+            activity_date=datetime.date.today() + datetime.timedelta(days=14),
+            added_by=self.president
+        )
 
         # test LoggedActivity
         self.log_alibaba_challenge = LoggedActivity(
@@ -142,8 +189,13 @@ class BaseTestCase(TestCase):
             user=self.test_user,
             activity=self.alibaba_ai_challenge,
             society=self.phoenix,
-            activity_type=self.hackathon
+            activity_type = self.hackathon
         )
+
+        # save common items to db
+        self.tech_event.save()
+        self.interview.save()
+        self.test_user.save()
 
     @staticmethod
     def generate_token(payload):

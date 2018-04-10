@@ -1,4 +1,5 @@
 import json
+import datetime
 
 from.base_test import BaseTestCase
 from api.models import LoggedActivity
@@ -64,3 +65,331 @@ class LoggedActivitiesTestCase(BaseTestCase):
 
         self.assertEqual(response_content['message'], "User not found")
         self.assertEqual(response.status_code, 404)
+
+
+class LogActivityTestCase(BaseTestCase):
+    """Log activity test cases."""
+
+    def test_log_activity_using_activity_uuid_is_successful(self):
+        '''Test that logging an activity with activity uuid works'''
+        self.alibaba_ai_challenge.save()
+
+        payload = json.dumps(
+            dict(activityId=f'{self.alibaba_ai_challenge.uuid}')
+        )
+        response = self.client.post(
+            'api/v1/logged-activities',
+            headers=self.header, data=payload
+        )
+
+        # test that request was successful
+        self.assertEqual(response.status_code, 201)
+
+        # test response message
+        response_content = json.loads(response.get_data(as_text=True))
+        self.assertEqual(
+            response_content['message'], 'Activity logged successfully'
+        )
+
+    def test_log_activity_using_activity_type_uuid_is_successful(self):
+        '''Test that logging an activity with activity_type uuid works'''
+        self.hackathon.save()
+
+        payload = json.dumps(
+            dict(activityTypeId=f'{self.hackathon.uuid}')
+        )
+        response = self.client.post(
+            'api/v1/logged-activities',
+            headers=self.header, data=payload
+        )
+
+        # test that request was unsuccessful due to lacking fields
+        self.assertEqual(response.status_code, 400)
+
+        payload = json.dumps(
+            dict(
+                activityTypeId=f'{self.hackathon.uuid}',
+                date=str(datetime.date.today() - datetime.timedelta(days=5)),
+                description='Describing this activity here...'
+            )
+        )
+        response = self.client.post(
+            'api/v1/logged-activities',
+            headers=self.header, data=payload
+        )
+
+        # test that request is now successful
+        self.assertEqual(response.status_code, 201)
+
+    def test_log_interview_activity_requires_no_of_interviewees(self):
+        '''
+        Test that logging an interview activity fails
+        without the no_of_interviewees field
+        '''
+        # using activity_type_id
+        data = dict(
+            activityTypeId=f'{self.interview.uuid}',
+            date=str(datetime.date.today() - datetime.timedelta(days=5)),
+            description='Describing this activity here...'
+        )
+        payload = json.dumps(data)
+        response = self.client.post(
+            'api/v1/logged-activities',
+            headers=self.header, data=payload
+        )
+
+        # test that response status_code is 400
+        self.assertEqual(response.status_code, 400)
+
+        data['noOfInterviewees']=5
+        payload = json.dumps(data)
+        response = self.client.post(
+            'api/v1/logged-activities',
+            headers=self.header, data=payload
+        )
+
+        # test that request is now successful
+        self.assertEqual(response.status_code, 201)
+
+        # using activity_id
+        data = dict(
+            activityId=f'{self.bootcamp_xiv.uuid}',
+            description='Describing this activity here...'
+        )
+        payload = json.dumps(data)
+        response = self.client.post(
+            'api/v1/logged-activities',
+            headers=self.header, data=payload
+        )
+
+        # test that response status_code is 400
+        self.assertEqual(response.status_code, 400)
+
+        data['noOfInterviewees'] = 5
+        payload = json.dumps(data)
+        response = self.client.post(
+            'api/v1/logged-activities',
+            headers=self.header, data=payload
+        )
+
+        # test that request is now successful
+        self.assertEqual(response.status_code, 201)
+
+    def test_log_interview_activity_when_user_is_not_a_society_member(self):
+        '''
+        Test that logging an activity fails when user is not a society member
+        '''
+        payload = json.dumps(
+            dict(
+                activityTypeId=f'{self.hackathon.uuid}',
+                date=str(datetime.date.today() - datetime.timedelta(days=5)),
+                description='Describing this activity here...'
+            )
+        )
+        self.test_user.society = None
+        self.test_user.save()
+        response = self.client.post(
+            'api/v1/logged-activities',
+            headers=self.header, data=payload
+        )
+
+        # test that response status_code is 422
+        self.assertEqual(response.status_code, 422)
+
+        # check response message
+        message = 'You are not a member of any society yet'
+        self.assertEqual(
+            json.loads(response.get_data(as_text=True))['message'], message
+        )
+
+    def test_log_activity_with_invalid_activity_id(self):
+        '''
+        Test that logging an activity fails when an invalid activity id is used
+        '''
+        payload = json.dumps(dict(activityId='invalid_id_yo'))
+
+        response = self.client.post(
+            'api/v1/logged-activities',
+            headers=self.header, data=payload
+        )
+
+        # test that response status_code is 422
+        self.assertEqual(response.status_code, 422)
+
+    def test_log_activity_with_invalid_activity_type_id(self):
+        '''
+        Test that logging an activity fails when an invalid activity_type id is used
+        '''
+        payload = json.dumps(
+            dict(
+                activityTypeId='invalid_activity_type_id',
+                date=str(datetime.date.today() - datetime.timedelta(days=5)),
+                description='Describing this activity here...'
+            )
+        )
+        response = self.client.post(
+            'api/v1/logged-activities',
+            headers=self.header, data=payload
+        )
+
+        # test that response status_code is 422
+        self.assertEqual(response.status_code, 422)
+
+    def test_log_activity_with_invalid_activity_date(self):
+        '''
+        Test that logging an activity fails when an invalid date id is used
+        '''
+        payload = json.dumps(
+            dict(
+                activityTypeId='invalid_activity_type_id',
+                date=str(datetime.date.today() + datetime.timedelta(days=1)),
+                description='Describing this activity here...'
+            )
+        )
+        response = self.client.post(
+            'api/v1/logged-activities',
+            headers=self.header, data=payload
+        )
+
+        # test that response status_code is 422
+        self.assertEqual(response.status_code, 422)
+
+    def test_log_expired_activity(self):
+        '''
+        Test that logging an activity fails when an invalid date id is used
+        '''
+        payload = json.dumps(
+            dict(
+                activityTypeId=f'{self.hackathon.uuid}',
+                date=str(datetime.date.today() - datetime.timedelta(days=31)),
+                description='Describing this activity here...'
+            )
+        )
+        response = self.client.post(
+            'api/v1/logged-activities',
+            headers=self.header, data=payload
+        )
+
+        # test that response status_code is 422
+        self.assertEqual(response.status_code, 422)
+
+        self.assertEqual(
+            json.loads(response.get_data(as_text=True))['message'],
+            'You\'re late. That activity happened more than 30 days ago'
+        )
+
+
+class EditLoggedActivityTestCase(BaseTestCase):
+    '''Edit activity test cases'''
+
+    def setUp(self):
+        # inherit parent tests setUp
+        super().setUp()
+
+        # add tests logged activity and corresponding activity
+        self.alibaba_ai_challenge.save()
+        self.log_alibaba_challenge.save()
+        self.js_meet_up.save()
+
+        self.payload = dict(
+            description="Participated in that event",
+            activityId=self.js_meet_up.uuid
+        )
+
+    def test_edit_logged_activity_is_successful(self):
+        '''Test that editing a logged activity does not fail'''
+
+        response = self.client.put(
+            f'/api/v1/logged-activities/{self.log_alibaba_challenge.uuid}',
+            data=json.dumps(self.payload), headers=self.header
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        message = 'Activity edited successfully'
+        self.assertEqual(
+            json.loads(response.get_data(as_text=True))['message'], message
+        )
+
+        edited_activity = LoggedActivity.query.get(
+            self.log_alibaba_challenge.uuid
+        )
+        self.assertEqual(edited_activity.activity_id, self.js_meet_up.uuid)
+
+
+    def test_edit_logged_activity_by_non_owner_is_unsuccessful(self):
+        '''
+        Test that editing a logged activity that
+        doesn't belong to you fails
+        '''
+        self.header["Authorization"] = self.generate_token(
+            self.test_user2_payload
+        )
+
+        response = self.client.put(
+            f'/api/v1/logged-activities/{self.log_alibaba_challenge.uuid}',
+            data=json.dumps(self.payload), headers=self.header
+        )
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_edit_logged_activity_that_is_no_longer_pending(self):
+        '''
+        Test that editing a logged activity that has been approved or rejected
+        fails
+        '''
+        self.log_alibaba_challenge.status = 'approved'
+        self.alibaba_ai_challenge.save()
+
+        response = self.client.put(
+            f'/api/v1/logged-activities/{self.log_alibaba_challenge.uuid}',
+            data=json.dumps(self.payload), headers=self.header
+        )
+
+        self.assertEqual(response.status_code, 401)
+
+    def test_edit_logged_activity_parser_works(self):
+        '''
+        Test that during editing a logged activity, the marshamallow result parser
+        works the same way it does while logging an activity
+        '''
+        self.js_meet_up.activity_date = datetime.date.today() - \
+            datetime.timedelta(days=31)
+        self.js_meet_up.save()
+
+        response = self.client.put(
+            f'/api/v1/logged-activities/{self.log_alibaba_challenge.uuid}',
+            data=json.dumps(self.payload), headers=self.header
+        )
+
+        self.assertEqual(response.status_code, 422)
+        message = 'You\'re late. That activity happened more than 30 days ago'
+        self.assertEqual(
+            json.loads(response.get_data(as_text=True))['message'], message
+        )
+
+        self.payload['activityId'] = 'invalid_activity_id'
+        response = self.client.put(
+            f'/api/v1/logged-activities/{self.log_alibaba_challenge.uuid}',
+            data=json.dumps(self.payload), headers=self.header
+        )
+
+        self.assertEqual(response.status_code, 422)
+        message = 'Invalid activity id'
+        self.assertEqual(
+            json.loads(response.get_data(as_text=True))['message'], message
+        )
+
+    def test_edit_logged_activity_validation_works(self):
+        '''
+        Test that during editing a logged activity, validation via marshmallow
+        works the same way it does while logging an activity
+        '''
+        self.payload['activityTypeId'] = 'blah blah'
+
+        response = self.client.put(
+            f'/api/v1/logged-activities/{self.log_alibaba_challenge.uuid}',
+            data=json.dumps(self.payload), headers=self.header
+        )
+
+        self.assertEqual(response.status_code, 400)
