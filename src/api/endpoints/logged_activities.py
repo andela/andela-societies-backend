@@ -13,7 +13,7 @@ from api.utils.helpers import parse_log_activity_fields, ParsedResult
 
 
 class UserLoggedActivitiesAPI(Resource):
-    """Logged Activities Resources."""
+    """User Logged Activities Resources."""
     decorators = [token_required]
 
     def get(self, user_id):
@@ -129,3 +129,20 @@ class LoggedActivityAPI(Resource):
             data=single_logged_activity_schema.dump(logged_activity).data,
             message = 'Activity edited successfully'
         ), 200
+
+    def delete(self, logged_activity_id):
+        """Delete a logged activity."""
+        logged_activity = LoggedActivity.query.filter_by(
+            uuid=logged_activity_id,
+            user_id=g.current_user.uuid).one_or_none()
+
+        if not logged_activity:
+            response = jsonify(message='Logged Activity does not exist!')
+            response.status_code = 404
+        else:
+            logged_activity.delete()
+
+            response = jsonify()
+            response.status_code = 204
+
+        return response
