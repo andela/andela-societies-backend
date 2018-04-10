@@ -60,7 +60,7 @@ def create_app(environment="Development"):
         '/api/v1/activity-types/', endpoint='activity_types'
     )
 
-    # logged activities
+    # user logged activities
     api.add_resource(
         LoggedActivitiesAPI,
         '/api/v1/logged-activities', '/api/v1/logged-activities/',
@@ -80,6 +80,8 @@ def create_app(environment="Development"):
         '/api/v1/users/<string:user_id>/logged-activities',
         endpoint='user_logged_activities'
     )
+
+    # user endpoints
     api.add_resource(
         UserAPI, '/api/v1/user/profile', '/api/v1/user/profile/',
         endpoint='user_info'
