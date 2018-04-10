@@ -11,11 +11,11 @@ class UserTestCase(BaseTestCase):
     def test_create_user(self):
         """Test we can create user objects."""
         test_user = User(
-            uuid="-KdQsMt2U0ixIy_-yJEH",
-            name="Larry Wachira",
+            uuid="-KdQsMt4M0ixIy_-yWTSZ",
+            name="Test User",
             photo="https://lh6.googleusercontent.com/-1DhBLOJentg/AAAAAAAAA"
                   "AI/AAAAAAAAABc/ImM13eP_cAI/photo.jpg?sz=50",
-            email="lawrence.wachira@andela.com",
+            email="test.user@andela.com",
             country=self.kenya,
             cohort=self.cohort_12_Ke)
 
@@ -29,11 +29,11 @@ class UserTestCase(BaseTestCase):
 
     def get_all_users(self):
         test_user = User(
-            uuid="-KdQsMt2U0ixIy_-yJEH",
-            name="Larry Wachira",
+            uuid="-KdQsMt4M0ixIy_-yWTSZ",
+            name="Test User",
             photo="https://lh6.googleusercontent.com/-1DhBLOJentg/AAAAAAAAA"
                   "AI/AAAAAAAAABc/ImM13eP_cAI/photo.jpg?sz=50",
-            email="lawrence.wachira@andela.com",
+            email="test.user@andela.com",
             country=self.kenya,
             cohort=self.cohort_12_Ke)
 
@@ -42,7 +42,8 @@ class UserTestCase(BaseTestCase):
 
         users = User.query.all()
 
-        self.assertListEqual([test_user, self.test_user], users)
+        self.assertListEqual([test_user, self.test_user, self.president],
+                             users)
 
     def test_user_can_log_activity(self):
 
@@ -89,11 +90,11 @@ class SocietyTestCase(BaseTestCase):
 
     def test_get_all_members(self):
         test_user = User(
-            uuid="-KdQsMt2U0ixIy_-yJEH",
-            name="Larry Wachira",
+            uuid="-KdQsMt4M0ixIy_-yWTSZ",
+            name="Test User",
             photo="https://lh6.googleusercontent.com/-1DhBLOJentg/AAAAAAAAA"
                   "AI/AAAAAAAAABc/ImM13eP_cAI/photo.jpg?sz=50",
-            email="lawrence.wachira@andela.com",
+            email="test.user@andela.com",
             country=self.kenya,
             cohort=self.cohort_12_Ke)
 
@@ -101,7 +102,8 @@ class SocietyTestCase(BaseTestCase):
         self.phoenix.save()
 
         users = User.query.filter_by(society=self.phoenix).all()
-        self.assertListEqual(users, [self.test_user, test_user])
+        self.assertListEqual(users,
+                             [self.president, self.test_user, test_user])
 
     def test_get_society(self):
         self.phoenix.save()
@@ -120,7 +122,7 @@ class SocietyTestCase(BaseTestCase):
 
         self.assertListEqual(
             societies,
-            [self.phoenix, self.sparks, self.istelle, self.invictus])
+            [self.phoenix, self.istelle, self.sparks, self.invictus])
 
     def test_save_null_values(self):
         """Test for false return if society name is null."""

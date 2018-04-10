@@ -14,7 +14,6 @@ services:
      - database
     environment:
       - TEST_DATABASE=postgresql://soc:soc@database:5432/test-db
-      - SECRET_KEY=dd0caf8705b32857d19b80ae626c1757c57742df18b2f62adcfe48307730ec6e
     # env_file:
       # - ../../src/.env
     volumes:

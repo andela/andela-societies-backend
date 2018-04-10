@@ -11,7 +11,6 @@ load_dotenv(dotenv_path)
 class Config(object):
     """Model base config object that can inherited by other configs."""
 
-    SECRET_KEY = os.environ.get('SECRET') or "secretkey"
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     DEBUG = False
@@ -29,8 +28,7 @@ class Development(Config):
 
     DEBUG = True
     DEVELOPMENT = True
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE') or \
-        "sqlite:///" + Config.BASE_DIR + "/dev_db.sqlite"
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE')
     SQLALCHEMY_TRACK_MODIFICATIONS = True
 
 
@@ -41,9 +39,8 @@ class Testing(Config):
     DEBUG = True
     TESTING = True
     SQLALCHEMY_TRACK_MODIFICATIONS = True
-    SQLALCHEMY_DATABASE_URI = os.environ.get('TEST_DATABASE') or \
-        "sqlite:///" + Config.BASE_DIR + "/tests/test_db.sqlite"
-    PUBLIC_KEY=os.environ.get('PUBLIC_KEY_TEST')
+    SQLALCHEMY_DATABASE_URI = os.environ.get('TEST_DATABASE')
+    PUBLIC_KEY = os.environ.get('PUBLIC_KEY_TEST')
 
 
 class Staging(Development):

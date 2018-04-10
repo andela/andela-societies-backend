@@ -2,8 +2,10 @@
 Sample Data for Initial Run.
 This contains the sample initial data required for the test run of the system.
 """
+import datetime
+
 from api.models import (ActivityType, Activity, Country, LoggedActivity, Society,
-                        User)
+                        User, Cohort)
 
 # activity types
 interview = ActivityType(name="Bootcamp Interviews",
@@ -47,48 +49,111 @@ outside_mentoring = ActivityType(name="External Mentoring",
                                  description="Mentoring students outside of"
                                  " Andela e.g. via SheLovesCode",
                                  value=250)
+activity_types = [
+    interview, open_saturdays, tech_event, open_source, hackathon, blog,
+    app, mentor, marketing, press, outside_mentoring
+]
 
 # societies
 phoenix = Society(name="Phoenix")
 istelle = Society(name="iStelle")
 sparks = Society(name="Sparks")
 invictus = Society(name="Invictus")
+societies = [phoenix, istelle, sparks, invictus]
 
 # test countries
 kenya = Country(name='Kenya')
+uganda = Country(name='Uganda')
+nigeria = Country(name='Nigeria')
+countries = [kenya, uganda, nigeria]
 
-# test user
-user = User(
-    uuid="-KdQsMt2U0ixIy_-yJEH",
+# cohorts
+cohort_14_ke = Cohort(name='Cohort 14', country=kenya)
+
+## users
+# member
+member = User(
+    uuid="-KdQsMtixI2U0y_-yJEH",
     name="Test User",
     photo="https://lh6.googleusercontent.com/-1DhBLOJentg/AAAAAAAAA"
-          "AI/AAAAAAAAABc/ImM13eP_cAI/photo.jpg?sz=50",
-    email="lawrence.wachira@andela.com",
+          "AI/AAAAAAAAABc/ImeP_cAI/photo.jpg?sz=50",
+    email="test.user.societies@andela.com",
     country=kenya,
+    cohort=cohort_14_ke,
     society=phoenix
 )
 
+# president
+president = User(
+    uuid="-KdQsMtixG4U0y_-yJEH",
+    name="Test President",
+    photo="https://lh6.googleusercontent.com/-1DhBLOJentg/AAAAAAAAA"
+          "AI/AAAAAAnAABc/ImeP_cAI/photo.jpg?sz=50",
+    email="test.president.societies@andela.com",
+    role="president",
+    country=kenya,
+    cohort=cohort_14_ke,
+    society=phoenix
+)
+
+# success ops
+success_ops = User(
+    uuid="-KdQsMtixG4U0y_-yJEF",
+    name="Test Success Ops",
+    photo="https://lh6.googleusercontent.com/-1DhBLOJentg/AAAAAAAAA"
+          "AI/AAAAAAnAABc/ImeP_cAI/photo.jpg?sz=50",
+    email="test.successops.societies@andela.com",
+    role="success ops",
+    country=kenya
+)
+users = [member, president, success_ops]
+
 # test activities
-python_blog = Activity(name="TDD For The Lazy Programmer", activity_type=blog)
-interview_2017 = Activity(name="2017-feb-bootcamp-17", activity_type=interview)
-open_saturdays_2018 = Activity(name="2018-feb-meetup",
-                               activity_type=open_saturdays)
+python_hackathon = Activity(
+    name="Hacktober Fest", activity_type=hackathon,
+    activity_date=datetime.date.today() + datetime.timedelta(days=7),
+    added_by=president
+)
+interview_2017 = Activity(
+    name="2017-feb-bootcamp-17", activity_type=interview,
+    activity_date=datetime.date.today() + datetime.timedelta(days=14),
+    added_by=president)
+open_saturdays_2018 = Activity(
+    name="2018-feb-meetup", activity_type=open_saturdays,
+    activity_date=datetime.date.today() + datetime.timedelta(days=21),
+    added_by=president
+)
 
-user.activities.extend([python_blog, interview_2017, open_saturdays_2018])
+member.activities.extend([python_hackathon, interview_2017, open_saturdays_2018])
 
-# LoggingActivity
-blog_points = LoggedActivity(value=blog.value,
-                             activity=python_blog,
-                             user=user)
-interview_points = LoggedActivity(value=interview.value,
-                                  activity=interview_2017,
-                                  user=user)
-open_saturday_points = LoggedActivity(value=open_saturdays.value,
-                                      activity=open_saturdays_2018,
-                                      user=user)
+# Logged Activities
+hackathon_points = LoggedActivity(
+    value=hackathon.value,
+    activity=python_hackathon,
+    user=member, society=phoenix,
+    activity_type=hackathon,
+    status='approved', approver_id=success_ops.uuid,
+    reviewer_id=president.uuid,
+    activity_date = python_hackathon.activity_date
+)
+interview_points = LoggedActivity(
+    value=interview.value * 5,
+    activity=interview_2017,
+    user=member, society=sparks,
+    activity_type=interview,
+    status='rejected', approver_id=success_ops.uuid,
+    reviewer_id=president.uuid,
+    activity_date = interview_2017.activity_date
+)
+open_saturday_points = LoggedActivity(
+    value=open_saturdays.value,
+    activity=open_saturdays_2018,
+    user=member, society=invictus,
+    activity_type=open_saturdays,
+    activity_date = open_saturdays_2018.activity_date
+)
+logged_activities = [hackathon_points, interview_points, open_saturday_points]
 
 
-all_data = [interview, open_saturdays, tech_event, open_source, hackathon,
-            blog, app, mentor, marketing, press, outside_mentoring, phoenix,
-            istelle, sparks, invictus, user, blog_points, interview_points,
-            open_saturday_points]
+test_data = activity_types + societies + users + logged_activities + countries
+production_data = activity_types + countries + societies
