@@ -42,7 +42,7 @@ class BaseTestCase(TestCase):
             "picture": "https://www.link.com",
             "roles": {
                     "Andelan": "-Ktest_andelan_id",
-                    "Success Ops": "-Ktest_fellow_id"
+                    "Success Ops": "-KkLwgbeJUO0dQKsEk1i"
             }
         },
         "exp": exp_date + datetime.timedelta(days=1)
@@ -112,6 +112,9 @@ class BaseTestCase(TestCase):
             "Authorization": self.generate_token(
                 {"I don't know": "what to put here"}
             )
+        }
+        self.success_ops_header = {
+            "Authorization": self.generate_token(self.test_successops_payload)
         }
 
         # test countries

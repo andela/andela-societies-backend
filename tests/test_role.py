@@ -7,6 +7,14 @@ from .base_test import BaseTestCase
 class RoleTestCase(BaseTestCase):
     """Holds tests of roles in authentication."""
 
+    def setUp(self):
+        """Save required roles."""
+        BaseTestCase.setUp(self)
+        self.successops_role.save()
+        self.fellow_role.save()
+        self.success_role.save()
+        self.finance_role.save()
+
     def test_fellow_cannot_create_activity(self):
         """Test if Fellow role can access Activity endpoint."""
         new_activity = dict(name="tech congress",
@@ -26,23 +34,33 @@ class RoleTestCase(BaseTestCase):
 
         self.assertEqual(message, response_details["message"])
 
-    def test_successops__can_create_activity(self):
+    def test_successops_can_create_activity(self):
         """Test if Success Ops role can access Activity endpoint."""
-        successops_token =\
-            {"Authorization": self.generate_token(self.test_successops_payload)}
         new_activity = dict(name="tech congress",
                             description="all about tech"
                             )
 
         response = self.client.post('/api/v1/activities',
                                     data=json.dumps(new_activity),
-                                    headers=successops_token,
+                                    headers=self.success_ops_header,
                                     content_type='application/json')
 
         self.assertTrue(json.loads(response.data))
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.status_code, 201)
 
-        message = "You're unauthorized to perform this operation"
+        message = "Activity created successfully"
+        response_details = json.loads(response.data)
+
+        self.assertIn(message, response_details["message"])
+
+    def test_get_roles(self):
+        """Test if Admins can retrieve and view all roles."""
+        response = self.client.get('/api/v1/roles',
+                                   headers=self.success_ops_header,
+                                   content_type='application/json')
+
+        message = "Roles fetched successfully."
         response_details = json.loads(response.data)
 
         self.assertEqual(message, response_details["message"])
+        self.assertEqual(response.status_code, 200)

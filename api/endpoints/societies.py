@@ -34,7 +34,7 @@ class SocietyResource(Resource):
             response = jsonify({
                 "status": "success",
                 "data": society.serialize(),
-                "message": "Society created succesfully."
+                "message": "Society created successfully."
             })
             response.status_code = 201
             return response
@@ -66,7 +66,7 @@ class SocietyResource(Resource):
             limit = int(_limit or current_app.config['PAGE_LIMIT'])
             search_term = request.args.get('q')
             societies = Society.query
-            
+
             societies = societies.paginate(
                 page=page,
                 per_page=limit,
@@ -107,7 +107,7 @@ class SocietyResource(Resource):
                 })
                 response.status_code = 404
                 return response
-    
+
     def put(self, society_id):
         payload = request.get_json()
 

@@ -23,13 +23,13 @@ class ActivitiesTestCase(BaseTestCase):
 
         response = self.client.post('/api/v1/activities',
                                     data=json.dumps(new_activity),
-                                    headers=self.header,
+                                    headers=self.success_ops_header,
                                     content_type='application/json')
 
         self.assertTrue(json.loads(response.data))
         self.assertEqual(response.status_code, 201)
 
-        message = "Activity created succesfully."
+        message = "Activity created successfully."
         response_details = json.loads(response.data)
 
         self.assertEqual(message, response_details["message"])
@@ -40,7 +40,7 @@ class ActivitiesTestCase(BaseTestCase):
 
         response = self.client.post('/api/v1/activities',
                                     data=json.dumps(new_activity),
-                                    headers=self.header,
+                                    headers=self.success_ops_header,
                                     content_type='application/json')
 
         self.assertTrue(json.loads(response.data))
@@ -57,7 +57,7 @@ class ActivitiesTestCase(BaseTestCase):
 
         response = self.client.post('/api/v1/activities',
                                     data=json.dumps(new_activity),
-                                    headers=self.header,
+                                    headers=self.success_ops_header,
                                     content_type='application/json')
 
         self.assertTrue(json.loads(response.data))
@@ -81,7 +81,7 @@ class ActivitiesTestCase(BaseTestCase):
         # attempt to save the already existing activity
         response = self.client.post('/api/v1/activities',
                                     data=json.dumps(existing_activity),
-                                    headers=self.header,
+                                    headers=self.success_ops_header,
                                     content_type='application/json')
 
         self.assertTrue(json.loads(response.data))

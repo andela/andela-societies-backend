@@ -10,7 +10,7 @@ class ActivitiesAPI(Resource):
     """Activity Resource to contain CRUD endpoints for activities."""
 
     @token_required
-    @roles_required(["Fellow"])
+    @roles_required(["Success Ops"])
     def post(self):
         """Create an activity."""
         payload = request.get_json()
@@ -48,7 +48,7 @@ class ActivitiesAPI(Resource):
                 response = jsonify({
                     "status": "success",
                     "data": activity.serialize(),
-                    "message": "Activity created succesfully."
+                    "message": "Activity created successfully."
                 })
                 response.status_code = 201
 
