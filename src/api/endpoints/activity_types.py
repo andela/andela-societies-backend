@@ -4,7 +4,7 @@ from flask_restplus import Resource
 
 from api.utils.auth import token_required
 from api.models import ActivityType
-from api.utils.marshamallow_schemas import get_activity_types_schema
+from api.utils.marshmallow_schemas import get_activity_types_schema
 
 class ActivityTypesAPI(Resource):
     """Activity Categories Resource."""
