@@ -47,6 +47,7 @@ Navigate to the folder you cloned and run: </br>
 
 - Install Requirements
 ```
+$ cd src
 $ pip install -r requirements.txt
 ```
 
@@ -64,6 +65,7 @@ $ pip install -r requirements.txt
 
 - Run App 🏃
 ```
+$ cd src
 $ python manage.py runserver
 ```
 The app should be accessiable via : http://127.0.0.1:5000/
@@ -73,6 +75,7 @@ The app should be accessiable via : http://127.0.0.1:5000/
 ## Running the tests
 
 ```
+$ cd src
 $ python manage.py test
 ```
 
@@ -81,7 +84,7 @@ $ python manage.py test
 [Pep8](https://www.python.org/dev/peps/pep-0008/) standards are followed in project.
 
 ```
-
+$ cd src
 $ pep8 api --count
 
 ```
