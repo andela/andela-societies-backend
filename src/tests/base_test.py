@@ -7,7 +7,7 @@ import base64
 from unittest import TestCase
 
 from api.models import (Activity, ActivityType, Cohort, Country,
-                        LoggedActivity, Society, User, db)
+                        LoggedActivity, Society, User, Role, db)
 from app import create_app
 from jose import jwt
 
@@ -27,6 +27,38 @@ class BaseTestCase(TestCase):
             "roles": {
                     "Andelan": "-Ktest_andelan_id",
                     "Fellow": "-Ktest_fellow_id"
+            }
+        },
+        "exp": exp_date + datetime.timedelta(days=1)
+    }
+
+    test_successops_payload = {
+        "UserInfo": {
+            "email": "test.test@andela.com",
+            "first_name": "test",
+            "id": "-Ktest_id",
+            "last_name": "test",
+            "name": "test test",
+            "picture": "https://www.link.com",
+            "roles": {
+                    "Andelan": "-Ktest_andelan_id",
+                    "Success Ops": "-KkLwgbeJUO0dQKsEk1i"
+            }
+        },
+        "exp": exp_date + datetime.timedelta(days=1)
+        }
+
+    test_auth_role_payload = {
+        "UserInfo": {
+            "email": "test.test@andela.com",
+            "first_name": "test",
+            "id": "-Ktest_id",
+            "last_name": "test",
+            "name": "test test",
+            "picture": "https://www.link.com",
+            "roles": {
+                    "Andelan": "-Ktest_andelan_id",
+                    "Learning Facilitator": "-Ktest_fellow_id"
             }
         },
         "exp": exp_date + datetime.timedelta(days=1)
@@ -76,6 +108,9 @@ class BaseTestCase(TestCase):
         self.header = {
             "Authorization": self.generate_token(self.test_payload)
         }
+        self.success_ops = {
+            "Authorization": self.generate_token(self.test_successops_payload)
+            }
         self.bad_token_header = {
             "Authorization": self.generate_token(
                 {"I don't know": "what to put here"}
@@ -93,6 +128,13 @@ class BaseTestCase(TestCase):
         self.sparks = Society(name="Sparks")
         self.invictus = Society(name="Invictus")
 
+        # test roles
+        self.successops_role = Role(uuid="-KkLwgbeJUO0dQKsEk1i",
+                                    name="Success Ops")
+        self.fellow_role = Role(uuid="-KXGy1EB1oimjQgFim6C", name="Fellow")
+        self.success_role = Role(uuid="-KXGy1EB1oimjQgFim6F", name="Success")
+        self.finance_role = Role(uuid="-KXGy1EB1oimjQgFim6L", name="Finance")
+
         # test cohorts
         self.cohort_12_Ke = Cohort(name="cohort-12", country=self.kenya)
         self.cohort_12_Ug = Cohort(name="cohort-12", country=self.uganda)
@@ -107,7 +149,7 @@ class BaseTestCase(TestCase):
             email="test.user@andela.com",
             country=self.nigeria,
             cohort=self.cohort_1_Nig,
-            society = self.phoenix)
+            society=self.phoenix)
 
         self.test_user_2 = User(
             uuid="-KdQsawesome_useridZ",

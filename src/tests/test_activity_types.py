@@ -13,7 +13,7 @@ class ActivityTypesTestCase(BaseTestCase):
         self.tech_event.save()
 
         response = self.client.get('api/v1/activity-types',
-                                    headers=self.header)
+                                   headers=self.header)
 
         # test that request was successful
         self.assertEqual(response.status_code, 200)

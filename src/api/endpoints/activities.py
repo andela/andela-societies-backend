@@ -2,7 +2,7 @@
 from flask import g, jsonify, request
 from flask_restplus import Resource
 
-from api.utils.auth import token_required
+from api.utils.auth import (token_required, roles_required)
 from api.models import Activity
 from api.utils.marshmallow_schemas import activity_schema
 
@@ -11,6 +11,7 @@ class ActivitiesAPI(Resource):
     """contains CRUD endpoints for activities."""
 
     @token_required
+    @roles_required(["Fellow"])
     def post(self):
         """Create an activity."""
         payload = request.get_json()
@@ -31,7 +32,7 @@ class ActivitiesAPI(Resource):
                                 )
             activity.save()
 
-            response = jsonify({'message': 'Activity created succesfully.',
+            response = jsonify({'message': 'Activity created successfully.',
                                 'data': result})
             response.status_code = 201
 

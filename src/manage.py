@@ -8,8 +8,8 @@ import pytest
 from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager, Shell, prompt_bool
 
-from api.utils.initial_data import all_data
-from api.models import Activity, Society, User, db
+from api.utils.initial_data import all_data, role
+from api.models import Activity, Society, User, Role, db
 from app import create_app
 
 app = create_app(environment=os.environ.get('APP_SETTINGS', "Development"))
@@ -47,6 +47,7 @@ def seed():
         try:
             db.drop_all()
             db.create_all()
+            db.session.add_all(role)
             db.session.add_all(all_data)
             print("\n\n\nTables seeded successfully.\n\n\n")
         except Exception:
@@ -61,7 +62,8 @@ def shell():
                 db=db,
                 User=User,
                 Society=Society,
-                Activity=Activity)
+                Activity=Activity,
+                Role=Role)
 
 
 manager.add_command("shell", Shell(make_context=shell))

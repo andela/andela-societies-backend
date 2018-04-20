@@ -1,7 +1,7 @@
 """Models TestSuite."""
 
 from api.models import (Activity, ActivityType, Cohort, Country,
-                        LoggedActivity, Society, User)
+                        LoggedActivity, Society, User, Role)
 from tests.base_test import BaseTestCase
 
 
@@ -65,8 +65,7 @@ class UserTestCase(BaseTestCase):
     def test_payload_has_null_values(self):
         new_user = User(email=None,
                         name=None,
-                        uuid="-Ksomeid",
-                        role="member")
+                        uuid="-Ksomeid")
 
         self.assertFalse(new_user.save())
 
@@ -215,3 +214,13 @@ class CountryTestCase(BaseTestCase):
         self.uganda = Country(name='Uganda')
 
         self.assertTrue(self.uganda.save())
+
+
+class RoleTestCase(BaseTestCase):
+    """Test suite for Role Model."""
+
+    def test_create_role(self):
+        self.success_ops = Role(uuid="-KkLwgbeJUO0dQKsEk1i",
+                                name="Success Ops")
+
+        self.assertTrue(self.success_ops.save())
