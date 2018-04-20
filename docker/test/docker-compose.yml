@@ -1,0 +1,40 @@
+version: '2.1'
+volumes:
+    build:
+      driver: local
+    cache:
+      external: true
+
+services:
+  test:
+    build:
+      context: ../../
+      dockerfile: docker/test/Dockerfile
+    links:
+     - database
+    environment:
+      - TEST_DATABASE=postgresql://soc:soc@database:5432/test-db
+      - SECRET_KEY=dd0caf8705b32857d19b80ae626c1757c57742df18b2f62adcfe48307730ec6e
+    env_file:
+      - ../../src/.env
+    volumes:
+      - build:/build
+      - cache:/cache
+    depends_on:
+      database:
+        condition: service_healthy
+  # postgres database image
+  database:
+    image: postgres
+    restart: always
+    expose:
+      - "5432"
+    environment:
+      POSTGRES_USER: soc
+      POSTGRES_PASSWORD: soc
+      POSTGRES_DB: test-db
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
