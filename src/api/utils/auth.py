@@ -9,7 +9,7 @@ from functools import wraps
 from flask import g, jsonify, request, current_app
 from jose import ExpiredSignatureError, JWTError, jwt
 
-from api.models import User
+from api.models import User, Role
 
 
 def auth_response(status_code, message):
@@ -81,20 +81,8 @@ def token_required(f):
     return decorated
 
 
-def roles_required(roles):  # roles should be a list
-    """Ensure only authorised roles may access sensitive data."""
-    def check_user_role(f):
-        @wraps(f)
-        def decorated(*args, **kwargs):
-            if g.current_user.society_position not in roles:
-                message = "You're unauthorized to perform this operation"
-                return auth_response(401, message)
-            return f(*args, **kwargs)
-        return decorated
-    return check_user_role
-
-
 def store_user_details(payload):
+    """Store User details if not in the DB."""
     uuid = payload["UserInfo"]["id"]
     name = payload["UserInfo"]["name"]
     email = payload["UserInfo"]["email"]
@@ -109,8 +97,28 @@ def store_user_details(payload):
             uuid=uuid, name=name, email=email, photo=photo
         )
 
-        user.save()
-
     # set current user in flask global variable, g
-    user.roles = roles
+    user.roles = [Role.query.filter_by(name=role).first()
+
+                  for role in roles
+                  if role != "Andelan" and
+                  Role.query.filter_by(name=role).first() is not None]
+
+    user.save()
+
     g.current_user = user
+
+
+def roles_required(roles):  # roles should be a list
+    """Ensure only authorised roles may access sensitive data."""
+    def check_user_role(f):
+        @wraps(f)
+        def decorated(*args, **kwargs):
+            for role in (Role.query.filter_by(name=role).first()
+                            for role in roles):
+                if role not in g.current_user.roles:
+                    message = "You're unauthorized to perform this operation"
+                    return auth_response(401, message)
+            return f(*args, **kwargs)
+        return decorated
+    return check_user_role

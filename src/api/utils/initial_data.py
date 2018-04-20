@@ -3,7 +3,7 @@ Sample Data for Initial Run.
 This contains the sample initial data required for the test run of the system.
 """
 from api.models import (ActivityType, Activity, Country, LoggedActivity, Society,
-                        User)
+                        User, Role)
 
 # activity types
 interview = ActivityType(name="Bootcamp Interviews",
@@ -57,6 +57,13 @@ invictus = Society(name="Invictus")
 # test countries
 kenya = Country(name='Kenya')
 
+# roles available
+role = [Role(uuid="-KXGy1EB1oimjQgFim6F", name="Success"),
+        Role(uuid="-KXGy1EB1oimjQgFim6L", name="Finance"),
+        Role(uuid="-KXGy1EB1oimjQgFim6C", name="Fellow"),
+        Role(uuid="-KkLwgbeJUO0dQKsEk1i", name="Success Ops"),
+        Role(uuid="-KiihfZoseQeqC6bWTau", name="Andelan")]
+
 # test user
 user = User(
     uuid="-KdQsMt2U0ixIy_-yJEH",
@@ -66,7 +73,8 @@ user = User(
     email="lawrence.wachira@andela.com",
     country=kenya,
     society=phoenix
-)
+    )
+user.roles.append(role[2])
 
 # test activities
 python_blog = Activity(name="TDD For The Lazy Programmer", activity_type=blog)
