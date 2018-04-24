@@ -1,5 +1,6 @@
 """
 Sample Data for Initial Run.
+gs
 This contains the sample initial data required for the test run of the system.
 """
 from api.models import (ActivityType, Activity, Country, LoggedActivity, Society,
@@ -99,4 +100,4 @@ open_saturday_points = LoggedActivity(value=open_saturdays.value,
 all_data = [interview, open_saturdays, tech_event, open_source, hackathon,
             blog, app, mentor, marketing, press, outside_mentoring, phoenix,
             istelle, sparks, invictus, user, blog_points, interview_points,
-            open_saturday_points]
+            open_saturday_points] + role

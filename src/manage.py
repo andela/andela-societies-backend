@@ -8,8 +8,9 @@ import pytest
 from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager, Shell, prompt_bool
 
-from api.utils.initial_data import all_data, role
-from api.models import Activity, Society, User, Role, db
+from api.utils.initial_data import all_data
+from api.models import (Activity, Society, User, Role, Country, Cohort,
+                        ActivityType, LoggedActivity, db)
 from app import create_app
 
 app = create_app(environment=os.environ.get('APP_SETTINGS', "Development"))
@@ -42,16 +43,17 @@ def create_database():
 @manager.command
 def seed():
     """Seed database tables with initial data."""
-    if prompt_bool("\n\n\nThis operation will remove all existing data."
-                   " Are you sure you want to continue?"):
+    if os.environ.get('APP_SETTINGS') == 'Testing' or \
+            prompt_bool("\n\n\nThis operation will remove all existing data."
+                        " Are you sure you want to continue?"):
         try:
             db.drop_all()
             db.create_all()
-            db.session.add_all(role)
             db.session.add_all(all_data)
             print("\n\n\nTables seeded successfully.\n\n\n")
-        except Exception:
+        except Exception as e:
             db.session.rollback()
+            print(e)
             print("\n\n\nFailed, make sure your database server is"
                   " running!\n\n\n")
 
@@ -63,6 +65,10 @@ def shell():
                 User=User,
                 Society=Society,
                 Activity=Activity,
+                Country=Country,
+                Cohort=Cohort,
+                ActivityType=ActivityType,
+                LoggedActivity=LoggedActivity,
                 Role=Role)
 
 

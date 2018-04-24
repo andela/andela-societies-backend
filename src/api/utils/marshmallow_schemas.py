@@ -2,7 +2,7 @@
 from datetime import date
 from marshmallow import (Schema, fields, post_load, validates,
                          validate, ValidationError)
-from api.models import User, Activity, ActivityType
+from api.models import User, Activity, ActivityType, Role
 
 
 class BaseSchema(Schema):
@@ -19,6 +19,20 @@ class BaseSchema(Schema):
     created_at = fields.DateTime(dump_only=True)
     modified_at = fields.DateTime(dump_only=True)
     description = fields.String()
+
+
+class RoleSchema(BaseSchema):
+    """Creates a Validation schema for Roles."""
+
+    @post_load
+    def verify_role(self, data):
+        """Extra validation for Roles."""
+        existing_role = Role.query.filter(
+                        Role.name.ilike(data['name'])).first()
+
+        if existing_role:
+            self.context = {'status_code': 409}
+            raise ValidationError({'name': 'Role already exists!'})
 
 
 class ActivityTypesSchema(BaseSchema):
@@ -122,3 +136,4 @@ user_logged_activities_schema = LoggedActivitySchema(
     many=True, exclude=('society', 'society_id')
 )
 activity_schema = ActivitySchema()
+role_schema = RoleSchema()
