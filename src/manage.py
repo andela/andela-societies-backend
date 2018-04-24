@@ -94,7 +94,6 @@ def test():
         COV.report()
         COV.html_report()
         COV.stop()
-        COV.erase()
         return 0
     COV.stop()
     COV.erase()
