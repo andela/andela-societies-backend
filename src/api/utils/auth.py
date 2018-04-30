@@ -114,9 +114,9 @@ def roles_required(roles):  # roles should be a list
     def check_user_role(f):
         @wraps(f)
         def decorated(*args, **kwargs):
-            for role in (Role.query.filter_by(name=role).first()
+            for role_id in (Role.query.filter_by(name=role).first()
                             for role in roles):
-                if role not in g.current_user.roles:
+                if role_id not in g.current_user.roles:
                     message = "You're unauthorized to perform this operation"
                     return auth_response(401, message)
             return f(*args, **kwargs)

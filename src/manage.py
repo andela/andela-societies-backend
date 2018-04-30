@@ -6,7 +6,7 @@ import sys
 from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager, Shell, prompt_bool
 
-from api.utils.initial_data import all_data, role
+from api.utils.initial_data import test_data, production_data
 from api.models import Activity, Society, User, Role, db
 from app import create_app
 from run_tests import test
@@ -61,8 +61,7 @@ def seed():
             db.session.remove()
             db.drop_all()
             db.create_all()
-            db.session.add_all(role)
-            db.session.add_all(all_data)
+            db.session.add_all(data_mapping.get(environment))
             print("\n\n\nTables seeded successfully.\n\n\n")
         except Exception as e:
             db.session.rollback()

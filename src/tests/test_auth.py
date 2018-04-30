@@ -1,5 +1,4 @@
-"""Test all Authorisation."""
-import time
+
 from tests.base_test import BaseTestCase
 
 

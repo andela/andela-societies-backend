@@ -38,8 +38,7 @@ class Testing(Config):
     DEBUG = True
     TESTING = True
     SQLALCHEMY_TRACK_MODIFICATIONS = True
-    SQLALCHEMY_DATABASE_URI = os.environ.get('TEST_DATABASE') or \
-        "sqlite:///" + Config.BASE_DIR + "/tests/test_db.sqlite"
+    SQLALCHEMY_DATABASE_URI = os.environ.get('TEST_DATABASE')
     PUBLIC_KEY = os.environ.get('PUBLIC_KEY_TEST')
 
 
