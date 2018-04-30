@@ -46,7 +46,7 @@ class Base(db.Model):
     name = db.Column(db.String)
     photo = db.Column(db.String)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    modified_at = db.Column(db.DateTime, default=datetime.utcnow)
+    modified_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
     description = db.Column(db.String)
 
     def __repr__(self):
@@ -201,12 +201,13 @@ class LoggedActivity(Base):
 
     __tablename__ = 'logged_activities'
     value = db.Column(db.Integer, nullable=False)
-    status = db.Column(db.String, default='pending')
+    status = db.Column(db.String, default='in review')
     approved_at = db.Column(db.DateTime)
     activity_date = db.Column(db.Date)
     redeemed = db.Column(db.Boolean, nullable=False, default=False)
 
     approver_id = db.Column(db.String)
+    reviewer_id = db.Column(db.String)
     activity_type_id = db.Column(
         db.String, db.ForeignKey('activity_types.uuid'), nullable=False
     )

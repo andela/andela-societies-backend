@@ -1,5 +1,6 @@
 """Test all Authorisation."""
 import time
+
 from tests.base_test import BaseTestCase
 
 
@@ -23,7 +24,6 @@ class AuthTestCase(BaseTestCase):
     def test_expired_token(self):
         """Test if token being used has expired."""
         expired_token = self.generate_token(self.expired_payload)
-        time.sleep(2)
 
         response = self.client.get('api/v1/societies',
                                    headers={"Authorization": expired_token})

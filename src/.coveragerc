@@ -6,6 +6,9 @@ omit =
     */venv/*
     config.py
     */site-packages/*
+    */__init__.py
+    */marshmallow_schemas.py
+    run_tests.py
 
 [report]
 omit =
@@ -17,3 +20,6 @@ omit =
     */.virtualenvs/*
     config.py
     manage.py
+    */__init__.py
+    */marshmallow_schemas.py
+    run_tests.py
