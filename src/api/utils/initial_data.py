@@ -81,15 +81,15 @@ role = [Role(uuid="-KXGy1EB1oimjQgFim6F", name="Success"),
 # test user
 member = User(
     uuid="-KdQsMt2U0ixIy_-yJEH",
+
     name="Test User",
     photo="https://lh6.googleusercontent.com/-1DhBLOJentg/AAAAAAAAA"
           "AI/AAAAAAAAABc/ImeP_cAI/photo.jpg?sz=50",
     email="test.user.societies@andela.com",
     country=kenya,
     cohort=cohort_14_ke,
-    society=istelle
+    society=phoenix
 )
-member.roles.append(role[2])
 
 # president
 president = User(
@@ -98,9 +98,10 @@ president = User(
     photo="https://lh6.googleusercontent.com/-1DhBLOJentg/AAAAAAAAA"
           "AI/AAAAAAnAABc/ImeP_cAI/photo.jpg?sz=50",
     email="test.president.societies@andela.com",
+    role="president",
     country=kenya,
     cohort=cohort_14_ke,
-    society=istelle
+    society=phoenix
     )
 president.roles.append(role[5])
 
@@ -115,6 +116,18 @@ success_ops = User(
 )
 success_ops.roles.append(role[3])
 
+users = [member, president, success_ops]
+
+# success ops
+success_ops = User(
+    uuid="-KdQsMtixG4U0y_-yJEF",
+    name="Test Success Ops",
+    photo="https://lh6.googleusercontent.com/-1DhBLOJentg/AAAAAAAAA"
+          "AI/AAAAAAnAABc/ImeP_cAI/photo.jpg?sz=50",
+    email="test.successops.societies@andela.com",
+    role="success ops",
+    country=kenya
+)
 users = [member, president, success_ops]
 
 # test activities
