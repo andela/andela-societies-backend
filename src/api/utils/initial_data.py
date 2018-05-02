@@ -4,8 +4,8 @@ This contains the sample initial data required for the test run of the system.
 """
 import datetime
 
-from api.models import (ActivityType, Activity, Country, LoggedActivity, Society,
-                        User, Cohort)
+from api.models import (ActivityType, Activity, Country, LoggedActivity,
+                        Society, User, Role, Cohort)
 
 # activity types
 interview = ActivityType(name="Bootcamp Interviews",
@@ -70,10 +70,18 @@ countries = [kenya, uganda, nigeria]
 # cohorts
 cohort_14_ke = Cohort(name='Cohort 14', country=kenya)
 
-## users
-# member
+# roles available
+role = [Role(uuid="-KXGy1EB1oimjQgFim6F", name="Success"),
+        Role(uuid="-KXGy1EB1oimjQgFim6L", name="Finance"),
+        Role(uuid="-KXGy1EB1oimjQgFim6C", name="Fellow"),
+        Role(uuid="-KkLwgbeJUO0dQKsEk1i", name="Success Ops"),
+        Role(uuid="-KiihfZoseQeqC6bWTau", name="Andelan"),
+        Role(name="Society President")]
+
+# test user
 member = User(
-    uuid="-KdQsMtixI2U0y_-yJEH",
+    uuid="-KdQsMt2U0ixIy_-yJEH",
+
     name="Test User",
     photo="https://lh6.googleusercontent.com/-1DhBLOJentg/AAAAAAAAA"
           "AI/AAAAAAAAABc/ImeP_cAI/photo.jpg?sz=50",
@@ -94,7 +102,21 @@ president = User(
     country=kenya,
     cohort=cohort_14_ke,
     society=phoenix
+    )
+president.roles.append(role[5])
+
+# success ops
+success_ops = User(
+    uuid="-KdQsMtixG4U0y_-yJEF",
+    name="Test Success Ops",
+    photo="https://lh6.googleusercontent.com/-1DhBLOJentg/AAAAAAAAA"
+          "AI/AAAAAAnAABc/ImeP_cAI/photo.jpg?sz=50",
+    email="test.successops.societies@andela.com",
+    country=kenya
 )
+success_ops.roles.append(role[3])
+
+users = [member, president, success_ops]
 
 # success ops
 success_ops = User(
@@ -155,5 +177,6 @@ open_saturday_points = LoggedActivity(
 logged_activities = [hackathon_points, interview_points, open_saturday_points]
 
 
-test_data = activity_types + societies + users + logged_activities + countries
-production_data = activity_types + countries + societies
+test_data = (activity_types + societies + users + logged_activities + countries
+             + role)
+production_data = activity_types + countries + societies + role

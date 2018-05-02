@@ -21,14 +21,24 @@ class SocietyBaseTestCase(BaseTestCase):
             photo="http://photo.url"
         )
         self.society.save()
-    
+        self.successops_role.save()
+        self.fellow_role.save()
+        self.success_role.save()
+        self.finance_role.save()
+
     def test_society_saved_successfully(self):
         old_societies = Society.query.all()
         post_response = self.client.post(
             '/api/v1/societies/',
             data=json.dumps(self.society2),
+            headers=self.success_ops,
             content_type='application/json'
         )
+        response_details = json.loads(post_response.data)
+
+        self.assertIn("Society created successfully", response_details["message"])
+        self.assertEqual(post_response.status_code, 201)
+
         new_societies = Society.query.all()
         self.assertEqual(
             len(new_societies), len(old_societies) + 1

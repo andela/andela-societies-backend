@@ -7,6 +7,14 @@ from tests.base_test import BaseTestCase
 class ActivitiesTestCase(BaseTestCase):
     """Test activities endpoints."""
 
+    def setUp(self):
+        """Save required roles."""
+        BaseTestCase.setUp(self)
+        self.successops_role.save()
+        self.fellow_role.save()
+        self.success_role.save()
+        self.finance_role.save()
+
     def test_create_activity(self):
         """Test that an activity has been created successfully."""
         new_activity = dict(name="tech congress",

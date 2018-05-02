@@ -7,7 +7,7 @@ from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager, Shell, prompt_bool
 
 from api.utils.initial_data import test_data, production_data
-from api.models import Activity, Society, User, db
+from api.models import Activity, Society, User, Role, db
 from app import create_app
 from run_tests import test
 
@@ -74,7 +74,8 @@ def shell():
                 db=db,
                 User=User,
                 Society=Society,
-                Activity=Activity)
+                Activity=Activity,
+                Role=Role)
 
 
 manager.add_command("shell", Shell(make_context=shell))

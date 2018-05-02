@@ -2,13 +2,14 @@
 from flask import g, jsonify
 from flask_restplus import Resource
 
-from api.utils.auth import token_required
+from api.utils.auth import token_required, roles_required
 
 
 class UserAPI(Resource):
     """User Resource."""
 
     @token_required
+    @roles_required(["Success Ops"])
     def get(self):
         """Get user information."""
         _user = g.current_user

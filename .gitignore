@@ -8,8 +8,6 @@ migrations/
 Mac generated files
 *.DS_Store
 
-
-
 # C extensions
 *.so
 
@@ -106,8 +104,6 @@ ENV/
 
 # mypy
 .mypy_cache/
-
-.vscode/
 
 # Databases(SQLite)
 *.sqlite
