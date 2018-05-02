@@ -1,5 +1,6 @@
 """Tests for Activities Module."""
 import json
+import datetime
 from api.models import ActivityType
 from tests.base_test import BaseTestCase
 
@@ -7,13 +8,21 @@ from tests.base_test import BaseTestCase
 class ActivitiesTestCase(BaseTestCase):
     """Test activities endpoints."""
 
+    def setUp(self):
+        """Save required roles."""
+        BaseTestCase.setUp(self)
+        self.successops_role.save()
+        self.fellow_role.save()
+        self.success_role.save()
+        self.finance_role.save()
+
     def test_create_activity(self):
         """Test that an activity has been created successfully."""
         new_activity = dict(name="tech congress",
                             description="all about tech",
                             activityTypeId=self.get_activity_type_id(
                                 "Tech Event"),
-                            activityDate='2020-11-20')
+                            activityDate=str(datetime.date.today()))
 
         response = self.client.post('/api/v1/activities',
                                     data=json.dumps(new_activity),
@@ -32,7 +41,7 @@ class ActivitiesTestCase(BaseTestCase):
         new_activity = dict(name="hackathon",
                             activityTypeId=self.get_activity_type_id(
                                 "Tech Event"),
-                            activityDate='2020-11-20')
+                            activityDate=str(datetime.date.today()))
 
         response = self.client.post('/api/v1/activities',
                                     data=json.dumps(new_activity),
@@ -50,7 +59,7 @@ class ActivitiesTestCase(BaseTestCase):
     def test_name_not_given(self):
         """Test for where name is not provided in request object."""
         new_activity = dict(description="all about tech",
-                            activityDate='2020-11-20')
+                            activityDate=str(datetime.date.today()))
 
         response = self.client.post('/api/v1/activities',
                                     data=json.dumps(new_activity),
@@ -75,7 +84,7 @@ class ActivitiesTestCase(BaseTestCase):
             description="all about js",
             activityTypeId=self.get_activity_type_id(
                 "Tech Event"),
-            activityDate='2020-11-20')
+            activityDate=str(datetime.date.today()))
 
         # attempt to save the already existing activity
         response = self.client.post('/api/v1/activities',
@@ -96,7 +105,7 @@ class ActivitiesTestCase(BaseTestCase):
                             description="learn new things in tech",
                             activityTypeId=(
                                 "da6321920@#$$911e8691232c4b301d34123"),
-                            activityDate="2020-11-20")
+                            activityDate=str(datetime.date.today()))
 
         response = self.client.post('/api/v1/activities',
                                     data=json.dumps(new_activity),
@@ -126,7 +135,6 @@ class ActivitiesTestCase(BaseTestCase):
 
         self.assertEqual(response.status_code, 400)
 
-
         self.assertEqual(message, response_details["activityDate"]["message"])
 
     def test_past_activity_date(self):
@@ -155,7 +163,7 @@ class ActivitiesTestCase(BaseTestCase):
                             description="open source project",
                             activityTypeId=self.get_activity_type_id(
                                 "Tech Event"),
-                            activityDate="2020-1-20")
+                            activityDate=str(datetime.date.today()))
 
         response = self.client.post('/api/v1/activities',
                                     data=json.dumps(new_activity),

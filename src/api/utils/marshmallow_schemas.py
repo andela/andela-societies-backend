@@ -1,10 +1,10 @@
 """Validation schemas."""
 from datetime import date
-from marshmallow import(
+from marshmallow import (
     Schema, fields, post_load, validates,
     validate, ValidationError, validates_schema
 )
-from api.models import User, Activity, ActivityType
+from api.models import User, Activity, ActivityType, Role
 
 
 class BaseSchema(Schema):
@@ -25,6 +25,20 @@ class BaseSchema(Schema):
         dump_only=True, dump_to='modifiedAt', load_from='modifiedAt'
     )
     description = fields.String()
+
+
+class RoleSchema(BaseSchema):
+    """Create a validation schema for Roles."""
+
+    @post_load
+    def verify_role(self, data):
+        """Extra validation of roles."""
+        existing_role = Role.query.filter(
+            Role.name.ilike(data['name'])).first()
+
+        if existing_role:
+            self.context = {'status_code': 409}
+            raise ValidationError({'name': 'Role already exists!'})
 
 
 class ActivityTypesSchema(BaseSchema):
@@ -190,3 +204,4 @@ log_edit_activity_schema = LogEditActivitySchema()
 user_logged_activities_schema = LoggedActivitySchema(
     many=True, exclude=('society', 'society_id')
 )
+role_schema = RoleSchema()

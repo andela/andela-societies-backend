@@ -8,6 +8,7 @@ from api.models import Society
 class SocietyBaseTestCase(BaseTestCase):
     def setUp(self):
         BaseTestCase.setUp(self)
+        self.successops_role.save()
         self.society = Society(
             name="Phoenix",
             color_scheme="#333333",
@@ -21,12 +22,13 @@ class SocietyBaseTestCase(BaseTestCase):
             photo="http://photo.url"
         )
         self.society.save()
-    
+
     def test_society_saved_successfully(self):
         old_societies = Society.query.all()
         post_response = self.client.post(
             '/api/v1/societies/',
             data=json.dumps(self.society2),
+            headers=self.success_ops,
             content_type='application/json'
         )
         new_societies = Society.query.all()
