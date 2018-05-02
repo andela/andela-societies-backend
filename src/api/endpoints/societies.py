@@ -1,13 +1,15 @@
 from flask import g, jsonify, request, current_app, url_for
 from flask_restplus import Resource
 
-from api.utils.auth import token_required
+from api.utils.auth import token_required, roles_required
 from ..models import Society
 
 
 class SocietyResource(Resource):
     """To contain CRUD endpoints for Society."""
 
+    @token_required
+    @roles_required(["Success Ops"])
     def post(self):
         """Create a society."""
         payload = request.get_json()
@@ -66,7 +68,7 @@ class SocietyResource(Resource):
             limit = int(_limit or current_app.config['PAGE_LIMIT'])
             search_term = request.args.get('q')
             societies = Society.query
-            
+
             societies = societies.paginate(
                 page=page,
                 per_page=limit,
@@ -107,7 +109,9 @@ class SocietyResource(Resource):
                 })
                 response.status_code = 404
                 return response
-    
+
+    @token_required
+    @roles_required(["Success Ops"])
     def put(self, society_id):
         payload = request.get_json()
 
@@ -142,6 +146,8 @@ class SocietyResource(Resource):
                 response.status_code = 404
             return response
 
+    @token_required
+    @roles_required("Success Ops")
     def delete(self, society_id):
         if not society_id:
             return {"status": "fail",
