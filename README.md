@@ -1,6 +1,6 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/afbc8438e34a48fea86d20a953bf6998)](https://app.codacy.com/app/jonathankamau/andela-societies-backend?utm_source=github.com&utm_medium=referral&utm_content=AndelaOSP/andela-societies-backend&utm_campaign=badger)
 [![CircleCI](https://circleci.com/gh/AndelaOSP/andela-societies-backend.svg?style=svg)](https://circleci.com/gh/AndelaOSP/andela-societies-backend)
-[![Coverage Status](https://coveralls.io/repos/github/AndelaOSP/andela-societies-backend/badge.svg?branch=setup-circle-ci)](https://coveralls.io/github/AndelaOSP/andela-societies-backend?branch=setup-circle-ci)
+[![Coverage Status](https://coveralls.io/repos/github/AndelaOSP/andela-societies-backend/badge.svg)](https://coveralls.io/github/AndelaOSP/andela-societies-backend)
 
 # Society-platform ✍
 API for an Andela Societies.

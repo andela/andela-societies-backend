@@ -16,5 +16,5 @@ jobs:
             make test
 
       - store_artifacts:
-          path: src/htmlcov
-          destination: src/htmlcov
+          path: test-reports
+          destination: test-reports
