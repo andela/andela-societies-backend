@@ -32,7 +32,6 @@ class Development(Config):
     SQLALCHEMY_TRACK_MODIFICATIONS = True
 
 
-
 class Testing(Config):
     """Model Testing enviroment config object."""
 
