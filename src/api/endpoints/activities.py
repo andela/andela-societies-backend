@@ -11,7 +11,7 @@ class ActivitiesAPI(Resource):
     """contains CRUD endpoints for activities."""
 
     @token_required
-    @roles_required(["Fellow"])
+    @roles_required(["Success Ops"])
     def post(self):
         """Create an activity."""
         payload = request.get_json()

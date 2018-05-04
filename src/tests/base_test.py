@@ -151,6 +151,8 @@ class BaseTestCase(TestCase):
         self.fellow_role = Role(uuid="-KXGy1EB1oimjQgFim6C", name="Fellow")
         self.success_role = Role(uuid="-KXGy1EB1oimjQgFim6F", name="Success")
         self.finance_role = Role(uuid="-KXGy1EB1oimjQgFim6L", name="Finance")
+        self.lf_role = Role(uuid="d47ec8a7-3f09-44a5-8188-ff1d40ef35b6",
+                            name="Learning Facilitator")
 
         # test cohorts
         self.cohort_12_Ke = Cohort(name="cohort-12", country=self.kenya)

@@ -1,8 +1,9 @@
 """Contain utility functions and constants."""
 import datetime
+from flask import jsonify, request, current_app, url_for
 from collections import namedtuple
 
-from api.models import Activity, ActivityType
+from api.models import Activity, ActivityType, Role
 
 
 ParsedResult = namedtuple(
@@ -56,6 +57,110 @@ def parse_log_activity_fields(result):
         activity, activity_type, activity_date, activity_value
     )
 
+
+def paginate_roles():
+    """Pagniate all roles for display."""
+    _page = request.args.get('page')
+    _limit = request.args.get('limit')
+    page = int(_page or current_app.config['DEFAULT_PAGE'])
+    limit = int(_limit or current_app.config['PAGE_LIMIT'])
+    roles = Role.query
+
+    roles = roles.paginate(
+        page=page,
+        per_page=limit,
+        error_out=False
+    )
+    if roles.items:
+        previous_url = None
+        next_url = None
+        if roles.has_next:
+            next_url = url_for(request.endpoint, limit=limit,
+                               page=page+1, _external=True)
+        if roles.has_prev:
+            previous_url = url_for(request.endpoint, limit=limit,
+                                   page=page-1, _external=True)
+
+        roles_list = []
+        for _role in roles.items:
+            role = _role.serialize()
+            roles_list.append(role)
+
+        response = jsonify({
+            "status": "success",
+            "data": {"roles": roles_list,
+                     "count": len(roles.items),
+                     "nextUrl": next_url,
+                     "previousUrl": previous_url,
+                     "currentPage": roles.page},
+            "message": "Roles fetched successfully."
+        })
+        response.status_code = 200
+        return response
+    else:
+        response = jsonify({
+            "status": "success",
+            "data": {"roles": [],
+                     "count": 0},
+            "message": "There are no roles."
+        })
+        response.status_code = 404
+        return response
+
+
+def edit_role(payload, search_term):
+    """Find and edit the role."""
+    role = Role.query.get(search_term)
+    name = payload["name"]
+    # if edit request == stored value
+    if name == role.name:
+        response = jsonify({
+            "data": {"path": role.serialize()},
+            "message": "No change specified."
+        })
+        response.status_code = 200
+        return response
+    else:
+        if role:
+            if name:
+                old_role_name = role.name
+                role.name = name
+            else:
+                return {"status": "fail",
+                        "message": "Name to edit to"
+                                   " must be provided."}, 400
+            role.save()
+            response = jsonify({
+                "data": {"path": role.serialize()},
+                "message": "Role {} has been changed"
+                           " to {}.".format(old_role_name, role.name)
+            })
+            response.status_code = 200
+        else:
+            response = jsonify({"status": "fail",
+                                "message": "Role does not exist."})
+            response.status_code = 404
+        return response
+
+
+def find_role(role):
+    """Find a role within the API."""
+    if role:
+        response = jsonify({
+            "data": role.serialize(),
+            "status": "success",
+            "message": "Role {} fetched successfully.".format(role.name)
+        })
+        response.status_code = 200
+        # return response
+    else:
+        response = jsonify({
+            "data": None,
+            "status": "fail",
+            "message": "Specified role does not exist."
+        })
+        response.status_code = 404
+    return response
 
 # def serialize_point(point):
 #     """Map point object to dict representation.

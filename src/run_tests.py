@@ -1,4 +1,4 @@
-'''Module containing run tests function'''
+"""Module containing run tests function."""
 import coverage
 import pytest
 
@@ -34,6 +34,7 @@ def test():
         COV.erase()
         return 0
     return 1
+
 
 if __name__ == '__main__':
     test()

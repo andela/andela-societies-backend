@@ -13,8 +13,8 @@ class ActivitiesTestCase(BaseTestCase):
         BaseTestCase.setUp(self)
         self.successops_role.save()
         self.fellow_role.save()
-        self.success_role.save()
-        self.finance_role.save()
+        self.successops_token =\
+            {"Authorization": self.generate_token(self.test_successops_payload)}
 
     def test_create_activity(self):
         """Test that an activity has been created successfully."""
@@ -26,7 +26,7 @@ class ActivitiesTestCase(BaseTestCase):
 
         response = self.client.post('/api/v1/activities',
                                     data=json.dumps(new_activity),
-                                    headers=self.header,
+                                    headers=self.successops_token,
                                     content_type='application/json')
 
         self.assertEqual(response.status_code, 201)
@@ -45,7 +45,7 @@ class ActivitiesTestCase(BaseTestCase):
 
         response = self.client.post('/api/v1/activities',
                                     data=json.dumps(new_activity),
-                                    headers=self.header,
+                                    headers=self.successops_token,
                                     content_type='application/json')
 
         response_details = json.loads(response.data)
@@ -63,7 +63,7 @@ class ActivitiesTestCase(BaseTestCase):
 
         response = self.client.post('/api/v1/activities',
                                     data=json.dumps(new_activity),
-                                    headers=self.header,
+                                    headers=self.successops_token,
                                     content_type='application/json')
 
         response_details = json.loads(response.data)
@@ -89,7 +89,7 @@ class ActivitiesTestCase(BaseTestCase):
         # attempt to save the already existing activity
         response = self.client.post('/api/v1/activities',
                                     data=json.dumps(existing_activity),
-                                    headers=self.header,
+                                    headers=self.successops_token,
                                     content_type='application/json')
         message = "Activity already exists!"
 
@@ -109,7 +109,7 @@ class ActivitiesTestCase(BaseTestCase):
 
         response = self.client.post('/api/v1/activities',
                                     data=json.dumps(new_activity),
-                                    headers=self.header,
+                                    headers=self.successops_token,
                                     content_type='application/json')
         message = "Activity type does not exist or is unsupported."
         response_details = json.loads(response.data)
@@ -127,7 +127,7 @@ class ActivitiesTestCase(BaseTestCase):
 
         response = self.client.post('/api/v1/activities',
                                     data=json.dumps(new_activity),
-                                    headers=self.header,
+                                    headers=self.successops_token,
                                     content_type='application/json')
 
         message = "An activity date is required."
@@ -147,7 +147,7 @@ class ActivitiesTestCase(BaseTestCase):
 
         response = self.client.post('/api/v1/activities',
                                     data=json.dumps(new_activity),
-                                    headers=self.header,
+                                    headers=self.successops_token,
                                     content_type='application/json')
 
         message = "Date is in the past! Please enter a valid date."
@@ -167,7 +167,7 @@ class ActivitiesTestCase(BaseTestCase):
 
         response = self.client.post('/api/v1/activities',
                                     data=json.dumps(new_activity),
-                                    headers=self.header,
+                                    headers=self.successops_token,
                                     content_type='application/json')
 
         message = 'This is not a valid activity!'
