@@ -11,7 +11,7 @@ services:
     links:
       - database
     environment:
-      APP_SETTINGS: Production
+      APP_SETTINGS: Staging
       DATABASE_URL: postgresql://soc:soc@database:5432/db
     env_file:
       - ../../src/.env
