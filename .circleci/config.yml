@@ -1,12 +1,14 @@
 # Python CircleCI 2.0 configuration file
 
+defaults: &defaults
+  docker:
+    - image: circleci/python:3.6.1
+  working_directory: ~/andela-societies-backend
+
 version: 2
 jobs:
-  build:
-    docker:
-      - image: circleci/python:3.6.1
-    working_directory: ~/andela-societies-backend
-
+  test:
+    <<: *defaults
     steps:
       - checkout
       - setup_remote_docker
@@ -18,3 +20,28 @@ jobs:
       - store_artifacts:
           path: test-reports
           destination: test-reports
+
+  deploy:
+    <<: *defaults
+    steps:
+      - checkout
+      - setup_remote_docker:
+          version: 17.11.0-ce
+      - run:
+          name: deploy application
+          command: |
+            bash scripts/deploy.sh
+
+workflows:
+  version: 2
+  test_and_deploy:
+    jobs:
+      - test
+      - deploy:
+          requires:
+            - test
+          filters:
+            branches:
+              only:
+                - staging
+                - master
