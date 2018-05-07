@@ -63,7 +63,7 @@ test:env_file
 	@ docker-compose -p $(DOCKER_TEST_PROJECT) -f $(DOCKER_TEST_COMPOSE_FILE) down -v
 
 ## Build project image
-release:
+release:env_file
 	${INFO} "Building required container image for the application"
 	@ echo " "
 	@ docker-compose -p $(DOCKER_REL_PROJECT) -f $(DOCKER_REL_COMPOSE_FILE) build app
