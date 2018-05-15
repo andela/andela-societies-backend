@@ -70,6 +70,10 @@ class RoleAPI(Resource):
 
         return edit_role(payload, role_query)
 
+        return response_builder(dict(
+                                message="Data for editing must be provided"),
+                                400)
+
     @classmethod
     @token_required
     @roles_required(["Success Ops"])
