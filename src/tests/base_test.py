@@ -1,6 +1,5 @@
 """Module to house setup, teardown and utility class for testing."""
 
-
 import os
 import datetime
 import base64
@@ -140,10 +139,22 @@ class BaseTestCase(TestCase):
         self.nigeria = Country(name='Nigeria')
 
         # test societies
-        self.phoenix = Society(name="Phoenix")
-        self.istelle = Society(name="iStelle")
-        self.sparks = Society(name="Sparks")
-        self.invictus = Society(name="Invictus")
+        self.phoenix = Society(name="Phoenix",
+                               color_scheme="#00001",
+                               logo="https://bit.ly/2FTjkbV",
+                               photo="https://bit.ly/2k2l0qx")
+        self.istelle = Society(name="iStelle",
+                               color_scheme="#00002",
+                               logo="https://bit.ly/2FTjkbV",
+                               photo="https://bit.ly/2k2l0qx")
+        self.sparks = Society(name="Sparks",
+                              color_scheme="#00003",
+                              logo="https://bit.ly/2FTjkbV",
+                              photo="https://bit.ly/2k2l0qx")
+        self.invictus = Society(name="Invictus",
+                                color_scheme="#00004",
+                                logo="https://bit.ly/2FTjkbV",
+                                photo="https://bit.ly/2k2l0qx")
 
         # test roles
         self.successops_role = Role(uuid="-KkLwgbeJUO0dQKsEk1i",
@@ -167,7 +178,7 @@ class BaseTestCase(TestCase):
             email="test.user.societies@andela.com",
             country=self.nigeria,
             cohort=self.cohort_1_Nig,
-            society = self.phoenix)
+            society=self.phoenix)
 
         self.test_user_2 = User(
             uuid="-KdQsawesome_useridZ",
@@ -208,7 +219,7 @@ class BaseTestCase(TestCase):
         self.alibaba_ai_challenge = Activity(
             name='Fashion challenge',
             activity_type=self.hackathon,
-            activity_date = datetime.date.today() + datetime.timedelta(days=21),
+            activity_date=datetime.date.today() + datetime.timedelta(days=21),
             added_by=self.president
         )
         self.js_meet_up = Activity(
@@ -232,12 +243,13 @@ class BaseTestCase(TestCase):
             user=self.test_user,
             activity=self.alibaba_ai_challenge,
             society=self.phoenix,
-            activity_type = self.hackathon
+            activity_type=self.hackathon
         )
 
         # save common items to db
         self.tech_event.save()
         self.interview.save()
+        self.hackathon.save()
         self.test_user.save()
 
     @staticmethod

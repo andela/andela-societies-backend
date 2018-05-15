@@ -38,7 +38,7 @@ class RoleSchema(BaseSchema):
 
         if existing_role:
             self.context = {'status_code': 409}
-            raise ValidationError({'name': 'Role already exists!'})
+            raise ValidationError({'message': 'Role already exists!'})
 
 
 class ActivityTypesSchema(BaseSchema):
@@ -155,6 +155,8 @@ class ActivitySchema(BaseSchema):
 
 
 class LogEditActivitySchema(BaseSchema):
+    """Validation Schema for LoggedActivity."""
+
     name = fields.String(required=False)
     activity_id = fields.String(
         validate=[validate.Length(max=36)], load_from='activityId'
@@ -167,6 +169,7 @@ class LogEditActivitySchema(BaseSchema):
 
     @validates_schema
     def validate_logged_activity(self, data):
+        """Validate the logged activity."""
         if (data.get('activity_type_id') and data.get('activity_id')) or not \
                 data.get('activity_type_id') and not data.get('activity_id'):
             raise ValidationError(
@@ -174,8 +177,8 @@ class LogEditActivitySchema(BaseSchema):
                 'error'
             )
 
-        if data.get('activity_type_id') and not(data.get('date') and \
-                data.get('description')):
+        if data.get('activity_type_id') and not(data.get('date') and
+                                                data.get('description')):
             raise ValidationError(
                 'Please send a date and description', 'error'
             )
@@ -191,7 +194,7 @@ class LogEditActivitySchema(BaseSchema):
         if data.get('activity_type_id') == bootcamp_interviews.uuid \
                 and not data.get('no_of_interviewees'):
             raise ValidationError(
-                'Please send all required fields for a bootcamp interview' \
+                'Please send all required fields for a bootcamp interview'
                 ' i.e. a date, number of interviewees and a description',
                 'no_of_interviewees'
             )
