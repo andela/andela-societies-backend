@@ -1,15 +1,16 @@
+"""Logged Activity Test Suite."""
+from api.models import LoggedActivity
 import json
 import datetime
 
 from.base_test import BaseTestCase
-from api.models import LoggedActivity
 
 
 class LoggedActivitiesTestCase(BaseTestCase):
     """Logged activities test cases."""
 
     def setUp(self):
-        # inherit parent tests setUp
+        """Inherit parent tests setUp."""
         super().setUp()
 
         # add test users and logged activity
@@ -18,10 +19,11 @@ class LoggedActivitiesTestCase(BaseTestCase):
         self.log_alibaba_challenge.save()
 
     def test_get_logged_activities_by_user_id(self):
-        '''
-        Test that fetching a user's logged activities by an
-        authenticated person does not fail.
-        '''
+        """
+        Test fetching a user's logged activities.
+
+        When this is done by an authenticated user it should not fail.
+        """
         test_user_id = self.test_user.uuid
         response = self.client.get(
             f'/api/v1/users/{test_user_id}/logged-activities',
@@ -39,10 +41,10 @@ class LoggedActivitiesTestCase(BaseTestCase):
         self.assertEqual(len(logged_activities), len(response_content['data']))
 
     def test_get_logged_activities_message_when_user_has_none(self):
-        '''
+        """
         Test that users with no logged activities get a helpful
         message in the response
-        '''
+        """
         response = self.client.get(
             f'/api/v1/users/{self.test_user_2.uuid}/logged-activities',
             headers=self.header
@@ -54,9 +56,7 @@ class LoggedActivitiesTestCase(BaseTestCase):
         self.assertEqual(response_content['message'], message)
 
     def test_get_logged_activities_message_when_user_does_not_exist(self):
-        '''
-        Test that a 404 error is thrown when a user does not exist
-        '''
+        """Test that a 404 error is thrown when a user does not exist."""
         response = self.client.get(
             '/api/v1/users/user_id/logged-activities',
             headers=self.header
@@ -71,7 +71,7 @@ class LogActivityTestCase(BaseTestCase):
     """Log activity test cases."""
 
     def test_log_activity_using_activity_uuid_is_successful(self):
-        '''Test that logging an activity with activity uuid works'''
+        """Test that logging an activity with activity uuid works."""
         self.alibaba_ai_challenge.save()
 
         payload = json.dumps(
@@ -92,7 +92,7 @@ class LogActivityTestCase(BaseTestCase):
         )
 
     def test_log_activity_using_activity_type_uuid_is_successful(self):
-        '''Test that logging an activity with activity_type uuid works'''
+        """Test that logging an activity with activity_type uuid works."""
         self.hackathon.save()
 
         payload = json.dumps(
@@ -122,10 +122,10 @@ class LogActivityTestCase(BaseTestCase):
         self.assertEqual(response.status_code, 201)
 
     def test_log_interview_activity_requires_no_of_interviewees(self):
-        '''
+        """
         Test that logging an interview activity fails
-        without the no_of_interviewees field
-        '''
+        without the no_of_interviewees field.
+        """
         # using activity_type_id
         data = dict(
             activityTypeId=f'{self.interview.uuid}',
@@ -141,7 +141,7 @@ class LogActivityTestCase(BaseTestCase):
         # test that response status_code is 400
         self.assertEqual(response.status_code, 400)
 
-        data['noOfInterviewees']=5
+        data['noOfInterviewees'] = 5
         payload = json.dumps(data)
         response = self.client.post(
             'api/v1/logged-activities',
@@ -176,9 +176,9 @@ class LogActivityTestCase(BaseTestCase):
         self.assertEqual(response.status_code, 201)
 
     def test_log_interview_activity_when_user_is_not_a_society_member(self):
-        '''
-        Test that logging an activity fails when user is not a society member
-        '''
+        """
+        Test that logging an activity fails when user is not a society member.
+        """
         payload = json.dumps(
             dict(
                 activityTypeId=f'{self.hackathon.uuid}',
@@ -203,9 +203,10 @@ class LogActivityTestCase(BaseTestCase):
         )
 
     def test_log_activity_with_invalid_activity_id(self):
-        '''
-        Test that logging an activity fails when an invalid activity id is used
-        '''
+        """
+        Test that logging an activity fails when an invalid activity id is
+        used.
+        """
         payload = json.dumps(dict(activityId='invalid_id_yo'))
 
         response = self.client.post(
@@ -217,9 +218,10 @@ class LogActivityTestCase(BaseTestCase):
         self.assertEqual(response.status_code, 422)
 
     def test_log_activity_with_invalid_activity_type_id(self):
-        '''
-        Test that logging an activity fails when an invalid activity_type id is used
-        '''
+        """
+        Test that logging an activity fails when an invalid activity_type
+        id is used.
+        """
         payload = json.dumps(
             dict(
                 activityTypeId='invalid_activity_type_id',
@@ -236,9 +238,9 @@ class LogActivityTestCase(BaseTestCase):
         self.assertEqual(response.status_code, 422)
 
     def test_log_activity_with_invalid_activity_date(self):
-        '''
-        Test that logging an activity fails when an invalid date id is used
-        '''
+        """
+        Test that logging an activity fails when an invalid date id is used.
+        """
         payload = json.dumps(
             dict(
                 activityTypeId='invalid_activity_type_id',
@@ -255,9 +257,9 @@ class LogActivityTestCase(BaseTestCase):
         self.assertEqual(response.status_code, 422)
 
     def test_log_expired_activity(self):
-        '''
-        Test that logging an activity fails when an invalid date id is used
-        '''
+        """
+        Test that logging an activity fails when an invalid date id is used.
+        """
         payload = json.dumps(
             dict(
                 activityTypeId=f'{self.hackathon.uuid}',
@@ -280,10 +282,10 @@ class LogActivityTestCase(BaseTestCase):
 
 
 class EditLoggedActivityTestCase(BaseTestCase):
-    '''Edit activity test cases'''
+    """Edit activity test cases."""
 
     def setUp(self):
-        # inherit parent tests setUp
+        """Inherit parent tests setUp."""
         super().setUp()
 
         # add tests logged activity and corresponding activity
@@ -297,7 +299,7 @@ class EditLoggedActivityTestCase(BaseTestCase):
         )
 
     def test_edit_logged_activity_is_successful(self):
-        '''Test that editing a logged activity does not fail'''
+        """Test that editing a logged activity does not fail."""
 
         response = self.client.put(
             f'/api/v1/logged-activities/{self.log_alibaba_challenge.uuid}',
@@ -316,12 +318,11 @@ class EditLoggedActivityTestCase(BaseTestCase):
         )
         self.assertEqual(edited_activity.activity_id, self.js_meet_up.uuid)
 
-
     def test_edit_logged_activity_by_non_owner_is_unsuccessful(self):
-        '''
+        """
         Test that editing a logged activity that
-        doesn't belong to you fails
-        '''
+        doesn't belong to you fails.
+        """
         self.header["Authorization"] = self.generate_token(
             self.test_user2_payload
         )
@@ -334,10 +335,10 @@ class EditLoggedActivityTestCase(BaseTestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_edit_logged_activity_that_is_no_longer_pending(self):
-        '''
+        """
         Test that editing a logged activity that has been approved or rejected
-        fails
-        '''
+        fails.
+        """
         self.log_alibaba_challenge.status = 'approved'
         self.alibaba_ai_challenge.save()
 
@@ -349,10 +350,10 @@ class EditLoggedActivityTestCase(BaseTestCase):
         self.assertEqual(response.status_code, 401)
 
     def test_edit_logged_activity_parser_works(self):
-        '''
-        Test that during editing a logged activity, the marshamallow result parser
-        works the same way it does while logging an activity
-        '''
+        """
+        Test that during editing a logged activity, the marshamallow result
+        parser works the same way it does while logging an activity.
+        """
         self.js_meet_up.activity_date = datetime.date.today() - \
             datetime.timedelta(days=31)
         self.js_meet_up.save()
@@ -381,10 +382,10 @@ class EditLoggedActivityTestCase(BaseTestCase):
         )
 
     def test_edit_logged_activity_validation_works(self):
-        '''
+        """
         Test that during editing a logged activity, validation via marshmallow
-        works the same way it does while logging an activity
-        '''
+        works the same way it does while logging an activity.
+        """
         self.payload['activityTypeId'] = 'blah blah'
 
         response = self.client.put(
@@ -396,10 +397,10 @@ class EditLoggedActivityTestCase(BaseTestCase):
 
 
 class DeleteLoggedActivityTestCase(BaseTestCase):
-    '''Delete logged activity test cases.'''
+    """Delete logged activity test cases."""
 
     def test_logged_activity_deleted_successfully(self):
-        '''Test that a logged activity was deleted successfully.'''
+        """Test that a logged activity was deleted successfully."""
         self.log_alibaba_challenge.save()
 
         logged_activity = LoggedActivity.query.filter_by(
@@ -413,9 +414,9 @@ class DeleteLoggedActivityTestCase(BaseTestCase):
         self.assertEqual(response.status_code, 204)
 
     def test_delete_nonexistant_logged_activity(self):
-        '''Test a scenario where a logged activity
+        """Test a scenario where a logged activity
         to be deleted does not exist.
-        '''
+        """
         message = 'Logged Activity does not exist!'
         logged_activity_id = 'qwerfdse-23232-ucvhh-1233'
         response = self.client.delete(

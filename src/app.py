@@ -1,5 +1,4 @@
 """Main app module."""
-import os
 
 from api.endpoints.activity_types import ActivityTypesAPI
 from api.endpoints.activities import ActivitiesAPI
@@ -36,14 +35,15 @@ def create_app(environment="Development"):
 
     api = Api(
         app=app,
-        default='Api',
+        default='API',
         default_label="Available Endpoints",
-        title='🗣️ Open-Platform Api 😱',
+        title='🗣️ Andela Societies API 😱',
         version='1.0',
-        description="""Open-Platform Api Endpoint Documentation 📚""")
+        description="""Andela Societies API Endpoint Documentation 📚""",
+        scheme='https')
 
     # to redirect all incoming production requests to https
-    if environment.lower() == "production":
+    if environment.lower() == "production" or "staging":
         sslify = SSLify(app, subdomains=True, permanent=True)
 
     # enable cross origin resource sharing

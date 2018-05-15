@@ -22,12 +22,14 @@ class UserTestCase(BaseTestCase):
         self.assertTrue(test_user.save())
 
     def test_get_user(self):
+        """Test retrieval of user from DB."""
         self.test_user.save()
 
         user = User.query.filter_by(uuid="-KdQsMt2U0ixIy_-yWTSZ").first()
         self.assertEqual(self.test_user, user)
 
     def get_all_users(self):
+        """Test retrieval of all users from DB."""
         test_user = User(
             uuid="-KdQsMt4M0ixIy_-yWTSZ",
             name="Test User",
@@ -46,7 +48,7 @@ class UserTestCase(BaseTestCase):
                              users)
 
     def test_user_can_log_activity(self):
-
+        """Test user and logged activity relationship created."""
         self.test_user.logged_activities.append(self.log_alibaba_challenge)
         self.test_user.save()
 
@@ -55,6 +57,7 @@ class UserTestCase(BaseTestCase):
         self.assertTrue(user_activity == self.log_alibaba_challenge)
 
     def test_user_can_participate_activity(self):
+        """Test user's participation in an activity captured."""
         self.test_user.activities.append(self.js_meet_up)
         self.test_user.save()
 
@@ -64,6 +67,7 @@ class UserTestCase(BaseTestCase):
         self.assertEqual(self.js_meet_up, user_activity)
 
     def test_payload_has_null_values(self):
+        """Test saving fails with no content."""
         new_user = User(email=None,
                         name=None,
                         uuid="-Ksomeid")
@@ -75,11 +79,13 @@ class SocietyTestCase(BaseTestCase):
     """Test Society model."""
 
     def test_create_society(self):
+        """Test creation of society."""
         istelle = Society(name="iStelle")
 
         self.assertTrue(istelle.save())
 
     def test_adding_members(self):
+        """Test addition of members to a society."""
         self.istelle.members.append(self.test_user)
         self.istelle.save()
 
@@ -88,6 +94,7 @@ class SocietyTestCase(BaseTestCase):
         self.assertEqual(user, self.test_user)
 
     def test_get_all_members(self):
+        """Test retrieval of all society members."""
         test_user = User(
             uuid="-KdQsMt4M0ixIy_-yWTSZ",
             name="Test User",
@@ -105,6 +112,7 @@ class SocietyTestCase(BaseTestCase):
                              [self.president, self.test_user, test_user])
 
     def test_get_society(self):
+        """Test retrieval of a society."""
         self.phoenix.save()
 
         society = Society.query.filter_by(name="Phoenix").first()
@@ -112,6 +120,7 @@ class SocietyTestCase(BaseTestCase):
         self.assertEqual(self.phoenix, society)
 
     def test_get_all_societies(self):
+        """Test retrieval of all societies."""
         self.phoenix.save()
         self.istelle.save()
         self.sparks.save()
@@ -143,11 +152,13 @@ class ActivityTestCase(BaseTestCase):
     """Test Activity model."""
 
     def test_create_activity(self):
+        """Test creation of activity."""
         google_hash_code = Activity(name='Google Tough hackathon',
                                     activity_type=self.hackathon)
         self.assertTrue(google_hash_code.save())
 
     def test_get_activity(self):
+        """Test retrieval of activity."""
         self.alibaba_ai_challenge.save()
 
         activity = Activity.query.filter_by(name='Fashion challenge').first()
@@ -159,6 +170,7 @@ class ActivityTypeTestCase(BaseTestCase):
     """Test suite for ActivityType model."""
 
     def test_create_activityType(self):
+        """Test create activity type."""
         hackathon = ActivityType(name="Hackathon",
                                  description="Participating in a Hackathon",
                                  value=100)
@@ -173,6 +185,7 @@ class LoggedActivityTestCase(BaseTestCase):
     """Tests suite for LoggedActivity model."""
 
     def test_create_logged_activity(self):
+        """Test creation of logged activity."""
         log_alibaba_challenge = LoggedActivity(
             name="my logged activity",
             description="Participated in this event",
@@ -186,6 +199,7 @@ class LoggedActivityTestCase(BaseTestCase):
         self.assertTrue(log_alibaba_challenge.save())
 
     def test_get_user_logged_activity(self):
+        """Test retrieval of user's logged activity."""
         self.log_alibaba_challenge.save()
 
         logged_activity = LoggedActivity.query.filter_by(
@@ -194,6 +208,7 @@ class LoggedActivityTestCase(BaseTestCase):
         self.assertEqual(logged_activity, self.log_alibaba_challenge)
 
     def test_get_society_logged_activities(self):
+        """Test retrieval of a society's logged activities."""
         self.log_alibaba_challenge.save()
 
         self.assertListEqual(
@@ -205,6 +220,7 @@ class CohortTestCase(BaseTestCase):
     """Tests suite for Cohort model."""
 
     def test_create_cohort(self):
+        """Test creation of a cohort."""
         cohort_1_Nig = Cohort(name="cohort-1", country=self.nigeria)
         self.assertTrue(cohort_1_Nig.save())
 
@@ -213,6 +229,7 @@ class CountryTestCase(BaseTestCase):
     """Tests suite for Country model."""
 
     def test_create_country(self):
+        """Test create a country."""  # bwahahahahah
         self.uganda = Country(name='Uganda')
 
         self.assertTrue(self.uganda.save())
@@ -222,6 +239,7 @@ class RoleTestCase(BaseTestCase):
     """Tests suite for Role model."""
 
     def test_create_role(self):
+        """Test creation of a role."""
         self.president = Role(name="Society President")
 
         self.assertTrue(self.president.save())

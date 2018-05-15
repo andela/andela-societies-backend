@@ -131,8 +131,8 @@ class User(Base):
     cohort_id = db.Column(db.String, db.ForeignKey('cohorts.uuid'))
 
     logged_activities = db.relationship(
-        'LoggedActivity', backref='user', lazy = 'dynamic',
-        order_by = 'desc(LoggedActivity.created_at)'
+        'LoggedActivity', backref='user', lazy='dynamic',
+        order_by='desc(LoggedActivity.created_at)'
     )
 
     created_activities = db.relationship('Activity',

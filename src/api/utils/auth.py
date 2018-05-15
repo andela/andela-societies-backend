@@ -1,23 +1,17 @@
 """
 Authorisation Module.
+
 This module contains the authorisation required by the client to
 communicate with the API.
 """
 import base64
 from functools import wraps
 
-from flask import g, jsonify, request, current_app
+from flask import g, request, current_app
 from jose import ExpiredSignatureError, JWTError, jwt
 
 from api.models import User, Role
-
-
-def auth_response(status_code, message):
-    response = jsonify({
-        "message": message
-    })
-    response.status_code = status_code
-    return response
+from api.utils.helpers import response_builder
 
 
 # authorization decorator
@@ -28,9 +22,9 @@ def token_required(f):
         # check that the Authorization header is set
         authorization_token = request.headers.get('Authorization')
         if not authorization_token:
-            message = "Bad request. Header does not contain " \
-                      "authorization token"
-            return auth_response(400, message)
+            return response_builder(dict(
+                                    message="Bad request. Header does"
+                                    "not contain authorization token"), 400)
 
         unauthorized_message = "Unauthorized. The authorization token " \
                                "supplied is invalid"
@@ -51,9 +45,9 @@ def token_required(f):
 
         except ExpiredSignatureError:
             expired_response = "The authorization token supplied is expired"
-            return auth_response(401, expired_response)
+            return response_builder(dict(message=expired_response), 401)
         except JWTError:
-            return auth_response(401, unauthorized_message)
+            return response_builder(dict(message=unauthorized_message), 401)
 
         expected_user_info_format = {
             "id": "user_id",
@@ -70,9 +64,9 @@ def token_required(f):
 
         # confirm that payload and UserInfo has required keys
         if ("UserInfo" and "exp") not in payload.keys():
-            return auth_response(401, unauthorized_message)
+            return response_builder(dict(message=unauthorized_message), 401)
         elif payload["UserInfo"].keys() != expected_user_info_format.keys():
-            return auth_response(401, unauthorized_message)
+            return response_builder(dict(message=unauthorized_message), 401)
         else:
             store_user_details(payload)
 
@@ -82,6 +76,7 @@ def token_required(f):
 
 
 def store_user_details(payload):
+    """Store user details if they dont exist in the DB."""
     uuid = payload["UserInfo"]["id"]
     name = payload["UserInfo"]["name"]
     email = payload["UserInfo"]["email"]
@@ -116,8 +111,9 @@ def roles_required(roles):  # roles should be a list
             for role in (Role.query.filter_by(name=role).first()
                          for role in roles):
                 if role not in g.current_user.roles:
-                    message = "You're unauthorized to perform this operation"
-                    return auth_response(401, message)
+                    return response_builder(dict(message="You're unauthorized"
+                                                 " to perform this operation"),
+                                            401)
             return f(*args, **kwargs)
         return decorated
     return check_user_role
