@@ -1,3 +1,4 @@
+"""Activity Types Test Suite."""
 import json
 
 from api.models import ActivityType
@@ -8,12 +9,13 @@ class ActivityTypesTestCase(BaseTestCase):
     """Test activity types endpoints."""
 
     def test_get_activity_types(self):
+        """Test retrieval of activity types."""
         # add test activity types
         self.hackathon.save()
         self.tech_event.save()
 
         response = self.client.get('api/v1/activity-types',
-                                    headers=self.header)
+                                   headers=self.header)
 
         # test that request was successful
         self.assertEqual(response.status_code, 200)

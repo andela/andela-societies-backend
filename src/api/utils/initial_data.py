@@ -1,11 +1,12 @@
 """
 Sample Data for Initial Run.
+
 This contains the sample initial data required for the test run of the system.
 """
 import datetime
 
-from api.models import (ActivityType, Activity, Country, LoggedActivity, Society,
-                        User, Cohort, Role)
+from api.models import (ActivityType, Activity, Country, LoggedActivity,
+                        Society, User, Cohort, Role)
 
 # activity types
 interview = ActivityType(name="Bootcamp Interviews",
@@ -134,7 +135,8 @@ open_saturdays_2018 = Activity(
     added_by=president
 )
 
-member.activities.extend([python_hackathon, interview_2017, open_saturdays_2018])
+member.activities.extend([python_hackathon, interview_2017,
+                          open_saturdays_2018])
 
 # Logged Activities
 hackathon_points = LoggedActivity(
@@ -144,7 +146,7 @@ hackathon_points = LoggedActivity(
     activity_type=hackathon,
     status='approved', approver_id=success_ops.uuid,
     reviewer_id=president.uuid,
-    activity_date = python_hackathon.activity_date
+    activity_date=python_hackathon.activity_date
 )
 interview_points = LoggedActivity(
     value=interview.value * 5,
@@ -153,17 +155,18 @@ interview_points = LoggedActivity(
     activity_type=interview,
     status='rejected', approver_id=success_ops.uuid,
     reviewer_id=president.uuid,
-    activity_date = interview_2017.activity_date
+    activity_date=interview_2017.activity_date
 )
 open_saturday_points = LoggedActivity(
     value=open_saturdays.value,
     activity=open_saturdays_2018,
     user=member, society=invictus,
     activity_type=open_saturdays,
-    activity_date = open_saturdays_2018.activity_date
+    activity_date=open_saturdays_2018.activity_date
 )
 logged_activities = [hackathon_points, interview_points, open_saturday_points]
 
 
-test_data = activity_types + societies + users + logged_activities + countries + roles
+test_data = (activity_types + societies + users + logged_activities + countries
+             + roles)
 production_data = activity_types + countries + societies

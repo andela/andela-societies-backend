@@ -14,7 +14,8 @@ class ActivitiesTestCase(BaseTestCase):
         self.successops_role.save()
         self.fellow_role.save()
         self.successops_token =\
-            {"Authorization": self.generate_token(self.test_successops_payload)}
+            {"Authorization":
+                self.generate_token(self.test_successops_payload)}
 
     def test_create_activity(self):
         """Test that an activity has been created successfully."""
@@ -35,6 +36,18 @@ class ActivitiesTestCase(BaseTestCase):
         response_details = json.loads(response.data)
 
         self.assertEqual(message, response_details["message"])
+
+    def test_create_activity_no_payload(self):
+        """Test when no payload has been passed it fails cleanly."""
+        response = self.client.post('/api/v1/activities',
+                                    headers=self.successops_token,
+                                    content_type='application/json')
+
+        message = "Data for creation must be provided."
+        response_details = json.loads(response.data)
+
+        self.assertEqual(message, response_details["message"])
+        self.assertEqual(response.status_code, 400)
 
     def test_description_not_given(self):
         """Test for where description isn't provided in request object."""

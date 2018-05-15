@@ -1,6 +1,6 @@
 """Test suite for restriction of endpoints by Role."""
-import json
 
+import json
 from .base_test import BaseTestCase
 
 
@@ -97,6 +97,23 @@ class RoleTestCase(BaseTestCase):
 
         self.assertIn(message, response_details["message"])
 
+    def test_create_existing_role(self):
+        """Test if role can be created."""
+        new_role = dict(name="Success Ops")
+
+        response = self.client.post("/api/v1/roles",
+                                    data=json.dumps(new_role),
+                                    headers=self.successops_token,
+                                    content_type='application/json')
+
+        self.assertTrue(json.loads(response.data))
+
+        message = "Role already exists"
+        response_details = json.loads(response.data)
+
+        self.assertIn(message, response_details["message"])
+        self.assertEqual(response.status_code, 409)
+
     def test_get_role_by_id(self):
         """Test that existing role can be retrieved by ID."""
         response = self.client.get("/api/v1/roles/-KXGy1EB1oimjQgFim6L",
@@ -186,3 +203,23 @@ class RoleTestCase(BaseTestCase):
         response_details = json.loads(response.data)
 
         self.assertIn(message, response_details["message"])
+
+
+class RoleTestCaseEmpty(BaseTestCase):
+    """Test case for no roles in DB."""
+
+    def setUp(self):
+        """Set up all needed variables."""
+        BaseTestCase.setUp(self)
+
+    def test_get_all_roles_empty(self):
+        """Test lack of roles in system is returned."""
+        response = self.client.get("api/v1/roles",
+                                   headers=self.header,
+                                   content_type='application/json')
+
+        message = "Resources were not found"
+        response_details = json.loads(response.data)
+
+        self.assertIn(message, response_details["message"])
+        self.assertEqual(response.status_code, 404)

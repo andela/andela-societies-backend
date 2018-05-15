@@ -13,41 +13,42 @@ ParsedResult = namedtuple(
 
 
 def parse_log_activity_fields(result):
+    """Parse the fields of the Log Activity Fields."""
     if result.get('activity_id'):
         activity = Activity.query.get(result['activity_id'])
         if not activity:
-            return dict(message='Invalid activity id'), 422
+            return response_builder(dict(message='Invalid activity id'), 422)
 
         activity_type = activity.activity_type
         if activity_type.name == 'Bootcamp Interviews' and \
                 not (result.get('no_of_interviewees')
-                        and result.get('description')):
-            return dict(
-                message='Please send the number of interviewees and' \
+                     and result.get('description')):
+            return response_builder(dict(
+                message='Please send the number of interviewees and'
                 ' their names in the description'
-            ), 400
+            ), 400)
 
         activity_date = activity.activity_date
         time_difference = datetime.date.today() - activity_date
     else:
         activity_date = result['date']
         if activity_date > datetime.date.today():
-            return dict(message='Invalid activity date'), 422
+            return response_builder(dict(message='Invalid activity date'), 422)
 
         activity_type = ActivityType.query.get(
             result['activity_type_id']
         )
         if not activity_type:
-            return dict(message='Invalid activity type id'), 422
+            return response_builder(dict(message='Invalid activity type id'),
+                                    422)
         activity = None
         time_difference = datetime.date.today() - activity_date
 
-
     if time_difference.days > 30:
-        return dict(
-            message = 'You\'re late. That activity' \
+        return response_builder(dict(
+            message='You\'re late. That activity'
             ' happened more than 30 days ago'
-        ), 422
+        ), 422)
 
     activity_value = activity_type.value if not \
         activity_type.name == 'Bootcamp Interviews' else \
@@ -58,54 +59,50 @@ def parse_log_activity_fields(result):
     )
 
 
-def paginate_roles():
+def paginate_items(fetched_data):
     """Pagniate all roles for display."""
     _page = request.args.get('page')
     _limit = request.args.get('limit')
     page = int(_page or current_app.config['DEFAULT_PAGE'])
     limit = int(_limit or current_app.config['PAGE_LIMIT'])
-    roles = Role.query
 
-    roles = roles.paginate(
+    fetched_data = fetched_data.paginate(
         page=page,
         per_page=limit,
         error_out=False
     )
-    if roles.items:
+    if fetched_data.items:
         previous_url = None
         next_url = None
-        if roles.has_next:
+
+        if fetched_data.has_next:
             next_url = url_for(request.endpoint, limit=limit,
                                page=page+1, _external=True)
-        if roles.has_prev:
+        if fetched_data.has_prev:
             previous_url = url_for(request.endpoint, limit=limit,
                                    page=page-1, _external=True)
 
-        roles_list = []
-        for _role in roles.items:
-            role = _role.serialize()
-            roles_list.append(role)
+        data_list = []
+        for _fetched_item in fetched_data.items:
+            data_item = _fetched_item.serialize()
+            data_list.append(data_item)
 
-        response = jsonify({
-            "status": "success",
-            "data": {"roles": roles_list,
-                     "count": len(roles.items),
-                     "nextUrl": next_url,
-                     "previousUrl": previous_url,
-                     "currentPage": roles.page},
-            "message": "Roles fetched successfully."
-        })
-        response.status_code = 200
-        return response
-    else:
-        response = jsonify({
-            "status": "success",
-            "data": {"roles": [],
-                     "count": 0},
-            "message": "There are no roles."
-        })
-        response.status_code = 404
-        return response
+        return response_builder(dict(
+            status="success",
+            data=dict(data_items=data_list,
+                      count=len(fetched_data.items),
+                      nextUrl=next_url,
+                      previousUrl=previous_url,
+                      currentPage=fetched_data.page),
+            message="Data fetched successfully."
+        ), 200)
+
+    return response_builder(dict(
+        status="success",
+        data=dict(data_list=[],
+                  count=0),
+        message="Resources were not found."
+    ), 404)
 
 
 def edit_role(payload, search_term):
@@ -114,66 +111,49 @@ def edit_role(payload, search_term):
     name = payload["name"]
     # if edit request == stored value
     if name == role.name:
-        response = jsonify({
-            "data": {"path": role.serialize()},
-            "message": "No change specified."
-        })
-        response.status_code = 200
-        return response
+        return response_builder(dict(
+            data=dict(path=role.serialize()),
+            message="No change specified."
+        ), 200)
+
     else:
         if role:
             if name:
                 old_role_name = role.name
                 role.name = name
             else:
-                return {"status": "fail",
-                        "message": "Name to edit to"
-                                   " must be provided."}, 400
+                return response_builder(dict(status="fail",
+                                        message="Name to edit to"
+                                        " must be provided."), 400)
             role.save()
-            response = jsonify({
-                "data": {"path": role.serialize()},
-                "message": "Role {} has been changed"
-                           " to {}.".format(old_role_name, role.name)
-            })
-            response.status_code = 200
-        else:
-            response = jsonify({"status": "fail",
-                                "message": "Role does not exist."})
-            response.status_code = 404
-        return response
+            return response_builder(dict(
+                data=dict(path=role.serialize()),
+                message="Role {} has been changed"
+                        " to {}.".format(old_role_name, role.name)
+            ), 200)
+
+        return response_builder(dict(status="fail",
+                                     message="Role does not exist."), 404)
 
 
-def find_role(role):
-    """Find a role within the API."""
-    if role:
-        response = jsonify({
-            "data": role.serialize(),
-            "status": "success",
-            "message": "Role {} fetched successfully.".format(role.name)
-        })
-        response.status_code = 200
-        # return response
-    else:
-        response = jsonify({
-            "data": None,
-            "status": "fail",
-            "message": "Specified role does not exist."
-        })
-        response.status_code = 404
+def find_item(data):
+    """Find a specified within the DB and return it."""
+    if data:
+        return response_builder(dict(
+            data=data.serialize(),
+            status="success",
+            message="{} fetched successfully.".format(data.name)
+        ), 200)
+
+    return response_builder(dict(
+        data=None,
+        status="fail",
+        message="Resource does not exist."
+    ), 404)
+
+
+def response_builder(data, status_code):
+    """Build the jsonified response to return."""
+    response = jsonify(data)
+    response.status_code = status_code
     return response
-
-# def serialize_point(point):
-#     """Map point object to dict representation.
-
-#     Args:
-#        point(Point): point object
-
-#     Returns:
-#        serialized_point(dict): dict representation of point
-#     """
-#     serialized_point = point.serialize()
-#     serialized_point["id"] = serialized_point.pop("uuid")
-#     serialized_point["activity"] = point.activity.name
-#     serialized_point["owner"] = point.user.name
-
-#     return serialized_point
