@@ -3,10 +3,14 @@
 [![CircleCI](https://circleci.com/gh/AndelaOSP/andela-societies-backend.svg?style=svg)](https://circleci.com/gh/AndelaOSP/andela-societies-backend)
 [![Coverage Status](https://coveralls.io/repos/github/AndelaOSP/andela-societies-backend/badge.svg)](https://coveralls.io/github/AndelaOSP/andela-societies-backend)
 
-# Society-platform ✍
-API for an Andela Societies.
+# Andela-Societies ✍
+### API for Andela Societies.
 
-```Insert Description here```
+
+The Andela Societies are an awesome platform for collaboration and relationship-building across all centers of Andela for all fellows.
+They give all Fellows a common ground to interact and know about each other regardless as to the geographical location of each one of them.
+This way location of the Fellow does not stand in the way of the opportunity for long-lasting collaborative relationships being formed.
+
 
 - ## API
 This App exposes endpoints that allows ```clients/Users``` to interact with Andela society Platform.
@@ -16,6 +20,16 @@ This App exposes endpoints that allows ```clients/Users``` to interact with Ande
 |Method | Endpoint | Usage |
 | ---- | ---- | --------------- |
 |POST| `/api/v1.0/login` | Login user.|
+|POST| `/api/v1/activities` or `/api/v1/activities/` | Create an activity.|
+|GET| `/api/v1/activity-types` or `/api/v1/activity-types/` | Get information on activity types.|
+|POST| `/api/v1/logged-activities` or `/api/v1/logged-activities/` | Log a new activity.|
+|DELETE| `/api/v1/logged-activities/{logged_activity_id}` or `/api/v1/logged-activities/{logged_activity_id}/` | Delete a logged activity.|
+|PUT| `/api/v1/logged-activities/{logged_activity_id}` or `/api/v1/logged-activities/{logged_activity_id}/` | Edit a logged activity.|
+|POST| `/api/v1/societies` or `/api/v1/societies/` | Create a society.|
+|PUT| `/api/v1/societies/{society_id}` or `/api/v1/societies/{society_id}/` | Edit a society.|
+|GET| `/api/v1/user/profile` or `/api/v1/user/profile/` | Get user information.|
+|GET| `/api/v1/users/{user_id}/logged-activities` | Get a user's logged activities by user_id URL parameter.|
+
 
 
 ## Getting Started 🕵
@@ -28,12 +42,12 @@ This App exposes endpoints that allows ```clients/Users``` to interact with Ande
 
 - To consume API in client of choice navigate to:
  ```
- <Insert Hosted site here>
+ http://api-staging-societies.andela.com/
  ```
 
 ### Prerequisites
-The application is built using python: flask framework.
->[Flask](http://flask.pocoo.org/) is a microframework for the Python programming language.
+The application is built using python: Flask framework.
+>[Flask](http://flask.pocoo.org/) is a micro-framework for the Python programming language.
 
 
 To Install python checkout:
@@ -52,25 +66,23 @@ $ cd src
 $ pip install -r requirements.txt
 ```
 
-- Configure Environment.
+- Configure Environment
 ```
-<Insert Config here>
+export SECRET="Thequickbrownfoxjumpedoverthelazydog"
+export APP_SETTINGS=Development
+export DATABASE_URL=database_url_for_development_environment
+export TEST_DATABASE=database_url_for_testing_environment
+export ANDELA_API_URL=https://api.andela.com/api/v1/
+export DEV_TOKEN=token_from_signed_in_webapps
 ```
-> Note replace the value for DEV_DATABASE with real database path and SECRET with a strong string value
-
-
-- Configure database
-```
-<Insert Config here>
-```
+> Note replace the value for DATABASE_URL & TEST_DATABASE with a real database path and SECRET with a strong string value
 
 - Run App 🏃
 ```
 $ cd src
 $ python manage.py runserver
 ```
-The app should be accessiable via : http://127.0.0.1:5000/
-
+The app should be accessible via : http://127.0.0.1:5000/
 
 
 ## Running the tests
@@ -82,11 +94,12 @@ $ python manage.py test
 
 - Coding style tests
 
-[Pep8](https://www.python.org/dev/peps/pep-0008/) standards are followed in project.
+[PEP8](https://pypi.org/project/pycodestyle/) (pycodestyle) standards are followed in project. </br>
+PEP8 has deprecated; instead use pycodestyle for the same effect
 
 ```
 $ cd src
-$ pep8 api --count
+$ pycodestyle .
 
 ```
 
