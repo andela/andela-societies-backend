@@ -108,9 +108,8 @@ def paginate_items(fetched_data):
 def edit_role(payload, search_term):
     """Find and edit the role."""
     role = Role.query.get(search_term)
-    name = payload["name"]
     # if edit request == stored value
-    if name == role.name:
+    if payload["name"] == role.name:
         return response_builder(dict(
             data=dict(path=role.serialize()),
             message="No change specified."
@@ -118,9 +117,9 @@ def edit_role(payload, search_term):
 
     else:
         if role:
-            if name:
+            if payload["name"]:
                 old_role_name = role.name
-                role.name = name
+                role.name = payload["name"]
             else:
                 return response_builder(dict(status="fail",
                                         message="Name to edit to"
@@ -137,7 +136,7 @@ def edit_role(payload, search_term):
 
 
 def find_item(data):
-    """Find a specified within the DB and return it."""
+    """Build the response with found/404 item in DB."""
     if data:
         return response_builder(dict(
             data=data.serialize(),

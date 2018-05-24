@@ -47,15 +47,26 @@ class ActivityTypesSchema(BaseSchema):
     description = fields.String(
         required=True,
         error_messages={
-            'required': 'A description is required.'
+            'message': 'A description is required.'
         }
     )
     value = fields.Integer(
         required=True,
         error_messages={
-            'required': 'Please send the activity points value'
+            'message': 'Please send the activity points value'
         }
     )
+
+    @post_load
+    def verify_activity_type(self, data):
+        """Extra validation of activity type."""
+        existing_activity_type_name = ActivityType.query.filter(
+            ActivityType.name.ilike(data['name'])).first()
+
+        if existing_activity_type_name:
+            self.context = {'status_code': 409}
+            raise ValidationError({'message':
+                                   'Activity Type (name) already exists!'})
 
 
 class LoggedActivitySchema(BaseSchema):
@@ -200,6 +211,7 @@ class LogEditActivitySchema(BaseSchema):
             )
 
 
+new_activity_type_schema = ActivityTypesSchema()
 activity_types_schema = ActivityTypesSchema(many=True)
 activity_schema = ActivitySchema()
 single_logged_activity_schema = LoggedActivitySchema()
