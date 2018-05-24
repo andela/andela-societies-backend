@@ -1,22 +1,126 @@
 """Module for activity types operations."""
 
+from flask import request
 from flask_restplus import Resource
 
-from api.utils.auth import token_required
+from api.utils.auth import token_required, roles_required
 from api.models import ActivityType
-from api.utils.marshmallow_schemas import activity_types_schema
-from api.utils.helpers import response_builder
+from api.utils.marshmallow_schemas import (new_activity_type_schema,
+                                           activity_types_schema)
+from api.utils.helpers import response_builder, find_item
 
 
 class ActivityTypesAPI(Resource):
     """Activity Categories Resource."""
 
-    @token_required
-    def get(self):
+    decorators = [token_required]
+
+    @classmethod
+    @roles_required(["Success Ops"])
+    def post(cls):
+        """Create new activity type."""
+        payload = request.get_json(silent=True)
+        if not payload:
+            return response_builder(dict(
+                                    message="Data for creation must "
+                                            "be provided.",
+                                    status="fail",
+                                    ), 400)
+
+        result, errors = new_activity_type_schema.load(payload)
+
+        if errors:
+            status_code = new_activity_type_schema.context.get(
+                            'status_code')
+            validation_status_code = status_code or 400
+            return response_builder(errors, validation_status_code)
+
+        activity_type = ActivityType(name=result["name"],
+                                     description=result["description"],
+                                     value=result["value"])
+        activity_type.save()
+        return response_builder(dict(
+                    status="success",
+                    data=activity_type.serialize(),
+                    message="Activity type created successfully."
+        ), 201)
+
+    @classmethod
+    def get(cls, act_types_id=None):
         """Get information on activity types."""
-        activity_types = ActivityType.query.all()
+        search_term = request.args.get('q')
+        if not search_term:
+            if not act_types_id:
+                activity_types = ActivityType.query.all()
 
-        activity_types_list = activity_types_schema.dump(
-            activity_types).data
+                activity_types_list = activity_types_schema.dump(
+                    activity_types).data
 
-        return response_builder(dict(data=activity_types_list), 200)
+                return response_builder(dict(data=activity_types_list), 200)
+
+            activity_type = ActivityType.query.get(act_types_id)
+            return find_item(activity_type)
+
+        activity_type = ActivityType.query.filter_by(name=search_term).first()
+        return find_item(activity_type)
+
+    @classmethod
+    @roles_required(["Success Ops"])
+    def put(cls, act_types_id=None):
+        """Edit information on an activity type."""
+        payload = request.get_json(silent=True)
+        if not payload:
+            return response_builder(dict(
+                                    message="Data for editing must "
+                                            "be provided.",
+                                    status="fail",
+                                    ), 400)
+
+        if not act_types_id:
+            return response_builder(dict(
+                                    message="Activity type to be edited"
+                                            " must be provided",
+                                    status="fail",
+                                    ), 400)
+
+        target_activity_type = ActivityType.query.get(act_types_id)
+        if not target_activity_type:
+            return response_builder(dict(
+                status="fail",
+                message="Resource not found."
+            ), 404)
+
+        if payload.get("name"):
+            target_activity_type.name = payload.get("name")
+        if payload.get("description"):
+            target_activity_type.description = payload.get("description")
+        if payload.get("value"):
+            target_activity_type.value = payload.get("value")
+        return response_builder(dict(
+                message="Edit successful",
+                path=target_activity_type.serialize(),
+                status="success",
+        ), 200)
+
+    @classmethod
+    @roles_required(["Success Ops"])
+    def delete(cls, act_types_id=None):
+        """Delete an activity type."""
+        if not act_types_id:
+            return response_builder(dict(
+                status="fail",
+                message="Activity type must be provided."
+            ), 400)
+
+        activity_type = ActivityType.query.get(act_types_id)
+        if not activity_type:
+            return response_builder(dict(
+                message="Resource not found.",
+                status="fail"
+            ), 404)
+
+        activity_type.delete()
+        return response_builder(dict(
+            status="success",
+            message="Activity type deleted successfully."
+        ), 200)

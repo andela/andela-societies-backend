@@ -61,6 +61,13 @@ def create_app(environment="Development"):
         '/api/v1/activity-types/', endpoint='activity_types'
     )
 
+    api.add_resource(
+        ActivityTypesAPI,
+        '/api/v1/activity-types/<string:act_types_id>',
+        '/api/v1/activity-types/<string:act_types_id>/',
+        endpoint='activity_types_detail'
+    )
+
     # user logged activities
     api.add_resource(
         LoggedActivitiesAPI,
