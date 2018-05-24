@@ -24,14 +24,13 @@ class RoleAPI(Resource):
 
             if errors:
                 status_code = role_schema.context.get('status_code')
-                role_schema.context = {'Roles': Role.query.all()}
                 validation_status_code = status_code or 400
                 return response_builder(errors, validation_status_code)
 
             role = Role(name=result['name'])
             role.save()
             return response_builder(dict(message='Role created successfully.',
-                                         data=result), 201)
+                                         data=role.serialize()), 201)
 
         return response_builder(dict(
                                 message="Data for creation must be provided."),
@@ -60,16 +59,16 @@ class RoleAPI(Resource):
         """Edit a role's details."""
         payload = request.get_json(silent=True)
 
-        if payload:
-            if not role_query:
-                return {"status": "fail",
-                        "message": "Role id/name must be provided."}, 400
+        if not payload:
+            return response_builder(dict(
+                                    message="Data for editing must "
+                                            "be provided"),
+                                    400)
+        if not role_query:
+            return {"status": "fail",
+                    "message": "Role id/name must be provided."}, 400
 
-            return edit_role(payload, role_query)
-
-        return response_builder(dict(
-                                message="Data for editing must be provided"),
-                                400)
+        return edit_role(payload, role_query)
 
     @classmethod
     @token_required

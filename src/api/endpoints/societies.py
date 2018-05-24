@@ -96,8 +96,10 @@ class SocietyResource(Resource):
                         message="Society edited successfully."
                     ), 200)
 
-                except KeyError:
-                    return response_builder(dict(module="Society Module"), 500)
+                except KeyError as e:
+                    return response_builder(dict(
+                        module="Society Module",
+                        errors=e), 500)
 
             return response_builder(dict(status="fail",
                                     message="Society does not exist."), 404)
