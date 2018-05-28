@@ -115,6 +115,7 @@ class Cohort(Base):
 
     __tablename__ = 'cohorts'
     country_id = db.Column(db.String, db.ForeignKey('countries.uuid'))
+    society_id = db.Column(db.String, db.ForeignKey('societies.uuid'))
 
     members = db.relationship('User', backref='cohort')
 
@@ -164,6 +165,7 @@ class Society(Base):
     members = db.relationship('User', backref='society', lazy='dynamic')
     logged_activities = db.relationship('LoggedActivity', backref='society',
                                         lazy='dynamic')
+    cohorts = db.relationship('Cohort', backref='society', lazy='dynamic')
 
     @property
     def total_points(self):

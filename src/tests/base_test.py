@@ -125,12 +125,14 @@ class BaseTestCase(TestCase):
             "Content-Type": "application/json"
         }
         self.success_ops = {
-            "Authorization": self.generate_token(self.test_successops_payload)
+            "Authorization": self.generate_token(self.test_successops_payload),
+            "Content-Type": "application/json"
             }
         self.bad_token_header = {
             "Authorization": self.generate_token(
                 {"I don't know": "what to put here"}
-            )
+            ),
+            "Content-Type": "application/json"
         }
 
         # test countries

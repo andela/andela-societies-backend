@@ -188,8 +188,8 @@ class LogEditActivitySchema(BaseSchema):
                 'error'
             )
 
-        if data.get('activity_type_id') and not(data.get('date') and
-                                                data.get('description')):
+        if data.get('activity_type_id') and not(data.get('date')
+                                                and data.get('description')):
             raise ValidationError(
                 'Please send a date and description', 'error'
             )
@@ -211,8 +211,24 @@ class LogEditActivitySchema(BaseSchema):
             )
 
 
-new_activity_type_schema = ActivityTypesSchema()
+class CohortSchema(BaseSchema):
+    """Validation Schema for Cohort."""
+
+    country_id = fields.String(dump_only=True, dump_to='countryId',
+                               validate=[validate.Length(max=36)])
+
+    society_id = fields.String(dump_only=True, dump_to='societyId',
+                               validate=[validate.Length(max=36)])
+
+
+class SocietySchema(BaseSchema):
+    """Validation/Serialize Schema for Society."""
+
+    pass
+
+
 activity_types_schema = ActivityTypesSchema(many=True)
+new_activity_type_schema = ActivityTypesSchema()
 activity_schema = ActivitySchema()
 single_logged_activity_schema = LoggedActivitySchema()
 log_edit_activity_schema = LogEditActivitySchema()
@@ -220,3 +236,5 @@ user_logged_activities_schema = LoggedActivitySchema(
     many=True, exclude=('society', 'society_id')
 )
 role_schema = RoleSchema()
+cohort_schema = CohortSchema()
+base_schema = BaseSchema()
