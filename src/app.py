@@ -2,7 +2,7 @@
 
 from api.endpoints.activity_types import ActivityTypesAPI
 from api.endpoints.activities import ActivitiesAPI
-from api.endpoints.societies import SocietyResource
+from api.endpoints.societies import SocietyResource, AddCohort
 from api.endpoints.users import UserAPI
 from api.endpoints.logged_activities import UserLoggedActivitiesAPI
 from api.endpoints.logged_activities import LoggedActivitiesAPI
@@ -21,7 +21,7 @@ except ImportError:
 
 
 def create_app(environment="Development"):
-    """Factory Method that creates an instance of the app with the given config.
+    """Factory Method that creates an instance of the app with the given env.
 
     Args:
         environment (str): Specify the configuration to initilize app with.
@@ -44,7 +44,7 @@ def create_app(environment="Development"):
 
     # to redirect all incoming production requests to https
     if environment.lower() == "production" or "staging":
-        sslify = SSLify(app, subdomains=True, permanent=True)
+        SSLify(app, subdomains=True, permanent=True)
 
     # enable cross origin resource sharing
     CORS(app)
@@ -108,6 +108,12 @@ def create_app(environment="Development"):
         endpoint="society_detail"
     )
 
+    # Add Cohort to society
+    api.add_resource(
+        AddCohort, "/api/v1/societies/cohorts"
+    )
+
+    # role endpoints
     api.add_resource(
         RoleAPI, "/api/v1/roles", "/api/v1/roles/",
         endpoint="role"

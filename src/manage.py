@@ -7,7 +7,7 @@ from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager, Shell, prompt_bool
 
 from api.utils.initial_data import test_data, production_data
-from api.models import Activity, Society, User, db
+from api.models import Activity, Society, User, db, Cohort
 from app import create_app
 from run_tests import test
 
@@ -15,6 +15,19 @@ from run_tests import test
 app = create_app(environment=os.environ.get('APP_SETTINGS', "Development"))
 manager = Manager(app)
 migrate = Migrate(app, db)
+
+
+def shell():
+    """Make a shell/REPL context available."""
+    return dict(app=app,
+                db=db,
+                User=User,
+                Society=Society,
+                Activity=Activity)
+
+
+manager.add_command('shell', Shell(make_context=shell))
+manager.add_command("db", MigrateCommand)
 
 
 @manager.command
@@ -68,21 +81,42 @@ def seed():
             print("\n\n\nFailed:\n", e, "\n\n")
 
 
-def shell():
-    """Make a shell/REPL context available."""
-    return dict(app=app,
-                db=db,
-                User=User,
-                Society=Society,
-                Activity=Activity)
+@manager.command
+def update_cohorts(name=None):
+    """Sync cohorts in DB with cohorts from Andela API."""
+    pass
 
 
-manager.add_command("shell", Shell(make_context=shell))
-manager.add_command("db", MigrateCommand)
+@manager.command
+def link_society_cohort(cohort_name, society_name):
+    """CLI tool, link cohort with society."""
+    with app.app_context():
+        cohort = Cohort.query.filter_by(name=cohort_name).first()
+        if not cohort:
+            return print(
+                f'Error cohort by name: {cohort_name} does not exist in DB.')
+        if cohort.society:
+            prompt_bool('Cohort has society already!\n Do you want to change?')
+
+        society = Society.query.filter_by(name=society_name).first()
+        if not society:
+            return print(
+                f'Error society with name:{society_name} does not exist.')
+
+        society.cohorts.append(cohort)
+        if society.save():
+            message = f'Cohort:{cohort_name} succefully'
+            message += f' added to society:{society_name}'
+            return print(message)
+        else:
+            print('Error something went wrong when saving to DB. :-)')
+
+
+@manager.command
+def tests():
+    """Run the tests."""
+    test()
 
 
 if __name__ == "__main__":
-    if sys.argv[1] == 'test':
-        test()
-    else:
-        manager.run()
+    manager.run()
