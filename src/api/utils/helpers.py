@@ -121,9 +121,9 @@ def edit_role(payload, search_term):
                 old_role_name = role.name
                 role.name = payload["name"]
             else:
-                return response_builder(dict(status="fail",
-                                        message="Name to edit to"
-                                        " must be provided."), 400)
+                return response_builder(
+                    dict(status="fail",
+                         message="Name to edit to must be provided."), 400)
             role.save()
             return response_builder(dict(
                 data=dict(path=role.serialize()),
@@ -151,7 +151,7 @@ def find_item(data):
     ), 404)
 
 
-def response_builder(data, status_code):
+def response_builder(data, status_code=200):
     """Build the jsonified response to return."""
     response = jsonify(data)
     response.status_code = status_code

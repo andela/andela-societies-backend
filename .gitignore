@@ -114,3 +114,4 @@ ENV/
 *.sqlite
 
 migrations/*
+.envrc

@@ -5,7 +5,8 @@ from flask_restplus import Resource
 
 from api.utils.auth import token_required, roles_required
 from api.utils.helpers import find_item, paginate_items, response_builder
-from ..models import Society
+from api.utils.marshmallow_schemas import cohort_schema, base_schema
+from ..models import Society, Cohort
 
 
 class SocietyResource(Resource):
@@ -101,8 +102,9 @@ class SocietyResource(Resource):
                         module="Society Module",
                         errors=e), 500)
 
-            return response_builder(dict(status="fail",
-                                    message="Society does not exist."), 404)
+            return response_builder(dict(
+                                status="fail",
+                                message="Society does not exist."), 404)
 
         # if payload does not exist
         return response_builder(dict(
@@ -129,3 +131,56 @@ class SocietyResource(Resource):
         return response_builder(dict(
                 status="success",
                 message="Society deleted successfully."), 200)
+
+
+class AddCohort(Resource):
+    """Resource for adding cohorts to societies."""
+
+    @token_required
+    @roles_required(["Success Ops"])
+    def put(self):
+        """Assign a cohort to a society.
+
+        Returns
+            response (dict): key:status
+        """
+        payload = request.get_json(silent=True)
+
+        if not payload or not ('societyId' in payload and 'cohortId' in payload):
+            return response_builder(dict(
+                message="Error societyId and cohortId are required."
+            ), 400)
+
+        society = Society.query.filter_by(
+            uuid=payload.get('societyId')).first()
+        if not society:
+            return response_builder(dict(
+                message="Error Invalid societyId."
+            ), 400)
+
+        cohort = Cohort.query.filter_by(uuid=payload.get('cohortId')).first()
+        if not cohort:
+            return response_builder(dict(
+                message="Error Invalid cohortId."
+            ), 400)
+
+        if cohort.society_id == society.uuid:
+            return response_builder(dict(
+                message="Cohort already in society."
+            ), 409)
+
+        society.cohorts.append(cohort)
+        society.save()
+        cohort.save()
+
+        cohort_data = cohort_schema.dump(cohort).data
+        cohort_meta_data = {
+                'society': base_schema.dump(society).data,
+                'country': base_schema.dump(cohort.country).data
+                }
+        cohort_data['meta'] = cohort_meta_data
+
+        return response_builder(dict(
+            message="Cohort added to society succesfully",
+            data=cohort_data
+        ), 200)
