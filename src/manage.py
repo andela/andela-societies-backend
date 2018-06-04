@@ -16,19 +16,6 @@ app = create_app(environment=os.environ.get('APP_SETTINGS', "Development"))
 manager = Manager(app)
 
 
-def shell():
-    """Make a shell/REPL context available."""
-    return dict(app=app,
-                db=db,
-                User=User,
-                Society=Society,
-                Activity=Activity)
-
-
-manager.add_command('shell', Shell(make_context=shell))
-manager.add_command("db", MigrateCommand)
-
-
 @manager.command
 def drop_database():
     """Drop database tables."""
