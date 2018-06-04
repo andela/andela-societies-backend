@@ -4,6 +4,7 @@ from marshmallow import (
     Schema, fields, post_load, validates,
     validate, ValidationError, validates_schema
 )
+
 from api.models import User, Activity, ActivityType, Role
 
 
@@ -227,6 +228,17 @@ class SocietySchema(BaseSchema):
     pass
 
 
+class UserSchema(BaseSchema):
+    """User serializer/validator."""
+
+    society_id = fields.String(dump_only=True, dump_to='societyId',
+                               validate=[validate.Length(max=36)])
+    country_id = fields.String(dump_only=True, dump_to='countryId',
+                               validate=[validate.Length(max=36)])
+    cohort_id = fields.String(dump_only=True, dump_to='cohortId',
+                              validate=[validate.Length(max=36)])
+
+
 activity_types_schema = ActivityTypesSchema(many=True)
 new_activity_type_schema = ActivityTypesSchema()
 activity_schema = ActivitySchema()
@@ -238,3 +250,5 @@ user_logged_activities_schema = LoggedActivitySchema(
 role_schema = RoleSchema()
 cohort_schema = CohortSchema()
 base_schema = BaseSchema()
+user_schema = UserSchema()
+basic_info_schema = BaseSchema()
