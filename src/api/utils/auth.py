@@ -6,12 +6,20 @@ communicate with the API.
 """
 import base64
 from functools import wraps
-
-from flask import g, request, current_app
+from flask import g, jsonify, request, current_app
 from jose import ExpiredSignatureError, JWTError, jwt
 
 from api.models import User, Role
-from api.utils.helpers import response_builder
+from api.utils.helpers import add_extra_user_info, response_builder
+
+
+def auth_response(status_code, message):
+    """Build authentication responses."""
+    response = jsonify({
+        "message": message
+    })
+    response.status_code = status_code
+    return response
 
 
 # authorization decorator
@@ -68,39 +76,50 @@ def token_required(f):
         elif payload["UserInfo"].keys() != expected_user_info_format.keys():
             return response_builder(dict(message=unauthorized_message), 401)
         else:
-            store_user_details(payload)
+            store_user_details(payload, authorization_token)
 
             # now return wrapped function
             return f(*args, **kwargs)
     return decorated
 
 
-def store_user_details(payload):
-    """Store user details if they dont exist in the DB."""
-    uuid = payload["UserInfo"]["id"]
+def store_user_details(payload, token):
+    """Store user details in our database."""
+    user_id = payload["UserInfo"]["id"]
     name = payload["UserInfo"]["name"]
     email = payload["UserInfo"]["email"]
     photo = payload["UserInfo"]["picture"]
     roles = payload["UserInfo"]["roles"]
 
-    user = User.query.get(uuid)
+    user = User.query.get(user_id)
 
     # save user to db if they haven't been saved yet
     if not user:
         user = User(
-            uuid=uuid, name=name, email=email, photo=photo
+            uuid=user_id, name=name, email=email, photo=photo
         )
 
-    # set current user in flask global variable, g
-    user.roles = [Role.query.filter_by(name=role).first()
+    cohort, location, _ = add_extra_user_info(token, user_id)
 
-                  for role in roles
-                  if role != "Andelan" and
-                  Role.query.filter_by(name=role).first() is not None]
+    if cohort:
+        cohort.members.append(user)
+        cohort.save()
+        user.society_id = cohort.society.uuid if cohort.society else None
+
+    if location:
+        location.members.append(user)
+        location.save()
+
+    # set current user in flask global variable, g
+    user.roles = [
+        Role.query.filter_by(name=role).first() for role in roles
+        if role != "Andelan" and Role.query.filter_by(
+            name=role).first() is not None]
 
     user.save()
 
     g.current_user = user
+    g.current_user_token = token
 
 
 def roles_required(roles):  # roles should be a list

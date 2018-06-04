@@ -1,7 +1,6 @@
 """Test suite for Society Module."""
 import json
 import uuid
-from app import create_app
 from .base_test import BaseTestCase
 from api.models import Society, Role, db
 
@@ -223,16 +222,12 @@ class SocietyTestCaseEmpty(BaseTestCase):
 
     def setUp(self):
         """Set up all needed variables."""
-        self.app = create_app("Testing")
-        self.app_context = self.app.app_context()
-        self.app_context.push()
+        super().setUp()
         db.drop_all()
         db.create_all()
         self.successops_role = Role(uuid="-KkLwgbeJUO0dQKsEk1i",
                                     name="Success Ops")
         self.successops_role.save()
-        # test client
-        self.client = self.app.test_client()
 
         self.header = {
             "Authorization": self.generate_token(self.test_user_payload),

@@ -3,12 +3,12 @@
 import os
 import datetime
 import base64
-from unittest import TestCase
+from unittest import TestCase, mock
+from jose import jwt
 
+from app import create_app
 from api.models import (Activity, ActivityType, Cohort, Country,
                         LoggedActivity, Society, User, Role, db)
-from app import create_app
-from jose import jwt
 
 
 class BaseTestCase(TestCase):
@@ -111,6 +111,10 @@ class BaseTestCase(TestCase):
 
     def setUp(self):
         """Setup function to configure test enviroment."""
+        self.patcher = mock.patch('api.utils.auth.add_extra_user_info',
+                                  return_value=(None, None, None))
+        self.patcher.start()
+
         self.app = create_app("Testing")
         self.app_context = self.app.app_context()
         self.app_context.push()
@@ -264,6 +268,7 @@ class BaseTestCase(TestCase):
 
     def tearDown(self):
         """Clean up after every test."""
+        self.patcher.stop()
         db.session.remove()
         db.drop_all()
         self.app_context.pop()
