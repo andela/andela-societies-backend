@@ -4,7 +4,7 @@ from flask import request
 from flask_restplus import Resource
 
 from api.utils.auth import token_required, roles_required
-from ..models import Role
+from ..models import Role, User, Society, user_role
 from api.utils.helpers import (paginate_items, edit_role, find_item,
                                response_builder)
 from api.utils.marshmallow_schemas import role_schema
@@ -88,3 +88,71 @@ class RoleAPI(Resource):
         role.delete()
         return response_builder(dict(status="success",
                                 message="Role deleted successfully."), 200)
+
+
+class SocietyRoleAPI(Resource):
+    """Contains functionality to change Society Executives."""
+
+    @token_required
+    @roles_required(["Success Ops"])
+    def put(self):
+        """Change the a society executives."""
+        payload = request.get_json(silent=True)
+        if not payload:
+            return response_builder(dict(
+                message="Executive for change must be provided"
+            ), 400)
+
+        if not payload.get("role") and payload.get("society") and payload.get(
+                                                                    "name"):
+            return response_builder(dict(
+                message="Role, society and individual for change "
+                        "must be provided"
+            ), 400)
+
+        society = Society.query.filter_by(name=payload.get("society")).first()
+        role_change = Role.query.filter_by(name=payload.get("role")).first()
+
+        query_user_role_changing = User.query.join(user_role).join(
+                                   Role).filter(
+                                   user_role.c.role_uuid
+                                   == role_change.uuid).all()
+
+        for user in query_user_role_changing:
+            if user.society_id == society.uuid:
+                old_exec = user
+            else:
+                old_exec = None
+
+        new_exec = User.query.filter_by(name=payload.get("name")).first()
+
+        # Remove the old role from the outgoing exceutive
+        if not old_exec:
+            return response_builder(dict(
+                message="Previous Executive not found.",
+                status="fail"
+            ), 404)
+        try:
+            for role in old_exec.roles:
+                if role.uuid == role_change.uuid:
+                    old_exec.roles.remove(role)
+        except ValueError:
+            return response_builder(dict(
+                message="Role not found in outgoing_exec",
+                status="fail"
+            ), 404)
+
+        if not Role.query.filter_by(name="President").first():
+            return response_builder(dict(
+                message="Create role to be appended.",
+                status="fail"
+            ), 404)
+
+        new_exec.roles.append(Role.query.filter_by(
+                                    name=payload.get("role")).first())
+        return response_builder(dict(
+            data=new_exec.serialize(),
+            message="{} has been appointed {} of {}".format(new_exec.name,
+                                payload.get("role"), society.name),
+            status="success"
+        ), 200)

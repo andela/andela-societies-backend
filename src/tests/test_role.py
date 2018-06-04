@@ -223,3 +223,78 @@ class RoleTestCaseEmpty(BaseTestCase):
 
         self.assertIn(message, response_details["message"])
         self.assertEqual(response.status_code, 404)
+
+
+class SocietyRoleTestCase(BaseTestCase):
+    """Contains all tests on society roles."""
+
+    def setUp(self):
+        """Set up all needed variables."""
+        BaseTestCase.setUp(self)
+        self.successops_role.save()
+        self.president_role.save()
+        self.v_president_role.save()
+        self.secretary_role.save()
+        self.successops_token = {"Authorization":
+                                 self.generate_token(
+                                  self.test_successops_payload)}
+        self.president.roles.append(self.president_role)
+        self.president.save()
+        self.vice_president.roles.append(self.v_president_role)
+        self.vice_president.save()
+        self.secretary.roles.append(self.secretary_role)
+        self.secretary.save()
+        self.test_user.save()
+        self.test_user_2.save()
+        self.test_user_3.save()
+
+    def test_reassign_society_president(self):
+        """Test the appointment of new President."""
+        new_president = dict(name="Test User",
+                             society="Phoenix",
+                             role="President")
+
+        response = self.client.put("/api/v1/roles/society-execs",
+                                   data=json.dumps(new_president),
+                                   headers=self.successops_token,
+                                   content_type='application/json')
+
+        message = "has been appointed"
+        response_details = json.loads(response.data)
+
+        self.assertIn(message, response_details["message"])
+        self.assertEqual(response.status_code, 200)
+
+    def test_reassign_society_vice_president(self):
+        """Test the appointment of new Vice President."""
+        new_vice_president = dict(name="Test User",
+                                  society="Sparks",
+                                  role="Vice President")
+
+        response = self.client.put("/api/v1/roles/society-execs",
+                                   data=json.dumps(new_vice_president),
+                                   headers=self.successops_token,
+                                   content_type='application/json')
+
+        message = "has been appointed"
+        response_details = json.loads(response.data)
+
+        self.assertIn(message, response_details["message"])
+        self.assertEqual(response.status_code, 200)
+
+    def test_reassign_society_secretary(self):
+        """Test the appointment of new Secretary."""
+        new_secretary = dict(name="Test User",
+                             society="Invictus",
+                             role="Secretary")
+
+        response = self.client.put("/api/v1/roles/society-execs",
+                                   data=json.dumps(new_secretary),
+                                   headers=self.successops_token,
+                                   content_type='application/json')
+
+        message = "has been appointed"
+        response_details = json.loads(response.data)
+
+        self.assertIn(message, response_details["message"])
+        self.assertEqual(response.status_code, 200)
