@@ -1,9 +1,11 @@
 """Contain utility functions and constants."""
 import datetime
-from flask import jsonify, request, current_app, url_for
+import requests
+import os
 from collections import namedtuple
+from flask import jsonify, request, current_app, url_for, Response
 
-from api.models import Activity, ActivityType, Role
+from api.models import Activity, ActivityType, Cohort, Country, Role
 
 
 ParsedResult = namedtuple(
@@ -156,3 +158,44 @@ def response_builder(data, status_code=200):
     response = jsonify(data)
     response.status_code = status_code
     return response
+
+
+def add_extra_user_info(token, user_id, url=os.environ.get('ANDELA_API_URL')):
+    """Retrive user information from ANDELA API.
+
+    params:
+        token(str): valid jwt token
+        user_id(str): id for user to retive information about
+
+    returns: tuple(location, cohort, api_response)
+    """
+    cohort = location = None
+    Bearer = 'Bearer '
+    headers = {'Authorization': Bearer + token}
+
+    try:
+        api_response = requests.get(url + f"users/{user_id}", headers=headers)
+    except requests.exceptions.ConnectionError:
+        response = Response()
+        response.status_code = 503
+        response.json = lambda :{"Error": "Network Error."}
+        return cohort, location, response
+    except Exception:
+        response = Response()
+        response.status_code = 500
+        response.json = lambda :{"Error": "Something went wrong."}
+        return cohort, location, response
+
+    if api_response.status_code == 200 and api_response.json().get('cohort'):
+        cohort = Cohort.query.filter_by(
+            uuid=api_response.json().get('cohort').get('id')).first()
+        if not cohort:
+            cohort = Cohort(uuid=api_response.json().get('cohort').get('id'),
+                            name=api_response.json().get('cohort').get('name'))
+
+        location = Country.query.filter_by(
+            uuid=api_response.json().get('location').get('id')).first()
+        if not location:
+            location = Country(
+                    uuid=api_response.json().get('location').get('id'))
+    return cohort, location, api_response

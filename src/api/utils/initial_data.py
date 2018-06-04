@@ -1,12 +1,73 @@
-"""
-Sample Data for Initial Run.
+"""Sample Data for Initial Run.
 
 This contains the sample initial data required for the test run of the system.
 """
 import datetime
+import os
+import base64
+import requests
+from jose import jwt
+
 
 from api.models import (ActivityType, Activity, Country, LoggedActivity,
                         Society, User, Cohort, Role)
+
+# test countries
+kenya = Country(name='Kenya')
+uganda = Country(name='Uganda')
+nigeria = Country(name='Nigeria')
+countries = [kenya, uganda, nigeria]
+
+cohorts = []
+
+# setup dev user info to access Andela API
+
+authorization_token = os.environ.get('DEV_TOKEN')
+url = os.environ.get('ANDELA_API_URL')
+public_key_token = os.environ.get('PUBLIC_KEY')
+
+if public_key_token and authorization_token and url:
+    try:
+        public_key = base64.b64decode(public_key_token).decode("utf-8")
+        payload = jwt.decode(authorization_token,
+                             public_key,
+                             algorithms=['RS256'],
+                             options={
+                                 'verify_signature': True,
+                                 'verify_exp': True
+                             })
+        Bearer = 'Bearer '
+        headers = {'Authorization': Bearer + authorization_token}
+
+        cohort_data_response = requests.get(url + 'cohorts',
+                                            headers=headers).json()
+        location_data_response = requests.get(url + 'locations',
+                                              headers=headers).json()
+        # test countries
+        locations = {}
+
+        for location in location_data_response.get('values'):
+            name = location.get("name")
+            locations[name] = Country(name=name, uuid=location.get('id'))
+
+        countries = list(locations.values())
+
+        # test countries
+        kenya = location.get('Nairobi') or location.get('nairobi')
+
+        # cohorts
+        cohorts = []
+        for cohort_information in cohort_data_response.get('values'):
+            name = cohort_information.get('name')
+            country = locations.get(
+                cohort_information.get('location').get('name'))
+            cohort = Cohort(name=name,
+                            uuid=cohort_information.get('id'),
+                            country_id=country.uuid)
+            cohorts.append(cohort)
+    except Exception:
+        print("Your initial dev-data, won't work...")
+
 
 # activity types
 interview = ActivityType(name="Bootcamp Interviews",
@@ -62,14 +123,8 @@ sparks = Society(name="Sparks")
 invictus = Society(name="Invictus")
 societies = [phoenix, istelle, sparks, invictus]
 
-# test countries
-kenya = Country(name='Kenya')
-uganda = Country(name='Uganda')
-nigeria = Country(name='Nigeria')
-countries = [kenya, uganda, nigeria]
-
 # cohorts
-cohort_14_ke = Cohort(name='Cohort 14', country=kenya)
+cohort_14_ke = Cohort(name='Cohort 14 Test', country=kenya)
 
 # roles available
 roles = [Role(uuid="-KXGy1EB1oimjQgFim6F", name="Success"),
@@ -164,9 +219,9 @@ open_saturday_points = LoggedActivity(
     activity_type=open_saturdays,
     activity_date=open_saturdays_2018.activity_date
 )
+
+
 logged_activities = [hackathon_points, interview_points, open_saturday_points]
-
-
-test_data = (activity_types + societies + users + logged_activities + countries
-             + roles)
-production_data = activity_types + countries + societies
+test_data = (activity_types + societies + users + logged_activities
+             + countries + cohorts + roles)
+production_data = activity_types + countries + cohorts + roles + societies
