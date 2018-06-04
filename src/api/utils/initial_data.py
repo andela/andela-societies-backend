@@ -127,12 +127,16 @@ societies = [phoenix, istelle, sparks, invictus]
 cohort_14_ke = Cohort(name='Cohort 14 Test', country=kenya)
 
 # roles available
-roles = [Role(uuid="-KXGy1EB1oimjQgFim6F", name="Success"),
+roles = [
+         Role(uuid="-KXGy1EB1oimjQgFim6F", name="Success"),
          Role(uuid="-KXGy1EB1oimjQgFim6L", name="Finance"),
          Role(uuid="-KXGy1EB1oimjQgFim6C", name="Fellow"),
          Role(uuid="-KkLwgbeJUO0dQKsEk1i", name="Success Ops"),
          Role(uuid="-KiihfZoseQeqC6bWTau", name="Andelan"),
-         Role(name="Society President")]
+         Role(name="Society President"),
+         Role(name="Society Vice President"),
+         Role(name="Society Secretary")
+         ]
 
 # users
 # member

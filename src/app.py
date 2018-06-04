@@ -7,7 +7,7 @@ from api.endpoints.users import UserAPI
 from api.endpoints.logged_activities import UserLoggedActivitiesAPI
 from api.endpoints.logged_activities import LoggedActivitiesAPI
 from api.endpoints.logged_activities import LoggedActivityAPI
-from api.endpoints.roles import RoleAPI
+from api.endpoints.roles import RoleAPI, SocietyRoleAPI
 from api.models import db
 from flask import Flask, jsonify
 from flask_cors import CORS
@@ -124,6 +124,12 @@ def create_app(environment="Development"):
         RoleAPI, "/api/v1/roles/<string:role_query>",
         "/api/v1/roles/<string:role_query>/",
         endpoint="role_detail"
+    )
+
+    api.add_resource(
+        SocietyRoleAPI, "/api/v1/roles/society-execs",
+        "/api/v1/roles/society-execs/",
+        endpoint="society_execs_roles"
     )
 
     # handle default 404 exceptions with a custom response

@@ -170,6 +170,9 @@ class BaseTestCase(TestCase):
         self.finance_role = Role(uuid="-KXGy1EB1oimjQgFim6L", name="Finance")
         self.lf_role = Role(uuid="d47ec8a7-3f09-44a5-8188-ff1d40ef35b6",
                             name="Learning Facilitator")
+        self.president_role = Role(uuid="-KXGyd2udi2", name="President")
+        self.v_president_role = Role(uuid="-KXGy32odnd", name="Vice President")
+        self.secretary_role = Role(uuid="-KXGy12odfn2idn", name="Secretary")
 
         # test cohorts
         self.cohort_12_Ke = Cohort(name="cohort-12", country=self.kenya)
@@ -184,16 +187,25 @@ class BaseTestCase(TestCase):
             email="test.user.societies@andela.com",
             country=self.nigeria,
             cohort=self.cohort_1_Nig,
-            society=self.phoenix)
-
+            society=self.phoenix
+            )
         self.test_user_2 = User(
-            uuid="-KdQsawesome_useridZ",
+            uuid="-KdQsawesome_usedk2cckjfbi",
             name="Test User2",
             photo="https://www.link.com",
             email="test.user2.societies@andela.com",
             country=self.uganda,
             cohort=self.cohort_12_Ug,
             society=self.sparks
+        )
+        self.test_user_3 = User(
+            uuid="-KdQsawesomb2dunkdnw",
+            name="Test User3",
+            photo="https://www.link.com",
+            email="test.user3.societies@andela.com",
+            country=self.kenya,
+            cohort=self.cohort_12_Ke,
+            society=self.invictus
         )
 
         self.president = User(
@@ -205,6 +217,26 @@ class BaseTestCase(TestCase):
             country=self.kenya,
             cohort=self.cohort_12_Ke,
             society=self.phoenix
+        )
+        self.vice_president = User(
+            uuid="-KdQsMtixGc2nuekwnd",
+            name="Test Vice-President",
+            photo="https://lh6.googleusercontent.com/-1DhBLOJentg/AAAAAAAAA"
+                  "AI/AAAAAAnAABc/ImeP_cAI/photo.jpg?sz=50",
+            email="test.vice_president.societies@andela.com",
+            country=self.kenya,
+            cohort=self.cohort_12_Ke,
+            society=self.sparks
+        )
+        self.secretary = User(
+            uuid="-KdQsMcwkncwnclkj",
+            name="Test Secretary",
+            photo="https://lh6.googleusercontent.com/-1DhBLOJentg/AAAAAAAAA"
+                  "AI/AAAAAAnAABc/ImeP_cAI/photo.jpg?sz=50",
+            email="test.secretary.societies@andela.com",
+            country=self.kenya,
+            cohort=self.cohort_12_Ke,
+            society=self.invictus
         )
 
         # test ActivityType
