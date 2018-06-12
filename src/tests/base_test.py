@@ -272,7 +272,8 @@ class BaseTestCase(TestCase):
             name="Bootcamp Interviews",
             description="Interviewing candidate for a fellow"
             " recruiting event",
-            value=20
+            value=20,
+            supports_multiple_participants=True
         )
 
         # test Activity

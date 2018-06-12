@@ -37,7 +37,9 @@ class ActivityTypesAPI(Resource):
 
         activity_type = ActivityType(name=result["name"],
                                      description=result["description"],
-                                     value=result["value"])
+                                     value=result["value"],
+                                     supports_multiple_participants=result["supports_multiple_participants"]
+                                     )
         activity_type.save()
         return response_builder(dict(
                     status="success",
@@ -96,6 +98,8 @@ class ActivityTypesAPI(Resource):
             target_activity_type.description = payload.get("description")
         if payload.get("value"):
             target_activity_type.value = payload.get("value")
+        if payload.get("supports_multiple_participant"):
+            target_activity_type.supports_multiple_participants = payload.get("supports_multiple_participants")
         return response_builder(dict(
                 message="Edit successful",
                 path=target_activity_type.serialize(),

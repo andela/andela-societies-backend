@@ -22,8 +22,8 @@ def parse_log_activity_fields(result):
             return response_builder(dict(message='Invalid activity id'), 422)
 
         activity_type = activity.activity_type
-        if activity_type.name == 'Bootcamp Interviews' and \
-                not (result.get('no_of_interviewees')
+        if activity_type.supports_multiple_participants and \
+                not (result.get('no_of_participants')
                      and result.get('description')):
             return response_builder(dict(
                 message='Please send the number of interviewees and'
@@ -53,8 +53,8 @@ def parse_log_activity_fields(result):
         ), 422)
 
     activity_value = activity_type.value if not \
-        activity_type.name == 'Bootcamp Interviews' else \
-        activity_type.value * result['no_of_interviewees']
+        activity_type.supports_multiple_participants else \
+        activity_type.value * result['no_of_participants']
 
     return ParsedResult(
         activity, activity_type, activity_date, activity_value
