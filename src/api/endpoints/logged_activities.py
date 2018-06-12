@@ -82,6 +82,7 @@ class LoggedActivitiesAPI(Resource):
                 society=society, user=g.current_user,
                 activity=parsed_result.activity,
                 photo=result.get('photo'), value=parsed_result.activity_value,
+                no_of_participants=result.get('no_of_participants'),
                 activity_type=parsed_result.activity_type,
                 activity_date=parsed_result.activity_date
             )

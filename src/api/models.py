@@ -201,6 +201,7 @@ class ActivityType(Base):
 
     __tablename__ = 'activity_types'
     value = db.Column(db.Integer)
+    supports_multiple_participants = db.Column(db.Boolean, default=False)
 
     activities = db.relationship('Activity', backref='activity_type')
 
@@ -225,6 +226,7 @@ class LoggedActivity(Base):
     approved_at = db.Column(db.DateTime)
     activity_date = db.Column(db.Date)
     redeemed = db.Column(db.Boolean, nullable=False, default=False)
+    no_of_participants = db.Column(db.Integer)
 
     approver_id = db.Column(db.String)
     reviewer_id = db.Column(db.String)

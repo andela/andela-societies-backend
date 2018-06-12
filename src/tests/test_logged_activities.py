@@ -121,7 +121,7 @@ class LogActivityTestCase(BaseTestCase):
         # test that request is now successful
         self.assertEqual(response.status_code, 201)
 
-    def test_log_interview_activity_requires_no_of_interviewees(self):
+    def test_log_activity_type_that_supports_multi_participants_requires_no_of_participants(self):
         """
         Test that logging an interview activity fails
         without the no_of_interviewees field.
@@ -141,7 +141,7 @@ class LogActivityTestCase(BaseTestCase):
         # test that response status_code is 400
         self.assertEqual(response.status_code, 400)
 
-        data['noOfInterviewees'] = 5
+        data['noOfParticipants'] = 5
         payload = json.dumps(data)
         response = self.client.post(
             'api/v1/logged-activities',
@@ -165,7 +165,7 @@ class LogActivityTestCase(BaseTestCase):
         # test that response status_code is 400
         self.assertEqual(response.status_code, 400)
 
-        data['noOfInterviewees'] = 5
+        data['noOfParticipants'] = 5
         payload = json.dumps(data)
         response = self.client.post(
             'api/v1/logged-activities',
