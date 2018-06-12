@@ -58,6 +58,13 @@ class ActivityTypesSchema(BaseSchema):
         }
     )
 
+    supports_multiple_participants = fields.Integer(
+        error_messages={
+            'message': 'Please send value if activity supports multiple participants'
+        },
+        dump_to='supportsMultipleParticipants'
+    )
+
     @post_load
     def verify_activity_type(self, data):
         """Extra validation of activity type."""
@@ -84,6 +91,7 @@ class LoggedActivitySchema(BaseSchema):
     activity_type_id = fields.String(
         load_from='activityTypeId', dump_to='activityTypeId'
     )
+    no_of_participants = fields.Integer(load_from='noOfParticipants', dump_to='noOfParticipants')
     society_id = fields.String(dump_to='societyId', load_from='societyId')
     society = fields.String(attribute='society.name')
     approved_by = fields.Method(
@@ -177,7 +185,7 @@ class LogEditActivitySchema(BaseSchema):
         validate=[validate.Length(max=36)], load_from='activityTypeId'
     )
     date = fields.Date()
-    no_of_interviewees = fields.Integer(load_from='noOfInterviewees')
+    no_of_participants = fields.Integer(load_from='noOfParticipants')
 
     @validates_schema
     def validate_logged_activity(self, data):
@@ -201,14 +209,14 @@ class LogEditActivitySchema(BaseSchema):
         # bootcamps, tech events etc is made a requirement, it should
         # be removed so that only supported activity types are logged
         # via activity_type_id
-        bootcamp_interviews = ActivityType.query.filter_by(
-            name='Bootcamp Interviews').one_or_none()
-        if data.get('activity_type_id') == bootcamp_interviews.uuid \
-                and not data.get('no_of_interviewees'):
+        multi_participant_activities = [x.uuid for x in ActivityType.query.filter_by(
+            supports_multiple_participants=True).all()]
+        if data.get('activity_type_id') in multi_participant_activities \
+                and not data.get('no_of_participants'):
             raise ValidationError(
-                'Please send all required fields for a bootcamp interview'
-                ' i.e. a date, number of interviewees and a description',
-                'no_of_interviewees'
+                'Please send all required fields for this activity'
+                ' i.e. a date, number of participants and a description',
+                'no_of_participants'
             )
 
 

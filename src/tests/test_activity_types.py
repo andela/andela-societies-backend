@@ -26,7 +26,8 @@ class ActivityTypesTestCase(BaseTestCase):
         new_activity_type = dict(name="Blog Editor",
                                  description="Taking responsibilty for editing"
                                  " a blog for the Andela Way.",
-                                 value=1000)
+                                 value=1000,
+                                 supports_multiple_participants=False)
 
         response = self.client.post("/api/v1/activity-types",
                                     data=json.dumps(new_activity_type),
@@ -43,7 +44,8 @@ class ActivityTypesTestCase(BaseTestCase):
         """Test duplication of activity type is unsuccessful."""
         new_activity_type = dict(name="Hackathon",
                                  description="A Hackathon",
-                                 value=1000)
+                                 value=1000,
+                                 supports_multiple_participants=False)
 
         response = self.client.post("/api/v1/activity-types",
                                     data=json.dumps(new_activity_type),
@@ -88,7 +90,8 @@ class ActivityTypesTestCase(BaseTestCase):
         """Test editing of existing activity type is successful."""
         edit_activity_type = dict(name="Look at me",
                                   description="You think this is a game!!!",
-                                  value=1000)
+                                  value=1000,
+                                  supports_multiple_participants=False)
 
         response = self.client.put(
                         f"/api/v1/activity-types/{self.hackathon.uuid}",
