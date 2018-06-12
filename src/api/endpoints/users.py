@@ -11,8 +11,9 @@ from api.models import User, Cohort, Country
 class UserAPI(Resource):
     """User Resource."""
 
+    @classmethod
     @token_required
-    def get(self, user_id):
+    def get(cls, user_id=None):
         """Get user information."""
         user_information = {}
         status_code = None

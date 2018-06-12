@@ -1,20 +1,21 @@
 """Society Module."""
 
-from flask import request
+from flask import request, g
 from flask_restplus import Resource
 
 from api.utils.auth import token_required, roles_required
 from api.utils.helpers import find_item, paginate_items, response_builder
 from api.utils.marshmallow_schemas import cohort_schema, base_schema
-from ..models import Society, Cohort
+from ..models import Society, Cohort, RedemptionRequest
 
 
 class SocietyResource(Resource):
     """To contain CRUD endpoints for Society."""
 
+    @classmethod
     @token_required
     @roles_required(["Success Ops"])
-    def post(self):
+    def post(cls):
         """Create a society."""
         payload = request.get_json(silent=True)
         if payload:
@@ -45,8 +46,9 @@ class SocietyResource(Resource):
             status="fail",
             message="Data for creation must be provided"), 400)
 
+    @classmethod
     @token_required
-    def get(self, society_id=None):
+    def get(cls, society_id=None):
         """Get Society(ies) details."""
         if society_id:
             society = Society.query.get(society_id)
@@ -92,7 +94,7 @@ class SocietyResource(Resource):
                         society.logo = photo
                     society.save()
                     return response_builder(dict(
-                        data=dict(path=society.serialize()),
+                        data=society.serialize(),
                         status="success",
                         message="Society edited successfully."
                     ), 200)
@@ -136,9 +138,10 @@ class SocietyResource(Resource):
 class AddCohort(Resource):
     """Resource for adding cohorts to societies."""
 
+    @classmethod
     @token_required
     @roles_required(["Success Ops"])
-    def put(self):
+    def put(cls):
         """Assign a cohort to a society.
 
         Returns
@@ -146,7 +149,8 @@ class AddCohort(Resource):
         """
         payload = request.get_json(silent=True)
 
-        if not payload or not ('societyId' in payload and 'cohortId' in payload):
+        if not payload or not ('societyId' in payload and
+                               'cohortId' in payload):
             return response_builder(dict(
                 message="Error societyId and cohortId are required."
             ), 400)
@@ -183,4 +187,209 @@ class AddCohort(Resource):
         return response_builder(dict(
             message="Cohort added to society succesfully",
             data=cohort_data
+        ), 200)
+
+
+class PointRedemption(Resource):
+    """
+    Resource handling all point redemption requests.
+
+    Only made by society presidents.
+    """
+
+    @classmethod
+    @token_required
+    @roles_required(["Society President"])
+    def post(cls):
+        """Create Redemption Request."""
+        payload = request.get_json(silent=True)
+        if not payload:
+            return response_builder(dict(
+                message="Redemption request must have data.",
+                status="fail"
+            ), 400)
+
+        try:
+            name = payload["name"],
+            value = payload["value"]
+        except KeyError:
+            return response_builder(dict(
+                message="Redemption request name and value required",
+                status="fail"
+            ), 400)
+
+        redemp_request = RedemptionRequest(
+            name=name,
+            value=value,
+            user=g.current_user
+        )
+
+        redemp_request.save()
+
+        return response_builder(dict(
+            message="Redemption request created. Success Ops will be in"
+                    " touch soon.",
+            status="success",
+            data=redemp_request.serialize()
+        ), 201)
+
+    @classmethod
+    @token_required
+    @roles_required(["Society President", "Success Ops"])
+    def put(cls, redeem_id=None):
+        """Edit Redemption Requests."""
+        payload = request.get_json(silent=True)
+        if not payload:
+            return response_builder(dict(
+                message="Data for editing must be provided",
+                status="fail"
+            ), 400)
+
+        if not redeem_id:
+            return response_builder(dict(
+                status="fail",
+                message="Redemption Request to be edited must be provided"),
+                400)
+
+        redemp_request = RedemptionRequest.query.filter_by(
+                            uuid=redeem_id).first()
+        if not redemp_request:
+            return response_builder(dict(
+                                status="fail",
+                                message="RedemptionRequest does not exist."),
+                                404)
+        try:
+            name = payload["name"]
+            value = payload["value"]
+
+            if name:
+                redemp_request.name = name
+            if value:
+                redemp_request.color = value
+
+            redemp_request.save()
+
+            return response_builder(dict(
+                data=redemp_request.serialize(),
+                status="success",
+                message="RedemptionRequest edited successfully."
+            ), 200)
+
+        except KeyError as e:
+            return response_builder(dict(
+                module="RedemptionRequest Module",
+                errors=e), 500)
+
+    @classmethod
+    @token_required
+    def get(cls, redeem_id=None):
+        """Get Redemption Requests."""
+        if not redeem_id:
+            redemption_requests = RedemptionRequest.query
+            return paginate_items(redemption_requests)
+
+        if not redeem_id:
+            search_term_name = request.args.get('name')
+            if search_term_name:
+                redemp_request = RedemptionRequest.query.filter_by(
+                                        name=search_term_name).first()
+                return find_item(redemp_request)
+
+            search_term_status = request.args.get('status')
+            if search_term_status:
+                redemp_request = RedemptionRequest.query.filter_by(
+                                        status=search_term_status)
+                return paginate_items(redemp_request)
+
+            search_term_society = request.args.get('society')
+            if search_term_society:
+                society = Society.query.filter_by(
+                                name=search_term_society).first()
+
+                redemp_request = RedemptionRequest.query.filter_by(
+                                        redemp_request.user.society_id ==
+                                        society.uuid
+                                        ).first()
+                return paginate_items(redemp_request)
+
+        redemp_request = RedemptionRequest.query.get(redeem_id)
+        return find_item(redemp_request)
+
+    @classmethod
+    @token_required
+    @roles_required(["Success Ops", "Society President"])
+    def delete(cls, redeem_id=None):
+        """Delete Redemption Requests."""
+        if not redeem_id:
+            return response_builder(dict(
+                status="fail",
+                message="RedemptionRequest id must be provided."), 400)
+
+        redemp_request = RedemptionRequest.query.get(redeem_id)
+        if not redemp_request:
+            return response_builder(dict(
+                status="fail",
+                message="RedemptionRequest does not exist."), 404)
+
+        redemp_request.delete()
+        return response_builder(dict(
+                status="success",
+                message="RedemptionRequest deleted successfully."), 200)
+
+
+class PointRedemptionRequestNumeration(Resource):
+    """
+    Approve or reject Redemption Requests.
+
+    After approval or rejection the relevant society get the result of the
+    request reflects on the amount of points.
+    Only done by Success Ops.
+    """
+
+    @classmethod
+    @token_required
+    @roles_required(["Success Ops"])
+    def put(cls, redeem_id=None):
+        """Approve or Reject Redemption requests."""
+        payload = request.get_json(silent=True)
+        if not payload:
+            return response_builder(dict(
+                message="Data for editing must be provided",
+                status="fail"
+            ), 400)
+
+        if not redeem_id:
+            return response_builder(dict(
+                status="fail",
+                message="RedemptionRequest id must be provided."), 400)
+
+        try:
+            status = payload["status"]
+        except KeyError as e:
+            return response_builder(dict(
+                module="RedemptionRequest Module",
+                errors=e,
+                message="Missing fields"), 400)
+
+        redemp_request = RedemptionRequest.query.get(redeem_id)
+        if not redemp_request:
+            return response_builder(dict(
+                data=None,
+                status="fail",
+                message="Resource does not exist."
+            ), 404)
+
+        if status == "approved":
+            user = redemp_request.user
+            society = Society.query.get(user.society_id)
+            society.used_points = redemp_request
+            redemp_request.status = status
+        else:
+            redemp_request.status = status
+
+        return response_builder(dict(
+            message="RedemptionRequest status changed to {}".format(
+                                                        redemp_request.status),
+            status="success",
+            data=redemp_request.serialize()
         ), 200)

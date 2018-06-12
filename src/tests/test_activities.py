@@ -198,3 +198,44 @@ class ActivitiesTestCase(BaseTestCase):
         activity_type_id = activity_type.uuid
 
         return activity_type_id
+
+
+class SocietyExecsTestCase(BaseTestCase):
+    """Contains tests on society exec roles."""
+
+    def setUp(self):
+        """Set up all needed variables."""
+        BaseTestCase.setUp(self)
+        self.successops_role.save()
+        self.president_role.save()
+        self.v_president_role.save()
+        self.secretary_role.save()
+        self.president.roles.append(self.president_role)
+        self.president.save()
+        self.vice_president.roles.append(self.v_president_role)
+        self.vice_president.save()
+        self.secretary.roles.append(self.secretary_role)
+        self.secretary.save()
+
+    def test_society_president_create_activity(self):
+        """Test that an activity has been created successfully.
+
+        By a society president.
+        """
+        new_activity = dict(name="tech congress",
+                            description="all about tech",
+                            activityTypeId=ActivitiesTestCase.get_activity_type_id(
+                                "Tech Event"),
+                            activityDate=str(datetime.date.today()))
+
+        response = self.client.post('/api/v1/activities',
+                                    data=json.dumps(new_activity),
+                                    headers=self.society_president,
+                                    content_type='application/json')
+
+        self.assertEqual(response.status_code, 201)
+
+        message = "Activity created successfully."
+        response_details = json.loads(response.data)
+
+        self.assertEqual(message, response_details["message"])

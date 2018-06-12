@@ -1,7 +1,7 @@
 """Models TestSuite."""
 
 from api.models import (Activity, ActivityType, Cohort, Country,
-                        LoggedActivity, Society, User, Role)
+                        LoggedActivity, Society, User, Role, RedemptionRequest)
 from tests.base_test import BaseTestCase
 
 
@@ -241,3 +241,23 @@ class RoleTestCase(BaseTestCase):
         self.president = Role(name="Society President")
 
         self.assertTrue(self.president.save())
+
+
+class RedemptionRequestTestCase(BaseTestCase):
+    """Test suite for the RedemptionRequest model."""
+
+    def setUp(self):
+        """Set up all required variables."""
+        BaseTestCase.setUp(self)
+        self.invictus.save()
+
+    def test_create_redemption_request_object(self):
+        """Test creation of a redemption request."""
+        self.redemp_req = RedemptionRequest(
+            name="T-shirt Funds Request",
+            value=2500,
+            user=self.test_user
+        )
+
+        self.assertTrue(self.redemp_req.save(),
+                        msg="Redemption Request save failed.")

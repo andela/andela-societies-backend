@@ -1,6 +1,7 @@
 """Test suite for restriction of endpoints by Role."""
 
 import json
+import uuid
 from .base_test import BaseTestCase
 
 
@@ -186,6 +187,40 @@ class RoleTestCase(BaseTestCase):
         self.assertEqual(response.status_code, 200)
 
         message = "No change specified"
+        response_details = json.loads(response.data)
+
+        self.assertIn(message, response_details["message"])
+
+    def test_edit_no_name(self):
+        """Test if existing role can be edited."""
+        edited_role = dict(change="Learning Facilitator")
+
+        response = self.client.put(f"/api/v1/roles/{self.lf_role.uuid}",
+                                   data=json.dumps(edited_role),
+                                   headers=self.successops_token,
+                                   content_type='application/json')
+
+        self.assertTrue(json.loads(response.data))
+        self.assertEqual(response.status_code, 400)
+
+        message = "must be provided"
+        response_details = json.loads(response.data)
+
+        self.assertIn(message, response_details["message"])
+
+    def test_edit_nonexistent_role(self):
+        """Test if existing role can be edited by ID."""
+        edited_role = dict(name="Number Cruncher")
+
+        response = self.client.put(f"/api/v1/roles/{str(uuid.uuid4())}",
+                                   data=json.dumps(edited_role),
+                                   headers=self.successops_token,
+                                   content_type='application/json')
+
+        self.assertTrue(json.loads(response.data))
+        self.assertEqual(response.status_code, 404)
+
+        message = "does not exist"
         response_details = json.loads(response.data)
 
         self.assertIn(message, response_details["message"])
