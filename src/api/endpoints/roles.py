@@ -93,9 +93,10 @@ class RoleAPI(Resource):
 class SocietyRoleAPI(Resource):
     """Contains functionality to change Society Executives."""
 
+    @classmethod
     @token_required
     @roles_required(["Success Ops"])
-    def put(self):
+    def put(cls):
         """Change the a society executives."""
         payload = request.get_json(silent=True)
         if not payload:

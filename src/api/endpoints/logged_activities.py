@@ -19,7 +19,8 @@ class UserLoggedActivitiesAPI(Resource):
 
     decorators = [token_required]
 
-    def get(self, user_id):
+    @classmethod
+    def get(cls, user_id):
         """Get a user's logged activities by user_id URL parameter."""
         user = User.query.get(user_id)
         if not user:
@@ -54,7 +55,8 @@ class LoggedActivitiesAPI(Resource):
 
     decorators = [token_required]
 
-    def post(self):
+    @classmethod
+    def post(cls):
         """Log a new activity."""
         payload = request.get_json(silent=True)
 
