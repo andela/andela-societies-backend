@@ -111,30 +111,32 @@ def edit_role(payload, search_term):
     """Find and edit the role."""
     role = Role.query.get(search_term)
     # if edit request == stored value
-    if payload["name"] == role.name:
-        return response_builder(dict(
-            data=dict(path=role.serialize()),
-            message="No change specified."
-        ), 200)
+    if not role:
+        return response_builder(dict(status="fail",
+                                     message="Role does not exist."), 404)
 
-    else:
-        if role:
-            if payload["name"]:
-                old_role_name = role.name
-                role.name = payload["name"]
-            else:
-                return response_builder(
-                    dict(status="fail",
-                         message="Name to edit to must be provided."), 400)
+    try:
+        if payload["name"] == role.name:
+            return response_builder(dict(
+                data=dict(path=role.serialize()),
+                message="No change specified."
+            ), 200)
+
+        else:
+            old_role_name = role.name
+            role.name = payload["name"]
             role.save()
+
             return response_builder(dict(
                 data=dict(path=role.serialize()),
                 message="Role {} has been changed"
                         " to {}.".format(old_role_name, role.name)
             ), 200)
 
-        return response_builder(dict(status="fail",
-                                     message="Role does not exist."), 404)
+    except KeyError:
+        return response_builder(
+            dict(status="fail",
+                 message="Name to edit to must be provided."), 400)
 
 
 def find_item(data):
@@ -178,12 +180,12 @@ def add_extra_user_info(token, user_id, url=os.environ.get('ANDELA_API_URL')):
     except requests.exceptions.ConnectionError:
         response = Response()
         response.status_code = 503
-        response.json = lambda :{"Error": "Network Error."}
+        response.json = lambda: {"Error": "Network Error."}
         return cohort, location, response
     except Exception:
         response = Response()
         response.status_code = 500
-        response.json = lambda :{"Error": "Something went wrong."}
+        response.json = lambda: {"Error": "Something went wrong."}
         return cohort, location, response
 
     if api_response.status_code == 200 and api_response.json().get('cohort'):

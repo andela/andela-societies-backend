@@ -8,7 +8,8 @@ from jose import jwt
 
 from app import create_app
 from api.models import (Activity, ActivityType, Cohort, Country,
-                        LoggedActivity, Society, User, Role, db)
+                        LoggedActivity, Society, User, Role, RedemptionRequest,
+                        db)
 
 
 class BaseTestCase(TestCase):
@@ -79,6 +80,22 @@ class BaseTestCase(TestCase):
         "exp": exp_date + datetime.timedelta(days=1)
     }
 
+    test_society_president_role_payload = {
+        "UserInfo": {
+            "email": "test.president.societies@andela.com",
+            "first_name": "Test",
+            "id": "-KdQsMtixG4U0y_-yJEH",
+            "last_name": "President",
+            "name": "Test President",
+            "picture": "https://bit.ly/2MeuICK",
+            "roles": {
+                    "Andelan": "-Ktest_andelan_id",
+                    "Society President": "-KXGyd2udi2"
+            }
+        },
+        "exp": exp_date + datetime.timedelta(days=1)
+    }
+
     expired_payload = {
         "UserInfo": {
             "email": "test.test@andela.com",
@@ -130,6 +147,11 @@ class BaseTestCase(TestCase):
         }
         self.success_ops = {
             "Authorization": self.generate_token(self.test_successops_payload),
+            "Content-Type": "application/json"
+            }
+        self.society_president = {
+            "Authorization": self.generate_token(
+                                self.test_society_president_role_payload),
             "Content-Type": "application/json"
             }
         self.bad_token_header = {
@@ -283,6 +305,12 @@ class BaseTestCase(TestCase):
             society=self.phoenix,
             activity_type=self.hackathon
         )
+
+        self.redemp_req = RedemptionRequest(
+            name="T-shirt Funds Request",
+            value=2500,
+            user_id=self.test_user.uuid
+            )
 
         # save common items to db
         self.tech_event.save()

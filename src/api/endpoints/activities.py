@@ -11,9 +11,10 @@ from api.utils.helpers import response_builder
 class ActivitiesAPI(Resource):
     """Contains CRUD endpoints for activities."""
 
+    @classmethod
     @token_required
-    @roles_required(["Success Ops"])
-    def post(self):
+    @roles_required(["Success Ops", "Society President"])
+    def post(cls):
         """Create an activity."""
         payload = request.get_json(silent=True)
 

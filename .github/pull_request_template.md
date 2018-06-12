@@ -12,5 +12,5 @@
 
 ## How to test (describe how to test your PR)
 
-  -
-  -
+- Clone the repository, install docker, run `make test` within the repository.
+- Trigger a build on CircleCI.

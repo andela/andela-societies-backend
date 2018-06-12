@@ -127,12 +127,12 @@ def roles_required(roles):  # roles should be a list
     def check_user_role(f):
         @wraps(f)
         def decorated(*args, **kwargs):
-            for role in (Role.query.filter_by(name=role).first()
-                         for role in roles):
-                if role not in g.current_user.roles:
-                    return response_builder(dict(message="You're unauthorized"
-                                                 " to perform this operation"),
-                                            401)
+            if not set(g.current_user.roles).issubset(
+                    [Role.query.filter_by(name=role).first()
+                     for role in roles]):
+                return response_builder(dict(message="You're unauthorized"
+                                             " to perform this operation"),
+                                        401)
             return f(*args, **kwargs)
         return decorated
     return check_user_role

@@ -144,6 +144,10 @@ class User(Base):
                                  lazy='dynamic',
                                  backref='participants')
     roles = db.relationship('Role', secondary='user_role', backref='user')
+    redemption_requests = db.relationship(
+        'RedemptionRequest', backref='user', lazy='dynamic',
+        order_by='desc(RedemptionRequest.created_at)'
+    )
 
 
 class Role(Base):
@@ -220,3 +224,12 @@ class LoggedActivity(Base):
 
     activity = db.relationship('Activity', uselist=False)
     activity_type = db.relationship('ActivityType', uselist=False)
+
+
+class RedemptionRequest(Base):
+    """Model all redemption requests by Society Presidents."""
+
+    __tablename__ = 'redemptions'
+    user_id = db.Column(db.String, db.ForeignKey('users.uuid'), nullable=False)
+    value = db.Column(db.Integer, nullable=False)
+    status = db.Column(db.String, default="pending", nullable=False)
