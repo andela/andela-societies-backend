@@ -225,7 +225,17 @@ class CohortSchema(BaseSchema):
 class SocietySchema(BaseSchema):
     """Validation/Serialize Schema for Society."""
 
-    pass
+    _total_points = fields.String(dump_only=True, dump_to='totalPoints',
+                                  validate=[validate.Length(max=36)])
+
+    _used_points = fields.String(dump_only=True, dump_to='usedPoints',
+                                 validate=[validate.Length(max=36)])
+
+    remaining_points = fields.String(dump_only=True, dump_to='remainingPoints',
+                                     validate=[validate.Length(max=36)])
+
+    color_scheme = fields.String(dump_only=True, dump_to='colorScheme',
+                                 validate=[validate.Length(max=36)])
 
 
 class UserSchema(BaseSchema):
@@ -252,3 +262,4 @@ cohort_schema = CohortSchema()
 base_schema = BaseSchema()
 user_schema = UserSchema()
 basic_info_schema = BaseSchema()
+society_schema = SocietySchema()
