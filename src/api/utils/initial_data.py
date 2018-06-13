@@ -117,10 +117,10 @@ activity_types = [
 ]
 
 # societies
-phoenix = Society(name="Phoenix")
-istelle = Society(name="iStelle")
-sparks = Society(name="Sparks")
-invictus = Society(name="Invictus")
+phoenix = Society(name="phoenix")
+istelle = Society(name="istelle")
+sparks = Society(name="sparks")
+invictus = Society(name="invictus")
 societies = [phoenix, istelle, sparks, invictus]
 
 # cohorts

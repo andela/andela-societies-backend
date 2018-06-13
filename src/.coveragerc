@@ -9,6 +9,7 @@ omit =
     */__init__.py
     */marshmallow_schemas.py
     run_tests.py
+    */initial_data.py
 
 [report]
 omit =
@@ -23,3 +24,4 @@ omit =
     */__init__.py
     */marshmallow_schemas.py
     run_tests.py
+    */initial_data.py

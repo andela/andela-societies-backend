@@ -5,8 +5,10 @@ from flask_restplus import Resource
 
 from api.utils.auth import token_required, roles_required
 from api.utils.helpers import find_item, paginate_items, response_builder
-from api.utils.marshmallow_schemas import cohort_schema, base_schema
-from ..models import Society, Cohort, RedemptionRequest
+from api.utils.marshmallow_schemas import (cohort_schema, base_schema,
+                                            society_schema,
+                                            user_logged_activities_schema)
+from ..models import Society, Cohort, RedemptionRequest, LoggedActivity
 
 
 class SocietyResource(Resource):
@@ -52,18 +54,31 @@ class SocietyResource(Resource):
         """Get Society(ies) details."""
         if society_id:
             society = Society.query.get(society_id)
-            return find_item(society)
-
+        elif request.args.get('name'):
+            society = Society.query.filter_by(
+                name=request.args.get('name')).first()
         else:
-            search_term = request.args.get('q')
-
-            if search_term:
-                society = Society.query.filter_by(name=search_term).first()
-                return find_item(society)
-
             # if no search term has been passed, return all societies in DB
             societies = Society.query
             return paginate_items(societies)
+
+        if society:
+            society_logged_activities = LoggedActivity.query.filter_by(
+                society_id=society.uuid).all()
+
+            data, _ = society_schema.dump(society)
+            data['loggedActivities'], _ = user_logged_activities_schema.dump(
+                society_logged_activities)
+
+            return response_builder(dict(
+                societyDetails=data,
+                message="{} fetched successfully.".format(society.name)
+            ), 200)
+        else:
+            return response_builder(dict(
+                data=None,
+                message="Resource does not exist."
+            ), 404)
 
     @classmethod
     @token_required

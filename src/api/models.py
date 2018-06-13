@@ -165,6 +165,7 @@ class Society(Base):
     color_scheme = db.Column(db.String)
     logo = db.Column(db.String)
     _total_points = db.Column(db.Integer, default=0)
+    _used_points = db.Column(db.Integer, default=0)
 
     members = db.relationship('User', backref='society', lazy='dynamic')
     logged_activities = db.relationship('LoggedActivity', backref='society',
@@ -179,6 +180,20 @@ class Society(Base):
     @total_points.setter
     def total_points(self, point):
         self._total_points += point.value
+
+    @property
+    def used_points(self):
+        """Keep track of redeemed points."""
+        return self._used_points
+
+    @used_points.setter
+    def used_points(self, redemption_request):
+        self._used_points += redemption_request.value
+
+    @property
+    def remaining_points(self):
+        """Keep track of points available for redeemption."""
+        return self.total_points - self.used_points
 
 
 class ActivityType(Base):
