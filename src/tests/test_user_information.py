@@ -39,7 +39,7 @@ class UserInformationTestCase(BaseTestCase):
 
     def test_get_user_info_saved_in_DB(self):
         """Test retrive saved information sucesfully."""
-        response = self.client.get('/api/v1/user/-KdQsMt2U0ixIy_-yWTSZ',
+        response = self.client.get('/api/v1/users/-KdQsMt2U0ixIy_-yWTSZ',
                                    headers=self.header,
                                    content_type='application/json')
         self.assertEqual(response.status_code, 200)
@@ -91,7 +91,7 @@ class UserInformationTestCase(BaseTestCase):
                                                     data=user_mock_response))
         patcher.start()
 
-        response = self.client.get('/api/v1/user/-Krwrwahorgt-mock-user-id',
+        response = self.client.get('/api/v1/users/-Krwrwahorgt-mock-user-id',
                                    headers=self.header,
                                    content_type='application/json')
         self.assertEqual(response.status_code, 200)
@@ -115,7 +115,7 @@ class UserInformationTestCase(BaseTestCase):
                 return_value=info_mock(404, data={"error": "user not found"}))
     def test_get_user_info_404(self, mocked_func):
         """Test handles user not found."""
-        response = self.client.get('/api/v1/user/-KoJA5HXKK5nVeIdc2Sv',
+        response = self.client.get('/api/v1/users/-KoJA5HXKK5nVeIdc2Sv',
                                    headers=self.header,
                                    content_type='application/json')
         self.assertEqual(response.status_code, 404)
@@ -126,7 +126,7 @@ class UserInformationTestCase(BaseTestCase):
                 return_value=info_mock(503, data={"Error": "Network Error"}))
     def test_get_user_info_503(self, mocked_func):
         """Test handles failed network connection correctly."""
-        response = self.client.get('/api/v1/user/-KoJA5HXKK5nVeIdc2Sv',
+        response = self.client.get('/api/v1/users/-KoJA5HXKK5nVeIdc2Sv',
                                    headers=self.header,
                                    content_type='application/json')
         self.assertEqual(response.status_code, 503)
@@ -138,7 +138,7 @@ class UserInformationTestCase(BaseTestCase):
                                        data={"Error": "Something went wrong"}))
     def test_get_user_info_500(self, mocked_func):
         """Test handles unexpected API issues correctly."""
-        response = self.client.get('/api/v1/user/-KoJA5HXKK5nVeIdc2Sv',
+        response = self.client.get('/api/v1/users/-KoJA5HXKK5nVeIdc2Sv',
                                    headers=self.header,
                                    content_type='application/json')
         self.assertEqual(response.status_code, 500)

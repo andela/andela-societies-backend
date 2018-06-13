@@ -93,8 +93,8 @@ def create_app(environment="Development"):
     # user endpoints
     api.add_resource(
         UserAPI,
-        '/api/v1/user/<string:user_id>',
-        '/api/v1/user/<string:user_id>/',
+        '/api/v1/users/<string:user_id>',
+        '/api/v1/users/<string:user_id>/',
         endpoint='user_info'
     )
 

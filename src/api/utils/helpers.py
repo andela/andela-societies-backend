@@ -162,7 +162,7 @@ def response_builder(data, status_code=200):
     return response
 
 
-def add_extra_user_info(token, user_id, url=os.environ.get('ANDELA_API_URL')):
+def add_extra_user_info(token, user_id, url=os.environ.get('ANDELA_API_URL')): # pragma: no cover
     """Retrive user information from ANDELA API.
 
     params:
