@@ -1,5 +1,5 @@
 PROJECT_NAME := andelasocietiesbackend
-REPO_NAME ?= andela-societies-backend
+REPO_NAME ?= soc-backend
 ORG_NAME ?= bench-projects
 # File names
 DOCKER_TEST_COMPOSE_FILE := docker/test/docker-compose.yml
