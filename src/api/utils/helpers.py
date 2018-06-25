@@ -139,6 +139,7 @@ def edit_role(payload, search_term):
                  message="Name to edit to must be provided."), 400)
 
 
+
 def find_item(data):
     """Build the response with found/404 item in DB."""
     if data:

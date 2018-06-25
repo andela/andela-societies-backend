@@ -191,6 +191,7 @@ class RoleTestCase(BaseTestCase):
 
         self.assertIn(message, response_details["message"])
 
+
     def test_edit_no_name(self):
         """Test if existing role can be edited."""
         edited_role = dict(change="Learning Facilitator")

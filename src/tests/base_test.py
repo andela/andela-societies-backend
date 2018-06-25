@@ -153,6 +153,7 @@ class BaseTestCase(TestCase):
             "Authorization": self.generate_token(
                                 self.test_society_president_role_payload),
             "Content-Type": "application/json"
+
             }
         self.bad_token_header = {
             "Authorization": self.generate_token(

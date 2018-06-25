@@ -133,6 +133,7 @@ def roles_required(roles):  # roles should be a list
                 return response_builder(dict(message="You're unauthorized"
                                              " to perform this operation"),
                                         401)
+
             return f(*args, **kwargs)
         return decorated
     return check_user_role
