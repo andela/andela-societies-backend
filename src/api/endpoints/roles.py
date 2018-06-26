@@ -65,8 +65,9 @@ class RoleAPI(Resource):
                                             "be provided"),
                                     400)
         if not role_query:
-            return {"status": "fail",
-                    "message": "Role id/name must be provided."}, 400
+            return response_builder(dict(status="fail",
+                                    message="Role id/name must be provided."),
+                                    400)
 
         return edit_role(payload, role_query)
 

@@ -96,6 +96,22 @@ class BaseTestCase(TestCase):
         "exp": exp_date + datetime.timedelta(days=1)
     }
 
+    test_cio_role_payload = {
+        "UserInfo": {
+            "email": "test.president.societies@andela.com",
+            "first_name": "Test",
+            "id": "-KdQsMtixG4U0y_-yJEH",
+            "last_name": "President",
+            "name": "Test President",
+            "picture": "https://bit.ly/2MeuICK",
+            "roles": {
+                    "Andelan": "-Ktest_andelan_id",
+                    "CIO": "-KXGionceu24i2y"
+            }
+        },
+        "exp": exp_date + datetime.timedelta(days=1)
+    }
+
     expired_payload = {
         "UserInfo": {
             "email": "test.test@andela.com",
@@ -154,6 +170,11 @@ class BaseTestCase(TestCase):
                                 self.test_society_president_role_payload),
             "Content-Type": "application/json"
             }
+        self.cio = {
+            "Authorization": self.generate_token(
+                                self.test_cio_role_payload),
+            "Content-Type": "application/json"
+            }
         self.bad_token_header = {
             "Authorization": self.generate_token(
                 {"I don't know": "what to put here"}
@@ -195,6 +216,7 @@ class BaseTestCase(TestCase):
         self.president_role = Role(uuid="-KXGyd2udi2", name="President")
         self.v_president_role = Role(uuid="-KXGy32odnd", name="Vice President")
         self.secretary_role = Role(uuid="-KXGy12odfn2idn", name="Secretary")
+        self.cio_role = Role(uuid="-KXGionceu24i2y", name="CIO")
 
         # test cohorts
         self.cohort_12_Ke = Cohort(name="cohort-12", country=self.kenya)
@@ -310,8 +332,9 @@ class BaseTestCase(TestCase):
         self.redemp_req = RedemptionRequest(
             name="T-shirt Funds Request",
             value=2500,
-            user_id=self.test_user.uuid
-            )
+            user=self.test_user,
+            country=self.test_user.country
+        )
 
         # save common items to db
         self.tech_event.save()

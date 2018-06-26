@@ -2,9 +2,9 @@
 
 from api.endpoints.activity_types import ActivityTypesAPI
 from api.endpoints.activities import ActivitiesAPI
-from api.endpoints.societies import (SocietyResource, AddCohort,
-                                     PointRedemption,
-                                     PointRedemptionRequestNumeration)
+from api.endpoints.societies import SocietyResource, AddCohort
+from api.endpoints.redemption_requests import PointRedemptionAPI
+from api.endpoints.redemption_requests import PointRedemptionRequestNumeration
 from api.endpoints.users import UserAPI
 from api.endpoints.logged_activities import UserLoggedActivitiesAPI
 from api.endpoints.logged_activities import LoggedActivitiesAPI
@@ -28,7 +28,7 @@ def create_app(environment="Development"):
     Args:
         environment (str): Specify the configuration to initilize app with.
 
-    Returns:
+    Return:
         app (Flask): it returns an instance of Flask.
     """
     app = Flask(__name__)
@@ -112,13 +112,13 @@ def create_app(environment="Development"):
     )
 
     api.add_resource(
-        PointRedemption, "/api/v1/societies/redeem",
+        PointRedemptionAPI, "/api/v1/societies/redeem",
         "/api/v1/societies/redeem/",
         endpoint="point_redemption"
     )
 
     api.add_resource(
-        PointRedemption, "/api/v1/societies/redeem/<string:redeem_id>",
+        PointRedemptionAPI, "/api/v1/societies/redeem/<string:redeem_id>",
         "/api/v1/societies/redeem/<string:redeem_id>/",
         endpoint="point_redemption_detail"
     )
