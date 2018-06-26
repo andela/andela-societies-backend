@@ -59,7 +59,7 @@ class Base(db.Model):
     def save(self):
         """Save the object in DB.
 
-        Returns:
+        Return:
             saved(boolean) true if saved, false otherwise
         """
         try:
@@ -73,7 +73,7 @@ class Base(db.Model):
     def delete(self):
         """Delete the object in DB.
 
-        Returns:
+        Return
             deleted(boolean) True if deleted else false
         """
         deleted = None
@@ -89,7 +89,7 @@ class Base(db.Model):
     def serialize(self):
         """Map model to a dictionary representation.
 
-        Returns:
+        Return:
             A dict object
         """
         dictionary_mapping = {
@@ -108,6 +108,10 @@ class Country(Base):
     cohorts = db.relationship('Cohort',
                               backref='country',
                               lazy='dynamic')
+    redemption_requests = db.relationship(
+        'RedemptionRequest', backref='country', lazy='dynamic',
+        order_by='desc(RedemptionRequest.created_at)'
+    )
 
 
 class Cohort(Base):
@@ -250,3 +254,5 @@ class RedemptionRequest(Base):
     user_id = db.Column(db.String, db.ForeignKey('users.uuid'), nullable=False)
     value = db.Column(db.Integer, nullable=False)
     status = db.Column(db.String, default="pending", nullable=False)
+    country_id = db.Column(db.String, db.ForeignKey('countries.uuid'),
+                           nullable=False)

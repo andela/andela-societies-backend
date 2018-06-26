@@ -249,14 +249,14 @@ class RedemptionRequestTestCase(BaseTestCase):
     def setUp(self):
         """Set up all required variables."""
         BaseTestCase.setUp(self)
-        self.invictus.save()
 
     def test_create_redemption_request_object(self):
         """Test creation of a redemption request."""
         self.redemp_req = RedemptionRequest(
             name="T-shirt Funds Request",
             value=2500,
-            user=self.test_user
+            user=self.test_user,
+            country=self.test_user.country
         )
 
         self.assertTrue(self.redemp_req.save(),

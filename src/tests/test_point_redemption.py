@@ -24,7 +24,8 @@ class PointRedemptionBaseTestCase(BaseTestCase):
         new_request = dict(
             name="T-shirt Funds Request",
             value=2500,
-            user_id=self.test_user.uuid
+            user_id=self.test_user.uuid,
+            country="Nigeria"
             )
 
         response = self.client.post("api/v1/societies/redeem",
@@ -81,6 +82,18 @@ class PointRedemptionBaseTestCase(BaseTestCase):
         self.assertIn(message, response_details["message"])
         self.assertEqual(response.status_code, 200)
 
+    def test_get_all_redemption_requests_by_cio(self):
+        """Test retrieval of Redemption Requests."""
+        response = self.client.get("api/v1/societies/redeem",
+                                   headers=self.cio,
+                                   content_type='application/json')
+
+        message = "fetched successfully"
+        response_details = json.loads(response.data)
+
+        self.assertIn(message, response_details["message"])
+        self.assertEqual(response.status_code, 200)
+
     def test_get_existing_redemption_requests_by_id(self):
         """Test retrieval of Redemption Requests."""
         response = self.client.get(
@@ -110,7 +123,7 @@ class PointRedemptionBaseTestCase(BaseTestCase):
     def test_get_existing_redemption_requests_by_society(self):
         """Test retrieval of Redemption Requests."""
         response = self.client.get(
-                    f"api/v1/societies/redeem?society={self.redemp_req.name}",
+                    f"api/v1/societies/redeem?society={self.test_user.society.name}",
                     headers=self.society_president,
                     content_type='application/json')
 
@@ -123,7 +136,7 @@ class PointRedemptionBaseTestCase(BaseTestCase):
     def test_get_existing_redemption_requests_by_status(self):
         """Test retrieval of Redemption Requests."""
         response = self.client.get(
-                    f"api/v1/societies/redeem?status={self.redemp_req.name}",
+                    f"api/v1/societies/redeem?status={self.redemp_req.status}",
                     headers=self.society_president,
                     content_type='application/json')
 
@@ -132,6 +145,85 @@ class PointRedemptionBaseTestCase(BaseTestCase):
 
         self.assertIn(message, response_details["message"])
         self.assertEqual(response.status_code, 200)
+
+    def test_get_existing_redemption_requests_by_country(self):
+        """Test retrieval of Redemption Requests."""
+        response = self.client.get(
+                    f"api/v1/societies/redeem?country={self.redemp_req.country.name}",
+                    headers=self.society_president,
+                    content_type='application/json')
+
+        message = "fetched successfully"
+        response_details = json.loads(response.data)
+
+        self.assertIn(message, response_details["message"])
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_non_existing_redemption_requests_by_id(self):
+        """Test retrieval of Redemption Requests."""
+        response = self.client.get(
+                        f"api/v1/societies/redeem/{str(uuid.uuid4())}",
+                        headers=self.society_president,
+                        content_type='application/json')
+
+        message = "does not exist"
+        response_details = json.loads(response.data)
+
+        self.assertIn(message, response_details["message"])
+        self.assertEqual(response.status_code, 404)
+
+    def test_get_non_existing_redemption_requests_by_name(self):
+        """Test retrieval of Redemption Requests."""
+        response = self.client.get(
+                    f"api/v1/societies/redeem?name={str(uuid.uuid4())}",
+                    headers=self.society_president,
+                    content_type='application/json')
+
+        message = "does not exist"
+        response_details = json.loads(response.data)
+
+        self.assertIn(message, response_details["message"])
+        self.assertEqual(response.status_code, 404)
+
+    def test_get_non_existing_redemption_requests_by_society(self):
+        """Test retrieval of Redemption Requests."""
+        response = self.client.get(
+                    f"api/v1/societies/redeem?society={str(uuid.uuid4())}",
+                    headers=self.society_president,
+                    content_type='application/json')
+
+        message = "not found"
+        response_details = json.loads(response.data)
+
+        self.assertIn(message, response_details["message"])
+        self.assertEqual(response.status_code, 404)
+
+    def test_get_non_existing_redemption_requests_by_status(self):
+        """Test retrieval of Redemption Requests."""
+        response = self.client.get(
+                    f"api/v1/societies/redeem?status={str(uuid.uuid4())}",
+                    headers=self.society_president,
+                    content_type='application/json')
+
+        message = "not found"
+        response_details = json.loads(response.data)
+
+        self.assertIn(message, response_details["message"])
+        self.assertEqual(response.status_code, 404)
+
+    def test_get_non_existing_redemption_requests_by_country(self):
+        """Test retrieval of Redemption Requests."""
+        response = self.client.get(
+                    f"api/v1/societies/redeem?country={str(uuid.uuid4())}",
+                    headers=self.society_president,
+                    content_type='application/json')
+
+        message = "not found"
+        response_details = json.loads(response.data)
+
+        self.assertIn(message, response_details["message"])
+        self.assertEqual(response.status_code, 404)
+
 
     def test_edit_redemption_request(self):
         """Test edit of Redemption Request through endpoint."""
@@ -191,7 +283,7 @@ class PointRedemptionBaseTestCase(BaseTestCase):
 
     def test_edit_redemption_request_no_payload(self):
         """Test editing request without payload fails."""
-        response = self.client.put(f"api/v1/societies/{self.sparks.uuid}",
+        response = self.client.put(f"api/v1/societies/redeem{self.sparks.uuid}",
                                    headers=self.society_president,
                                    content_type='application/json')
 

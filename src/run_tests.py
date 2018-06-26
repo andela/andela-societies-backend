@@ -23,7 +23,7 @@ def test():
     )
     COV.start()
 
-    tests_failed = pytest.main(['-v', '-s', 'tests'])
+    tests_failed = pytest.main(['-x', '-v', '-s', 'tests'])
 
     COV.stop()
     if not tests_failed:
