@@ -176,6 +176,11 @@ class BaseTestCase(TestCase):
                                 self.test_cio_role_payload),
             "Content-Type": "application/json"
             }
+        self.cio = {
+            "Authorization": self.generate_token(
+                                self.test_cio_role_payload),
+            "Content-Type": "application/json"
+            }
         self.bad_token_header = {
             "Authorization": self.generate_token(
                 {"I don't know": "what to put here"}
