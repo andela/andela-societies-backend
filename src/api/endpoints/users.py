@@ -5,7 +5,7 @@ from api.utils.helpers import add_extra_user_info
 
 from api.utils.auth import token_required
 from api.utils.marshmallow_schemas import user_schema, basic_info_schema
-from api.models import User, Cohort, Country
+from api.models import User, Cohort, Center
 
 
 class UserAPI(Resource):
@@ -38,7 +38,7 @@ class UserAPI(Resource):
                 'name': None,
                 'photo': None,
                 'modifiedAt': None,
-                'countryId': None,
+                'centerId': None,
                 'cohortId': None,
                 'roles': []
             }
@@ -48,14 +48,14 @@ class UserAPI(Resource):
             data['name'] = (f"{user_info.json().get('first_name')} "
                             f"{user_info.json().get('last_name')}")
             data['photo'] = user_info.json().get('picture')
-            data['countryId'] = user_info.json().get('location').get('id')
+            data['centerId'] = user_info.json().get('location').get('id')
             data['cohortId'] = user_info.json().get('cohort').get('id')
             user_information = data
             status_code = user_info.status_code
 
         location, _ = basic_info_schema.dump(
-            Country.query.filter_by(
-                uuid=user_information.pop('countryId')).first())
+            Center.query.filter_by(
+                uuid=user_information.pop('centerId')).first())
         cohort = Cohort.query.filter_by(
             uuid=user_information.pop('cohortId')).first()
 

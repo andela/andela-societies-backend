@@ -7,7 +7,7 @@ from unittest import TestCase, mock
 from jose import jwt
 
 from app import create_app
-from api.models import (Activity, ActivityType, Cohort, Country,
+from api.models import (Activity, ActivityType, Cohort, Center,
                         LoggedActivity, Society, User, Role, RedemptionRequest,
                         db)
 
@@ -182,10 +182,10 @@ class BaseTestCase(TestCase):
             "Content-Type": "application/json"
         }
 
-        # test countries
-        self.kenya = Country(name='Kenya')
-        self.uganda = Country(name='Uganda')
-        self.nigeria = Country(name='Nigeria')
+        # test centers
+        self.kenya = Center(name='Kenya')
+        self.uganda = Center(name='Uganda')
+        self.nigeria = Center(name='Nigeria')
 
         # test societies
         self.phoenix = Society(name="Phoenix",
@@ -219,9 +219,9 @@ class BaseTestCase(TestCase):
         self.cio_role = Role(uuid="-KXGionceu24i2y", name="CIO")
 
         # test cohorts
-        self.cohort_12_Ke = Cohort(name="cohort-12", country=self.kenya)
-        self.cohort_12_Ug = Cohort(name="cohort-12", country=self.uganda)
-        self.cohort_1_Nig = Cohort(name="cohort-1", country=self.nigeria)
+        self.cohort_12_Ke = Cohort(name="cohort-12", center=self.kenya)
+        self.cohort_12_Ug = Cohort(name="cohort-12", center=self.uganda)
+        self.cohort_1_Nig = Cohort(name="cohort-1", center=self.nigeria)
 
         # test users
         self.test_user = User(
@@ -229,7 +229,7 @@ class BaseTestCase(TestCase):
             name="Test User",
             photo="https://www.link.com",
             email="test.user.societies@andela.com",
-            country=self.nigeria,
+            center=self.nigeria,
             cohort=self.cohort_1_Nig,
             society=self.phoenix
             )
@@ -238,7 +238,7 @@ class BaseTestCase(TestCase):
             name="Test User2",
             photo="https://www.link.com",
             email="test.user2.societies@andela.com",
-            country=self.uganda,
+            center=self.uganda,
             cohort=self.cohort_12_Ug,
             society=self.sparks
         )
@@ -247,7 +247,7 @@ class BaseTestCase(TestCase):
             name="Test User3",
             photo="https://www.link.com",
             email="test.user3.societies@andela.com",
-            country=self.kenya,
+            center=self.kenya,
             cohort=self.cohort_12_Ke,
             society=self.invictus
         )
@@ -258,7 +258,7 @@ class BaseTestCase(TestCase):
             photo="https://lh6.googleusercontent.com/-1DhBLOJentg/AAAAAAAAA"
                   "AI/AAAAAAnAABc/ImeP_cAI/photo.jpg?sz=50",
             email="test.president.societies@andela.com",
-            country=self.kenya,
+            center=self.kenya,
             cohort=self.cohort_12_Ke,
             society=self.phoenix
         )
@@ -268,7 +268,7 @@ class BaseTestCase(TestCase):
             photo="https://lh6.googleusercontent.com/-1DhBLOJentg/AAAAAAAAA"
                   "AI/AAAAAAnAABc/ImeP_cAI/photo.jpg?sz=50",
             email="test.vice_president.societies@andela.com",
-            country=self.kenya,
+            center=self.kenya,
             cohort=self.cohort_12_Ke,
             society=self.sparks
         )
@@ -278,7 +278,7 @@ class BaseTestCase(TestCase):
             photo="https://lh6.googleusercontent.com/-1DhBLOJentg/AAAAAAAAA"
                   "AI/AAAAAAnAABc/ImeP_cAI/photo.jpg?sz=50",
             email="test.secretary.societies@andela.com",
-            country=self.kenya,
+            center=self.kenya,
             cohort=self.cohort_12_Ke,
             society=self.invictus
         )
@@ -333,7 +333,7 @@ class BaseTestCase(TestCase):
             name="T-shirt Funds Request",
             value=2500,
             user=self.test_user,
-            country=self.test_user.country
+            center=self.test_user.center
         )
 
         # save common items to db

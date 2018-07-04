@@ -2,7 +2,7 @@
 
 
 import json
-from tests.base_test import BaseTestCase, Country, Cohort, Society
+from tests.base_test import BaseTestCase, Center, Cohort, Society
 from api.utils.marshmallow_schemas import basic_info_schema
 from unittest import mock
 from flask import Response
@@ -60,9 +60,9 @@ class UserInformationTestCase(BaseTestCase):
 
     def test_get_user_info_not_saved_in_DB(self):
         """Test retrive user info from ANDELA API sucesfully."""
-        mock_location = Country(name='Mock-location')
+        mock_location = Center(name='Mock-location')
         mock_location.save()
-        mock_cohort = Cohort(name="mock_cohort", country=mock_location)
+        mock_cohort = Cohort(name="mock_cohort", center=mock_location)
         mock_cohort.save()
         mock_society = Society(name="Mock-society")
         mock_society.cohorts.append(mock_cohort)

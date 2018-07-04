@@ -98,18 +98,18 @@ class Base(db.Model):
         return dictionary_mapping
 
 
-class Country(Base):
+class Center(Base):
     """Models different centres in Andela."""
 
-    __tablename__ = 'countries'
+    __tablename__ = 'centers'
     members = db.relationship('User',
-                              backref='country',
+                              backref='center',
                               lazy='dynamic')
     cohorts = db.relationship('Cohort',
-                              backref='country',
+                              backref='center',
                               lazy='dynamic')
     redemption_requests = db.relationship(
-        'RedemptionRequest', backref='country', lazy='dynamic',
+        'RedemptionRequest', backref='center', lazy='dynamic',
         order_by='desc(RedemptionRequest.created_at)'
     )
 
@@ -118,7 +118,7 @@ class Cohort(Base):
     """Models cohorts available in Andela."""
 
     __tablename__ = 'cohorts'
-    country_id = db.Column(db.String, db.ForeignKey('countries.uuid'))
+    center_id = db.Column(db.String, db.ForeignKey('centers.uuid'))
     society_id = db.Column(db.String, db.ForeignKey('societies.uuid'))
 
     members = db.relationship('User', backref='cohort')
@@ -132,7 +132,7 @@ class User(Base):
     email = db.Column(db.String, nullable=False, unique=True)
 
     society_id = db.Column(db.String, db.ForeignKey('societies.uuid'))
-    country_id = db.Column(db.String, db.ForeignKey('countries.uuid'))
+    center_id = db.Column(db.String, db.ForeignKey('centers.uuid'))
     cohort_id = db.Column(db.String, db.ForeignKey('cohorts.uuid'))
 
     logged_activities = db.relationship(
@@ -254,5 +254,5 @@ class RedemptionRequest(Base):
     user_id = db.Column(db.String, db.ForeignKey('users.uuid'), nullable=False)
     value = db.Column(db.Integer, nullable=False)
     status = db.Column(db.String, default="pending", nullable=False)
-    country_id = db.Column(db.String, db.ForeignKey('countries.uuid'),
-                           nullable=False)
+    center_id = db.Column(db.String, db.ForeignKey('centers.uuid'),
+                          nullable=False)

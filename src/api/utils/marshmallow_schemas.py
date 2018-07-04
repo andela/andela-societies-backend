@@ -91,7 +91,8 @@ class LoggedActivitySchema(BaseSchema):
     activity_type_id = fields.String(
         load_from='activityTypeId', dump_to='activityTypeId'
     )
-    no_of_participants = fields.Integer(load_from='noOfParticipants', dump_to='noOfParticipants')
+    no_of_participants = fields.Integer(load_from='noOfParticipants',
+                                        dump_to='noOfParticipants')
     society_id = fields.String(dump_to='societyId', load_from='societyId')
     society = fields.String(attribute='society.name')
     approved_by = fields.Method(
@@ -223,7 +224,7 @@ class LogEditActivitySchema(BaseSchema):
 class CohortSchema(BaseSchema):
     """Validation Schema for Cohort."""
 
-    country_id = fields.String(dump_only=True, dump_to='countryId',
+    center_id = fields.String(dump_only=True, dump_to='centerId',
                                validate=[validate.Length(max=36)])
 
     society_id = fields.String(dump_only=True, dump_to='societyId',
@@ -251,10 +252,25 @@ class UserSchema(BaseSchema):
 
     society_id = fields.String(dump_only=True, dump_to='societyId',
                                validate=[validate.Length(max=36)])
-    country_id = fields.String(dump_only=True, dump_to='countryId',
+    center_id = fields.String(dump_only=True, dump_to='centerId',
                                validate=[validate.Length(max=36)])
     cohort_id = fields.String(dump_only=True, dump_to='cohortId',
                               validate=[validate.Length(max=36)])
+
+
+class RedemptionRequestSchema(BaseSchema):
+    """RedemptionRequest serializer/validator."""
+
+    value = fields.Integer(
+        required=True,
+        error_messages={
+            'required': {'message': 'A value is required.'}
+        })
+    center = fields.String(
+        required=True,
+        error_messages={
+            'required': {'message': 'Center name is required.'}
+        })
 
 
 activity_types_schema = ActivityTypesSchema(many=True)
@@ -271,3 +287,4 @@ base_schema = BaseSchema()
 user_schema = UserSchema()
 basic_info_schema = BaseSchema()
 society_schema = SocietySchema()
+redemption_request_schema = RedemptionRequestSchema()

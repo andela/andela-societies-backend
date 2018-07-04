@@ -1,6 +1,6 @@
 """Models TestSuite."""
 
-from api.models import (Activity, ActivityType, Cohort, Country,
+from api.models import (Activity, ActivityType, Cohort, Center,
                         LoggedActivity, Society, User, Role, RedemptionRequest)
 from tests.base_test import BaseTestCase
 
@@ -16,7 +16,7 @@ class UserTestCase(BaseTestCase):
             photo="https://lh6.googleusercontent.com/-1DhBLOJentg/AAAAAAAAA"
                   "AI/AAAAAAAAABc/ImM13eP_cAI/photo.jpg?sz=50",
             email="test.user@andela.com",
-            country=self.kenya,
+            center=self.kenya,
             cohort=self.cohort_12_Ke)
 
         self.assertTrue(test_user.save())
@@ -36,7 +36,7 @@ class UserTestCase(BaseTestCase):
             photo="https://lh6.googleusercontent.com/-1DhBLOJentg/AAAAAAAAA"
                   "AI/AAAAAAAAABc/ImM13eP_cAI/photo.jpg?sz=50",
             email="test.user@andela.com",
-            country=self.kenya,
+            center=self.kenya,
             cohort=self.cohort_12_Ke)
 
         test_user.save()
@@ -101,7 +101,7 @@ class SocietyTestCase(BaseTestCase):
             photo="https://lh6.googleusercontent.com/-1DhBLOJentg/AAAAAAAAA"
                   "AI/AAAAAAAAABc/ImM13eP_cAI/photo.jpg?sz=50",
             email="test.user@andela.com",
-            country=self.kenya,
+            center=self.kenya,
             cohort=self.cohort_12_Ke)
 
         self.phoenix.members.extend([test_user, self.test_user])
@@ -219,16 +219,16 @@ class CohortTestCase(BaseTestCase):
 
     def test_create_cohort(self):
         """Test creation of a cohort."""
-        cohort_1_Nig = Cohort(name="cohort-1", country=self.nigeria)
+        cohort_1_Nig = Cohort(name="cohort-1", center=self.nigeria)
         self.assertTrue(cohort_1_Nig.save())
 
 
-class CountryTestCase(BaseTestCase):
-    """Tests suite for Country model."""
+class CenterTestCase(BaseTestCase):
+    """Tests suite for Center model."""
 
-    def test_create_country(self):
-        """Test create a country."""  # bwahahahahah
-        self.uganda = Country(name='Uganda')
+    def test_create_center(self):
+        """Test create a center."""  # bwahahahahah
+        self.uganda = Center(name='Uganda')
 
         self.assertTrue(self.uganda.save())
 
@@ -256,7 +256,7 @@ class RedemptionRequestTestCase(BaseTestCase):
             name="T-shirt Funds Request",
             value=2500,
             user=self.test_user,
-            country=self.test_user.country
+            center=self.test_user.center
         )
 
         self.assertTrue(self.redemp_req.save(),

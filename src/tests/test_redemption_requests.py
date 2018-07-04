@@ -24,8 +24,7 @@ class PointRedemptionBaseTestCase(BaseTestCase):
         new_request = dict(
             name="T-shirt Funds Request",
             value=2500,
-            user_id=self.test_user.uuid,
-            country="Nigeria"
+            center="Nigeria"
             )
 
         response = self.client.post("api/v1/societies/redeem",
@@ -67,7 +66,7 @@ class PointRedemptionBaseTestCase(BaseTestCase):
         message = "required"
         response_details = json.loads(response.data)
 
-        self.assertIn(message, response_details["message"])
+        self.assertIn(message, response_details["center"]["message"])
         self.assertEqual(response.status_code, 400)
 
     def test_get_all_redemption_requests(self):
@@ -146,10 +145,10 @@ class PointRedemptionBaseTestCase(BaseTestCase):
         self.assertIn(message, response_details["message"])
         self.assertEqual(response.status_code, 200)
 
-    def test_get_existing_redemption_requests_by_country(self):
+    def test_get_existing_redemption_requests_by_center(self):
         """Test retrieval of Redemption Requests."""
         response = self.client.get(
-                    f"api/v1/societies/redeem?country={self.redemp_req.country.name}",
+                    f"api/v1/societies/redeem?center={self.redemp_req.center.name}",
                     headers=self.society_president,
                     content_type='application/json')
 
@@ -211,10 +210,10 @@ class PointRedemptionBaseTestCase(BaseTestCase):
         self.assertIn(message, response_details["message"])
         self.assertEqual(response.status_code, 404)
 
-    def test_get_non_existing_redemption_requests_by_country(self):
+    def test_get_non_existing_redemption_requests_by_center(self):
         """Test retrieval of Redemption Requests."""
         response = self.client.get(
-                    f"api/v1/societies/redeem?country={str(uuid.uuid4())}",
+                    f"api/v1/societies/redeem?center={str(uuid.uuid4())}",
                     headers=self.society_president,
                     content_type='application/json')
 

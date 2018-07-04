@@ -9,14 +9,14 @@ import requests
 from jose import jwt
 
 
-from api.models import (ActivityType, Activity, Country, LoggedActivity,
+from api.models import (ActivityType, Activity, Center, LoggedActivity,
                         Society, User, Cohort, Role)
 
-# test countries
-kenya = Country(name='Kenya')
-uganda = Country(name='Uganda')
-nigeria = Country(name='Nigeria')
-countries = [kenya, uganda, nigeria]
+# test centers
+kenya = Center(name='Kenya')
+uganda = Center(name='Uganda')
+nigeria = Center(name='Nigeria')
+centers = [kenya, uganda, nigeria]
 
 cohorts = []
 
@@ -43,27 +43,27 @@ if public_key_token and authorization_token and url:
                                             headers=headers).json()
         location_data_response = requests.get(url + 'locations',
                                               headers=headers).json()
-        # test countries
+        # test centers
         locations = {}
 
         for location in location_data_response.get('values'):
             name = location.get("name")
-            locations[name] = Country(name=name, uuid=location.get('id'))
+            locations[name] = Center(name=name, uuid=location.get('id'))
 
-        countries = list(locations.values())
+        centers = list(locations.values())
 
-        # test countries
+        # test centers
         kenya = location.get('Nairobi') or location.get('nairobi')
 
         # cohorts
         cohorts = []
         for cohort_information in cohort_data_response.get('values'):
             name = cohort_information.get('name')
-            country = locations.get(
+            center = locations.get(
                 cohort_information.get('location').get('name'))
             cohort = Cohort(name=name,
                             uuid=cohort_information.get('id'),
-                            country_id=country.uuid)
+                            center_id=center.uuid)
             cohorts.append(cohort)
     except Exception:
         print("Your initial dev-data, won't work...")
@@ -124,7 +124,7 @@ invictus = Society(name="invictus")
 societies = [phoenix, istelle, sparks, invictus]
 
 # cohorts
-cohort_14_ke = Cohort(name='Cohort 14 Test', country=kenya)
+cohort_14_ke = Cohort(name='Cohort 14 Test', center=kenya)
 
 # roles available
 roles = [
@@ -146,7 +146,7 @@ member = User(
     photo="https://lh6.googleusercontent.com/-1DhBLOJentg/AAAAAAAAA"
           "AI/AAAAAAAAABc/ImeP_cAI/photo.jpg?sz=50",
     email="test.user.societies@andela.com",
-    country=kenya,
+    center=kenya,
     cohort=cohort_14_ke,
     society=phoenix
 )
@@ -159,7 +159,7 @@ president = User(
     photo="https://lh6.googleusercontent.com/-1DhBLOJentg/AAAAAAAAA"
           "AI/AAAAAAnAABc/ImeP_cAI/photo.jpg?sz=50",
     email="test.president.societies@andela.com",
-    country=kenya,
+    center=kenya,
     cohort=cohort_14_ke,
     society=phoenix
 )
@@ -172,7 +172,7 @@ success_ops = User(
     photo="https://lh6.googleusercontent.com/-1DhBLOJentg/AAAAAAAAA"
           "AI/AAAAAAnAABc/ImeP_cAI/photo.jpg?sz=50",
     email="test.successops.societies@andela.com",
-    country=kenya
+    center=kenya
 )
 success_ops.roles.append(roles[3])
 
@@ -227,5 +227,5 @@ open_saturday_points = LoggedActivity(
 
 logged_activities = [hackathon_points, interview_points, open_saturday_points]
 test_data = (activity_types + societies + users + logged_activities
-             + countries + cohorts + roles)
-production_data = activity_types + countries + cohorts + roles + societies
+             + centers + cohorts + roles)
+production_data = activity_types + centers + cohorts + roles + societies

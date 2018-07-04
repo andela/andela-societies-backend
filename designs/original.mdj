@@ -787,7 +787,7 @@
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "+country_id",
+											"text": "+center_id",
 											"horizontalAlignment": 0,
 											"verticalAlignment": 5,
 											"wordWrap": false
@@ -5878,7 +5878,7 @@
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "Country",
+											"text": "Center",
 											"horizontalAlignment": 2,
 											"verticalAlignment": 5,
 											"wordWrap": false
@@ -6937,7 +6937,7 @@
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "+country_id",
+											"text": "+center_id",
 											"horizontalAlignment": 0,
 											"verticalAlignment": 5,
 											"wordWrap": false
@@ -8402,7 +8402,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFiKYrpPs/zMkA="
 							},
-							"name": "country_id",
+							"name": "center_id",
 							"visibility": "public",
 							"isStatic": false,
 							"isLeaf": false,
@@ -9385,7 +9385,7 @@
 					"_parent": {
 						"$ref": "AAAAAAFF+qBWK6M3Z8Y="
 					},
-					"name": "Country",
+					"name": "Center",
 					"ownedElements": [
 						{
 							"_type": "UMLGeneralization",
@@ -9456,7 +9456,7 @@
 					"_parent": {
 						"$ref": "AAAAAAFF+qBWK6M3Z8Y="
 					},
-					"name": "Country",
+					"name": "Center",
 					"ownedElements": [
 						{
 							"_type": "UMLGeneralization",
@@ -9909,7 +9909,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFiQ1g9//sadWo="
 							},
-							"name": "country_id",
+							"name": "center_id",
 							"visibility": "public",
 							"isStatic": false,
 							"isLeaf": false,

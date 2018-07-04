@@ -5,7 +5,8 @@ import os
 from collections import namedtuple
 from flask import jsonify, request, current_app, url_for, Response
 
-from api.models import Activity, ActivityType, Cohort, Country, Role
+from api.models import Activity, ActivityType, Cohort, Center, Role
+from api.utils.marshmallow_schemas import basic_info_schema
 
 
 ParsedResult = namedtuple(
@@ -86,6 +87,12 @@ def paginate_items(fetched_data):
 
         data_list = []
         for _fetched_item in fetched_data.items:
+
+            # Serialization of RedemptionRequests
+            if fetched_data.items[0].__class__.__name__ == 'RedemptionRequest':
+                data_item = redemp_request_serializer(_fetched_item)
+                data_list.append(data_item)
+
             data_item = _fetched_item.serialize()
             data_list.append(data_item)
 
@@ -142,6 +149,15 @@ def edit_role(payload, search_term):
 def find_item(data):
     """Build the response with found/404 item in DB."""
     if data:
+
+        # Serialization of RedemptionRequest
+        if data.__class__.__name__ == 'RedemptionRequest':
+            return response_builder(dict(
+                data=redemp_request_serializer(data),
+                status="success",
+                message="{} fetched successfully.".format(data.name)
+            ), 200)
+
         return response_builder(dict(
             data=data.serialize(),
             status="success",
@@ -162,14 +178,16 @@ def response_builder(data, status_code=200):
     return response
 
 
-def add_extra_user_info(token, user_id, url=os.environ.get('ANDELA_API_URL')): # pragma: no cover
+# pragma: no cover
+def add_extra_user_info(token, user_id, url=os.environ.get('ANDELA_API_URL')):
     """Retrive user information from ANDELA API.
 
     params:
         token(str): valid jwt token
         user_id(str): id for user to retive information about
 
-    returns: tuple(location, cohort, api_response)
+    Returns
+    tuple(location, cohort, api_response)
     """
     cohort = location = None
     Bearer = 'Bearer '
@@ -195,9 +213,20 @@ def add_extra_user_info(token, user_id, url=os.environ.get('ANDELA_API_URL')): #
             cohort = Cohort(uuid=api_response.json().get('cohort').get('id'),
                             name=api_response.json().get('cohort').get('name'))
 
-        location = Country.query.filter_by(
+        location = Center.query.filter_by(
             uuid=api_response.json().get('location').get('id')).first()
         if not location:
-            location = Country(
+            location = Center(
                     uuid=api_response.json().get('location').get('id'))
     return cohort, location, api_response
+
+
+def redemp_request_serializer(redemp_request):
+    """Return fully serialsed data on RedemptionRequest objects."""
+    data, _ = basic_info_schema.dump(redemp_request)
+    center, _ = basic_info_schema.dump(redemp_request.center)
+    user, _ = basic_info_schema.dump(redemp_request.user)
+
+    data['center'] = center
+    data['user'] = user
+    return data
