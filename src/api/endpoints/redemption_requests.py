@@ -5,7 +5,9 @@ from flask_restplus import Resource
 
 from api.utils.auth import token_required, roles_required
 from api.utils.helpers import find_item, paginate_items, response_builder
-from ..models import Society, RedemptionRequest, User, Country
+from api.utils.helpers import redemp_request_serializer
+from api.utils.marshmallow_schemas import redemption_request_schema
+from ..models import Society, RedemptionRequest, User, Center
 
 
 class PointRedemptionAPI(Resource):
@@ -27,32 +29,37 @@ class PointRedemptionAPI(Resource):
                 status="fail"
             ), 400)
 
-        name = payload.get("name")
-        value = payload.get("value")
-        country_input = payload.get("country")
+        result, errors = redemption_request_schema.load(payload)
 
-        country = Country.query.filter_by(name=country_input).first()
+        if errors:
+            status_code = redemption_request_schema.context.get(
+                            'status_code')
+            validation_status_code = status_code or 400
+            return response_builder(errors, validation_status_code)
 
-        if name and value and country_input:
+        name = result.get('name')
+        value = result.get('value')
+        center = Center.query.filter_by(name=result.get('center')).first()
+
+        if name and value and center:
             redemp_request = RedemptionRequest(
                 name=name,
                 value=value,
                 user=g.current_user,
-                country=country
+                center=center
             )
-
             redemp_request.save()
 
             return response_builder(dict(
                 message="Redemption request created. Success Ops will be in"
                         " touch soon.",
                 status="success",
-                data=redemp_request.serialize()
+                data=redemp_request_serializer(redemp_request)
             ), 201)
 
         else:
             return response_builder(dict(
-                message="Redemption request name, value and country required",
+                message="Redemption request name, value and center required",
                 status="fail"
             ), 400)
 
@@ -96,7 +103,7 @@ class PointRedemptionAPI(Resource):
         redemp_request.save()
 
         return response_builder(dict(
-            data=redemp_request.serialize(),
+            data=redemp_request_serializer(redemp_request),
             status="success",
             message="RedemptionRequest edited successfully."
         ), 200)
@@ -142,13 +149,13 @@ class PointRedemptionAPI(Resource):
                                         ))
                 return paginate_items(redemp_request)
 
-            search_term_country = request.args.get("country")
-            if search_term_country:
-                country_query = Country.query.filter_by(
-                            name=search_term_country).first()
+            search_term_center = request.args.get("center")
+            if search_term_center:
+                center_query = Center.query.filter_by(
+                            name=search_term_center).first()
 
                 redemp_request = RedemptionRequest.query.filter_by(
-                                        country=country_query)
+                                        center=center_query)
                 return paginate_items(redemp_request)
 
         redemption_requests = RedemptionRequest.query
@@ -230,5 +237,5 @@ class PointRedemptionRequestNumeration(Resource):
             message="RedemptionRequest status changed to {}".format(
                                                         redemp_request.status),
             status="success",
-            data=redemp_request.serialize()
+            data=redemp_request_serializer(redemp_request)
         ), 200)

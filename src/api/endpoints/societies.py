@@ -196,7 +196,7 @@ class AddCohort(Resource):
         cohort_data = cohort_schema.dump(cohort).data
         cohort_meta_data = {
                 'society': base_schema.dump(society).data,
-                'country': base_schema.dump(cohort.country).data
+                'center': base_schema.dump(cohort.center).data
                 }
         cohort_data['meta'] = cohort_meta_data
 
