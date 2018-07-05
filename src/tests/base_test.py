@@ -228,7 +228,7 @@ class BaseTestCase(TestCase):
             uuid="-KdQsMt2U0ixIy_-yWTSZ",
             name="Test User",
             photo="https://www.link.com",
-            email="test.user.societies@andela.com",
+            email="test.fellow@andela.com",
             center=self.nigeria,
             cohort=self.cohort_1_Nig,
             society=self.phoenix

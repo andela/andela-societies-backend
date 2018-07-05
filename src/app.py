@@ -23,7 +23,7 @@ except ImportError:
 
 
 def create_app(environment="Development"):
-    """Factory Method that creates an instance of the app with the given env.
+    """(Factory) Method that creates an instance of the app with the given env.
 
     Args:
         environment (str): Specify the configuration to initilize app with.

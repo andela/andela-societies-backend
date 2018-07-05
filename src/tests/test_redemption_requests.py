@@ -367,3 +367,26 @@ class PointRedemptionApprovalTestCase(BaseTestCase):
 
         self.assertIn(message, response_details["message"])
         self.assertEqual(response.status_code, 200)
+
+    def test_point_redemption_rejection_successful(self):
+        """Test rejection of redemption request.
+
+        When rejected the value of the redemption request should reflect on the
+        society._total_points.
+        """
+        approval_payload = dict(status="rejected",
+                                description="The reason for redemption is not"
+                                            "within the scope of the points")
+
+        response = self.client.put(
+                    f"api/v1/societies/redeem/verify/{self.redemp_req.uuid}",
+                    data=json.dumps(approval_payload),
+                    headers=self.success_ops,
+                    content_type='application/json'
+        )
+
+        message = "status changed to {}".format(approval_payload["status"])
+        response_details = json.loads(response.data)
+
+        self.assertIn(message, response_details["message"])
+        self.assertEqual(response.status_code, 200)

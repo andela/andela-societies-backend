@@ -1,4 +1,5 @@
 """RedemptionRequest Module."""
+import os
 
 from flask import request, g
 from flask_restplus import Resource
@@ -8,6 +9,7 @@ from api.utils.helpers import find_item, paginate_items, response_builder
 from api.utils.helpers import redemp_request_serializer
 from api.utils.marshmallow_schemas import redemption_request_schema
 from ..models import Society, RedemptionRequest, User, Center
+from api.utils.notifications.email_notices import send_email
 
 
 class PointRedemptionAPI(Resource):
@@ -49,6 +51,14 @@ class PointRedemptionAPI(Resource):
                 center=center
             )
             redemp_request.save()
+            send_email.delay(
+                sender=os.environ.get("SENDER_CREDS"),
+                subject="RE: Andela Societies: Redemption Request.",
+                message="The request {} has been submitted. Kindly respond to"
+                        " the same through the application, {}.".format(
+                        redemp_request.name, "https://societies.andela.com/"),
+                recipients=["successops@andela.com"]
+            )
 
             return response_builder(dict(
                 message="Redemption request created. Success Ops will be in"
@@ -226,12 +236,33 @@ class PointRedemptionRequestNumeration(Resource):
             ), 404)
 
         if status == "approved":
-            user = redemp_request.user
-            society = Society.query.get(user.society_id)
+            society = Society.query.get(redemp_request.user.society_id)
             society.used_points = redemp_request
             redemp_request.status = status
-        else:
+
+            send_email.delay(
+                sender=os.environ.get("SENDER_CREDS"),
+                subject="RE: Andela Societies: Redemption Request.",
+                message="The request {} has been approved.".format(
+                        redemp_request.name),
+                recipients=[
+                            redemp_request.user.email,
+                            "test.successops@andela.com",
+                            ]
+                    )
+
+        elif status == "rejected":
             redemp_request.status = status
+            redemp_request.description = payload.get("description") or None
+
+            send_email.delay(
+                sender=os.environ.get("SENDER_CREDS"),
+                subject="RE: Andela Societies: Redemption Request.",
+                message="The request {} has been rejected. Reasons given are:"
+                        " {}.".format(
+                        redemp_request.name, redemp_request.description),
+                recipients=[redemp_request.user.email]
+                    )
 
         return response_builder(dict(
             message="RedemptionRequest status changed to {}".format(
