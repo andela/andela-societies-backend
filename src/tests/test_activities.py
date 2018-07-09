@@ -1,6 +1,7 @@
 """Tests for Activities Module."""
-import json
 import datetime
+import json
+
 from api.models import ActivityType
 from tests.base_test import BaseTestCase
 
@@ -222,11 +223,12 @@ class SocietyExecsTestCase(BaseTestCase):
 
         By a society president.
         """
-        new_activity = dict(name="tech congress",
-                            description="all about tech",
-                            activityTypeId=ActivitiesTestCase.get_activity_type_id(
-                                "Tech Event"),
-                            activityDate=str(datetime.date.today()))
+        new_activity = dict(
+            name="tech congress",
+            description="all about tech",
+            activityTypeId=ActivitiesTestCase.get_activity_type_id(
+                "Tech Event"),
+            activityDate=str(datetime.date.today()))
 
         response = self.client.post('/api/v1/activities',
                                     data=json.dumps(new_activity),

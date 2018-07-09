@@ -1,13 +1,13 @@
 """Module for activity types operations."""
 
 from flask import request
-from flask_restplus import Resource
+from flask_restful import Resource
 
-from api.utils.auth import token_required, roles_required
 from api.models import ActivityType
-from api.utils.marshmallow_schemas import (new_activity_type_schema,
-                                           activity_types_schema)
-from api.utils.helpers import response_builder, find_item
+from api.utils.auth import roles_required, token_required
+from api.utils.helpers import find_item, response_builder
+from api.utils.marshmallow_schemas import (activity_types_schema,
+                                           new_activity_type_schema)
 
 
 class ActivityTypesAPI(Resource):
@@ -16,7 +16,7 @@ class ActivityTypesAPI(Resource):
     decorators = [token_required]
 
     @classmethod
-    @roles_required(["Success Ops"])
+    @roles_required(["success ops"])
     def post(cls):
         """Create new activity type."""
         payload = request.get_json(silent=True)
@@ -35,11 +35,13 @@ class ActivityTypesAPI(Resource):
             validation_status_code = status_code or 400
             return response_builder(errors, validation_status_code)
 
-        activity_type = ActivityType(name=result["name"],
-                                     description=result["description"],
-                                     value=result["value"],
-                                     supports_multiple_participants=result["supports_multiple_participants"]
-                                     )
+        support_mutiple = result["supports_multiple_participants"]
+        activity_type = ActivityType(
+                name=result["name"],
+                description=result["description"],
+                value=result["value"],
+                supports_multiple_participants=support_mutiple
+        )
         activity_type.save()
         return response_builder(dict(
                     status="success",
@@ -67,7 +69,7 @@ class ActivityTypesAPI(Resource):
         return find_item(activity_type)
 
     @classmethod
-    @roles_required(["Success Ops"])
+    @roles_required(["success ops"])
     def put(cls, act_types_id=None):
         """Edit information on an activity type."""
         payload = request.get_json(silent=True)
@@ -99,7 +101,8 @@ class ActivityTypesAPI(Resource):
         if payload.get("value"):
             target_activity_type.value = payload.get("value")
         if payload.get("supports_multiple_participant"):
-            target_activity_type.supports_multiple_participants = payload.get("supports_multiple_participants")
+            target_activity_type.supports_multiple_participants =\
+             payload.get("supports_multiple_participants")
         return response_builder(dict(
                 message="Edit successful",
                 path=target_activity_type.serialize(),
@@ -107,7 +110,7 @@ class ActivityTypesAPI(Resource):
         ), 200)
 
     @classmethod
-    @roles_required(["Success Ops"])
+    @roles_required(["success ops"])
     def delete(cls, act_types_id=None):
         """Delete an activity type."""
         if not act_types_id:

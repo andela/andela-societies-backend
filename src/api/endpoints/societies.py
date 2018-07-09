@@ -1,14 +1,15 @@
 """Society Module."""
 
 from flask import request
-from flask_restplus import Resource
+from flask_restful import Resource
 
-from api.utils.auth import token_required, roles_required
+from api.utils.auth import roles_required, token_required
 from api.utils.helpers import paginate_items, response_builder
-from api.utils.marshmallow_schemas import (cohort_schema, base_schema,
+from api.utils.marshmallow_schemas import (base_schema, cohort_schema,
                                            society_schema,
                                            user_logged_activities_schema)
-from ..models import Society, Cohort, LoggedActivity
+
+from ..models import Cohort, LoggedActivity, Society
 
 
 class SocietyResource(Resource):
@@ -16,7 +17,7 @@ class SocietyResource(Resource):
 
     @classmethod
     @token_required
-    @roles_required(["Success Ops"])
+    @roles_required(["success ops"])
     def post(cls):
         """Create a society."""
         payload = request.get_json(silent=True)
@@ -82,7 +83,7 @@ class SocietyResource(Resource):
 
     @classmethod
     @token_required
-    @roles_required(["Success Ops"])
+    @roles_required(["success ops"])
     def put(cls, society_id=None):
         """Edit Society details."""
         payload = request.get_json(silent=True)
@@ -130,7 +131,7 @@ class SocietyResource(Resource):
 
     @classmethod
     @token_required
-    @roles_required(["Success Ops"])
+    @roles_required(["success ops"])
     def delete(cls, society_id=None):
         """Delete Society."""
         if not society_id:
@@ -155,7 +156,7 @@ class AddCohort(Resource):
 
     @classmethod
     @token_required
-    @roles_required(["Success Ops"])
+    @roles_required(["success ops"])
     def put(cls):
         """Assign a cohort to a society.
 

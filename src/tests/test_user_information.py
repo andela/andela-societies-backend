@@ -2,17 +2,19 @@
 
 
 import json
+from unittest import mock
+
+from flask import Response
+
 from tests.base_test import BaseTestCase, Center, Cohort, Society
 from api.utils.marshmallow_schemas import basic_info_schema
-from unittest import mock
-from flask import Response
 
 
 def info_mock(status_code, society=None, location=None, cohort=None, data=None):
     """Mock reponses from api calls to ANDELA API."""
     data = {} if not data else data
     api_response = Response()
-    api_response.json = lambda : data
+    api_response.json = lambda: data
     api_response.status_code = status_code
     return cohort, location, api_response
 
@@ -39,6 +41,11 @@ class UserInformationTestCase(BaseTestCase):
 
     def test_get_user_info_saved_in_DB(self):
         """Test retrive saved information sucesfully."""
+        self.cohort_1_Nig.save()
+        self.phoenix.cohorts.append(self.cohort_1_Nig)
+        self.phoenix.save()
+        self.test_user.save()
+
         response = self.client.get('/api/v1/users/-KdQsMt2U0ixIy_-yWTSZ',
                                    headers=self.header,
                                    content_type='application/json')
@@ -46,15 +53,13 @@ class UserInformationTestCase(BaseTestCase):
 
         response_data = json.loads(response.data)
 
-        expected_location_data, _ = basic_info_schema.dump(self.kenya)
+        expected_location_data, _ = basic_info_schema.dump(self.nigeria)
         self.assertDictEqual(response_data.get('data').get('location'),
                              expected_location_data)
-
-        expected_society_data, _ = basic_info_schema.dump(self.society)
+        expected_society_data, _ = basic_info_schema.dump(self.phoenix)
         self.assertDictEqual(response_data.get('data').get('society'),
                              expected_society_data)
-
-        expected_cohort_data, _ = basic_info_schema.dump(self.cohort_12_Ke)
+        expected_cohort_data, _ = basic_info_schema.dump(self.cohort_1_Nig)
         self.assertDictEqual(response_data.get('data').get('cohort'),
                              expected_cohort_data)
 

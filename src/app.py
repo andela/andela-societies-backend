@@ -13,7 +13,7 @@ from api.endpoints.roles import RoleAPI, SocietyRoleAPI
 from api.models import db
 from flask import Flask, jsonify
 from flask_cors import CORS
-from flask_restplus import Api
+from flask_restful import Api
 from flask_sslify import SSLify
 
 try:
@@ -35,14 +35,7 @@ def create_app(environment="Development"):
     app.config.from_object(configuration[environment])
     db.init_app(app)
 
-    api = Api(
-        app=app,
-        default='API',
-        default_label="Available Endpoints",
-        title='🗣️ Andela Societies API 😱',
-        version='1.0',
-        description="""Andela Societies API Endpoint Documentation 📚""",
-        scheme='https')
+    api = Api(app=app)
 
     # to redirect all incoming production requests to https
     if environment.lower() == "production" or "staging":

@@ -1,11 +1,10 @@
 """Validation schemas."""
 from datetime import date
-from marshmallow import (
-    Schema, fields, post_load, validates,
-    validate, ValidationError, validates_schema
-)
 
-from api.models import User, Activity, ActivityType, Role
+from marshmallow import (Schema, ValidationError, fields, post_load, validate,
+                         validates, validates_schema)
+
+from api.models import Activity, ActivityType, Role, User
 
 
 class BaseSchema(Schema):
@@ -225,7 +224,7 @@ class CohortSchema(BaseSchema):
     """Validation Schema for Cohort."""
 
     center_id = fields.String(dump_only=True, dump_to='centerId',
-                               validate=[validate.Length(max=36)])
+                              validate=[validate.Length(max=36)])
 
     society_id = fields.String(dump_only=True, dump_to='societyId',
                                validate=[validate.Length(max=36)])
@@ -253,7 +252,7 @@ class UserSchema(BaseSchema):
     society_id = fields.String(dump_only=True, dump_to='societyId',
                                validate=[validate.Length(max=36)])
     center_id = fields.String(dump_only=True, dump_to='centerId',
-                               validate=[validate.Length(max=36)])
+                              validate=[validate.Length(max=36)])
     cohort_id = fields.String(dump_only=True, dump_to='cohortId',
                               validate=[validate.Length(max=36)])
 
@@ -261,7 +260,14 @@ class UserSchema(BaseSchema):
 class RedemptionRequestSchema(BaseSchema):
     """RedemptionRequest serializer/validator."""
 
+    name = fields.String(
+        load_from='reason',
+        required=True,
+        error_messages={
+            'required': {'message': 'A name is required.'}
+        })
     value = fields.Integer(
+        load_from='points',
         required=True,
         error_messages={
             'required': {'message': 'A value is required.'}
@@ -271,6 +277,15 @@ class RedemptionRequestSchema(BaseSchema):
         error_messages={
             'required': {'message': 'Center name is required.'}
         })
+
+
+class RedemptionSchema(BaseSchema):
+    """Redemption serializer/validator."""
+
+    status = fields.String(dump_only=True, dump_to='status',
+                           validate=[validate.Length(max=36)])
+    value = fields.Integer(dump_only=True, dump_to='value',
+                           validate=[validate.Length(max=36)])
 
 
 activity_types_schema = ActivityTypesSchema(many=True)
@@ -288,3 +303,4 @@ user_schema = UserSchema()
 basic_info_schema = BaseSchema()
 society_schema = SocietySchema()
 redemption_request_schema = RedemptionRequestSchema()
+redemption_schema = RedemptionSchema()

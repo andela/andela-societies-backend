@@ -1,13 +1,14 @@
 """Contain utility functions and constants."""
 import datetime
-import requests
 import os
 from collections import namedtuple
-from flask import jsonify, request, current_app, url_for, Response
 
-from api.models import Activity, ActivityType, Cohort, Center, Role
-from api.utils.marshmallow_schemas import basic_info_schema
 
+import requests
+from flask import Response, current_app, jsonify, request, url_for
+from api.models import (Activity, ActivityType, Cohort, Center, Role, Society,
+                        RedemptionRequest)
+from api.utils.marshmallow_schemas import basic_info_schema, redemption_schema
 
 ParsedResult = namedtuple(
         'ParsedResult',
@@ -64,10 +65,10 @@ def parse_log_activity_fields(result):
 
 def paginate_items(fetched_data):
     """Pagniate all roles for display."""
-    _page = request.args.get('page')
-    _limit = request.args.get('limit')
-    page = int(_page or current_app.config['DEFAULT_PAGE'])
-    limit = int(_limit or current_app.config['PAGE_LIMIT'])
+    _page = int(request.args.get('page') or current_app.config['DEFAULT_PAGE'])
+    _limit = int(request.args.get('limit') or current_app.config['PAGE_LIMIT'])
+    page = current_app.config['DEFAULT_PAGE'] if _page < 0 else _page
+    limit = current_app.config['PAGE_LIMIT'] if _limit < 0 else _limit
 
     fetched_data = fetched_data.paginate(
         page=page,
@@ -87,23 +88,21 @@ def paginate_items(fetched_data):
 
         data_list = []
         for _fetched_item in fetched_data.items:
-
-            # Serialization of RedemptionRequests
-            if fetched_data.items[0].__class__.__name__ == 'RedemptionRequest':
-                data_item = redemp_request_serializer(_fetched_item)
+            if isinstance(_fetched_item, RedemptionRequest):
+                data_item = serialize_redmp(_fetched_item)
                 data_list.append(data_item)
-
-            data_item = _fetched_item.serialize()
-            data_list.append(data_item)
+            else:
+                data_item = _fetched_item.serialize()
+                data_list.append(data_item)
 
         return response_builder(dict(
             status="success",
-            data=dict(data_items=data_list,
-                      count=len(fetched_data.items),
-                      nextUrl=next_url,
-                      previousUrl=previous_url,
-                      currentPage=fetched_data.page),
-            message="Data fetched successfully."
+            data=data_list,
+            count=fetched_data.total,
+            nextUrl=next_url,
+            previousUrl=previous_url,
+            currentPage=fetched_data.page,
+            message="fetched successfully."
         ), 200)
 
     return response_builder(dict(
@@ -151,9 +150,9 @@ def find_item(data):
     if data:
 
         # Serialization of RedemptionRequest
-        if data.__class__.__name__ == 'RedemptionRequest':
+        if isinstance(data, RedemptionRequest):
             return response_builder(dict(
-                data=redemp_request_serializer(data),
+                data=serialize_redmp(data),
                 status="success",
                 message="{} fetched successfully.".format(data.name)
             ), 200)
@@ -178,16 +177,16 @@ def response_builder(data, status_code=200):
     return response
 
 
-# pragma: no cover
-def add_extra_user_info(token, user_id, url=os.environ.get('ANDELA_API_URL')):
+def add_extra_user_info(token, user_id, url=os.environ.get('ANDELA_API_URL')):# pragma: no cover
     """Retrive user information from ANDELA API.
 
     params:
         token(str): valid jwt token
         user_id(str): id for user to retive information about
 
-    Returns
-    tuple(location, cohort, api_response)
+    Returns:
+        tuple(location, cohort, api_response)
+
     """
     cohort = location = None
     Bearer = 'Bearer '
@@ -221,12 +220,13 @@ def add_extra_user_info(token, user_id, url=os.environ.get('ANDELA_API_URL')):
     return cohort, location, api_response
 
 
-def redemp_request_serializer(redemp_request):
-    """Return fully serialsed data on RedemptionRequest objects."""
-    data, _ = basic_info_schema.dump(redemp_request)
-    center, _ = basic_info_schema.dump(redemp_request.center)
-    user, _ = basic_info_schema.dump(redemp_request.user)
-
-    data['center'] = center
-    data['user'] = user
-    return data
+def serialize_redmp(redmption):
+    """To serialize and package redeptions."""
+    serial_data, _ = redemption_schema.dump(redmption)
+    seriallized_user, _ = basic_info_schema.dump(redmption.user)
+    serilaized_society, _ = basic_info_schema.dump(
+        Society.query.get(redmption.user.society_id))
+    serial_data["user"] = seriallized_user
+    serial_data["society"] = serilaized_society
+    serial_data["center"], _ = basic_info_schema.dump(redmption.center)
+    return serial_data

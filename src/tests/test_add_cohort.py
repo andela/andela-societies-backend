@@ -8,7 +8,7 @@ class AddCohortTestCase(BaseTestCase):
 
     def setUp(self):
         super().setUp()
-        self.success_role = Role(name="Success Ops")
+        self.success_role = Role(name="success ops")
         self.success_role.save()
 
     def test_add_society(self):
