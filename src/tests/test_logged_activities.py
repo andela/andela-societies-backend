@@ -1,7 +1,8 @@
 """Logged Activity Test Suite."""
-from api.models import LoggedActivity
-import json
 import datetime
+import json
+
+from api.models import LoggedActivity
 
 from.base_test import BaseTestCase
 

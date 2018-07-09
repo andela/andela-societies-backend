@@ -1,6 +1,7 @@
 """Test suite for Point Redemption Module."""
 import json
 import uuid
+
 from .base_test import BaseTestCase
 
 
@@ -21,8 +22,10 @@ class PointRedemptionBaseTestCase(BaseTestCase):
 
     def test_create_redemption_request(self):
         """Test creation of Redemption Request through endpoint."""
+        self.nigeria.save()
+
         new_request = dict(
-            name="T-shirt Funds Request",
+            reason="T-shirt Funds Request",
             value=2500,
             center="Nigeria"
             )
@@ -121,11 +124,11 @@ class PointRedemptionBaseTestCase(BaseTestCase):
 
     def test_get_existing_redemption_requests_by_society(self):
         """Test retrieval of Redemption Requests."""
+        self.test_user.society.save()
         response = self.client.get(
                     f"api/v1/societies/redeem?society={self.test_user.society.name}",
                     headers=self.society_president,
                     content_type='application/json')
-
         message = "fetched successfully"
         response_details = json.loads(response.data)
 
@@ -164,7 +167,6 @@ class PointRedemptionBaseTestCase(BaseTestCase):
                         f"api/v1/societies/redeem/{str(uuid.uuid4())}",
                         headers=self.society_president,
                         content_type='application/json')
-
         message = "does not exist"
         response_details = json.loads(response.data)
 
@@ -178,7 +180,7 @@ class PointRedemptionBaseTestCase(BaseTestCase):
                     headers=self.society_president,
                     content_type='application/json')
 
-        message = "does not exist"
+        message = "Resources were not found."
         response_details = json.loads(response.data)
 
         self.assertIn(message, response_details["message"])
@@ -190,12 +192,11 @@ class PointRedemptionBaseTestCase(BaseTestCase):
                     f"api/v1/societies/redeem?society={str(uuid.uuid4())}",
                     headers=self.society_president,
                     content_type='application/json')
-
-        message = "not found"
+        message = f'not found'
         response_details = json.loads(response.data)
 
-        self.assertIn(message, response_details["message"])
-        self.assertEqual(response.status_code, 404)
+        self.assertTrue(response_details["message"].find(message))
+        self.assertEqual(response.status_code, 400)
 
     def test_get_non_existing_redemption_requests_by_status(self):
         """Test retrieval of Redemption Requests."""
@@ -204,7 +205,7 @@ class PointRedemptionBaseTestCase(BaseTestCase):
                     headers=self.society_president,
                     content_type='application/json')
 
-        message = "not found"
+        message = "Resources were not found."
         response_details = json.loads(response.data)
 
         self.assertIn(message, response_details["message"])
@@ -221,8 +222,7 @@ class PointRedemptionBaseTestCase(BaseTestCase):
         response_details = json.loads(response.data)
 
         self.assertIn(message, response_details["message"])
-        self.assertEqual(response.status_code, 404)
-
+        self.assertEqual(response.status_code, 400)
 
     def test_edit_redemption_request(self):
         """Test edit of Redemption Request through endpoint."""
@@ -282,7 +282,7 @@ class PointRedemptionBaseTestCase(BaseTestCase):
 
     def test_edit_redemption_request_no_payload(self):
         """Test editing request without payload fails."""
-        response = self.client.put(f"api/v1/societies/redeem{self.sparks.uuid}",
+        response = self.client.put(f"api/v1/societies/redeem/{self.sparks.uuid}",
                                    headers=self.society_president,
                                    content_type='application/json')
 

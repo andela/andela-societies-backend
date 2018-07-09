@@ -6,10 +6,11 @@ communicate with the API.
 """
 import base64
 from functools import wraps
-from flask import g, jsonify, request, current_app
+
+from flask import current_app, g, jsonify, request
 from jose import ExpiredSignatureError, JWTError, jwt
 
-from api.models import User, Role
+from api.models import Role, User
 from api.utils.helpers import add_extra_user_info, response_builder
 
 
@@ -50,7 +51,6 @@ def token_required(f):
                                      'verify_exp': True
                                  }
                                  )
-
         except ExpiredSignatureError:
             expired_response = "The authorization token supplied is expired"
             return response_builder(dict(message=expired_response), 401)
@@ -69,17 +69,26 @@ def token_required(f):
                 "Fellow": "unique_id"
             }
         }
+        expected_user_keys = expected_user_info_format.keys()
+        payload_user_keys = payload.get("UserInfo").keys()
 
         # confirm that payload and UserInfo has required keys
         if ("UserInfo" and "exp") not in payload.keys():
             return response_builder(dict(message=unauthorized_message), 401)
-        elif payload["UserInfo"].keys() != expected_user_info_format.keys():
+        elif not all(item in payload_user_keys for item in expected_user_keys):
             return response_builder(dict(message=unauthorized_message), 401)
         else:
-            store_user_details(payload, authorization_token)
+            user = User.query.get(payload["UserInfo"]["id"])
+            if not user:
+                user = store_user_details(payload, authorization_token)
+            g.current_user = user
+            g.current_user_token = authorization_token
 
-            # now return wrapped function
-            return f(*args, **kwargs)
+            # attempt to link user to society
+            if not g.current_user.society and g.current_user.cohort:
+                user.society = g.current_user.cohort.society
+                user.save()
+        return f(*args, **kwargs)
     return decorated
 
 
@@ -115,11 +124,8 @@ def store_user_details(payload, token):
         Role.query.filter_by(name=role).first() for role in roles
         if role != "Andelan" and Role.query.filter_by(
             name=role).first() is not None]
-
     user.save()
-
-    g.current_user = user
-    g.current_user_token = token
+    return user
 
 
 def roles_required(roles):  # roles should be a list
@@ -127,12 +133,16 @@ def roles_required(roles):  # roles should be a list
     def check_user_role(f):
         @wraps(f)
         def decorated(*args, **kwargs):
-            if not set(g.current_user.roles).issubset(
-                    [Role.query.filter_by(name=role).first()
-                     for role in roles]):
-                return response_builder(dict(message="You're unauthorized"
-                                             " to perform this operation"),
-                                        401)
+            route_roles = list(filter(lambda r: r is not None,
+                                      [Role.query.filter_by(name=role).first()
+                                       for role in roles]))
+            for role in g.current_user.roles:
+                if role in route_roles:
+                    break
+            else:
+                return response_builder(
+                    dict(message="You're unauthorized"
+                         " to perform this operation"), 401)
             return f(*args, **kwargs)
         return decorated
     return check_user_role

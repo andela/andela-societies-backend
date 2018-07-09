@@ -1,11 +1,11 @@
 """Module for Users in platform."""
-from flask_restplus import Resource
 from flask import g
-from api.utils.helpers import add_extra_user_info
+from flask_restful import Resource
 
-from api.utils.auth import token_required
-from api.utils.marshmallow_schemas import user_schema, basic_info_schema
 from api.models import User, Cohort, Center
+from api.utils.auth import token_required
+from api.utils.helpers import add_extra_user_info
+from api.utils.marshmallow_schemas import user_schema, basic_info_schema
 
 
 class UserAPI(Resource):
@@ -56,12 +56,17 @@ class UserAPI(Resource):
         location, _ = basic_info_schema.dump(
             Center.query.filter_by(
                 uuid=user_information.pop('centerId')).first())
+        user_information['location'] = location
+
         cohort = Cohort.query.filter_by(
             uuid=user_information.pop('cohortId')).first()
+        if cohort:
+            cohort_serialized, _ = basic_info_schema.dump(cohort)
+            user_information['cohort'] = cohort_serialized
+            user_information['society'], _ = basic_info_schema.dump(
+                   cohort.society)
 
-        cohort_serialized, _ = basic_info_schema.dump(cohort)
-        user_information['location'] = location
-        user_information['cohort'] = cohort_serialized
-        user_information['society'], _ = basic_info_schema.dump(cohort.society)
+        user_information['roles'] = {role['name']: role['id']
+                                     for role in user_information['roles']}
 
         return dict(data=user_information), status_code

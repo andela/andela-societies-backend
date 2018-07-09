@@ -1,13 +1,14 @@
 """Module for Roles."""
 
 from flask import request
-from flask_restplus import Resource
+from flask_restful import Resource
 
-from api.utils.auth import token_required, roles_required
-from ..models import Role, User, Society, user_role
-from api.utils.helpers import (paginate_items, edit_role, find_item,
+from api.utils.auth import roles_required, token_required
+from api.utils.helpers import (edit_role, find_item, paginate_items,
                                response_builder)
 from api.utils.marshmallow_schemas import role_schema
+
+from ..models import Role, Society, User, user_role
 
 
 class RoleAPI(Resource):
@@ -15,7 +16,7 @@ class RoleAPI(Resource):
 
     @classmethod
     @token_required
-    @roles_required(["Success Ops"])
+    @roles_required(["success ops"])
     def post(cls):
         """Create a Role."""
         payload = request.get_json(silent=True)
@@ -54,7 +55,7 @@ class RoleAPI(Resource):
 
     @classmethod
     @token_required
-    @roles_required(["Success Ops"])
+    @roles_required(["success ops"])
     def put(cls, role_query=None):
         """Edit a role's details."""
         payload = request.get_json(silent=True)
@@ -73,7 +74,7 @@ class RoleAPI(Resource):
 
     @classmethod
     @token_required
-    @roles_required(["Success Ops"])
+    @roles_required(["success ops"])
     def delete(cls, role_query=None):
         """Delete a role."""
         if not role_query:
@@ -96,7 +97,7 @@ class SocietyRoleAPI(Resource):
 
     @classmethod
     @token_required
-    @roles_required(["Success Ops"])
+    @roles_required(["success ops"])
     def put(cls):
         """Change the a society executives."""
         payload = request.get_json(silent=True)
@@ -144,7 +145,7 @@ class SocietyRoleAPI(Resource):
                 status="fail"
             ), 404)
 
-        if not Role.query.filter_by(name="President").first():
+        if not Role.query.filter_by(name="society president").first():
             return response_builder(dict(
                 message="Create role to be appended.",
                 status="fail"

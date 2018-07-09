@@ -226,7 +226,7 @@ class SocietyTestCaseEmpty(BaseTestCase):
         db.drop_all()
         db.create_all()
         self.successops_role = Role(uuid="-KkLwgbeJUO0dQKsEk1i",
-                                    name="Success Ops")
+                                    name="success ops")
         self.successops_role.save()
 
         self.header = {

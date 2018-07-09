@@ -1,6 +1,7 @@
 """Conatain App configurations."""
 
 import os
+
 from dotenv import load_dotenv
 
 dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
@@ -20,6 +21,8 @@ class Config(object):
     PAGE_LIMIT = 10
     DEFAULT_PAGE = 1
     PUBLIC_KEY = os.environ.get('PUBLIC_KEY')
+    API_ISSUER = "accounts.andela.com"
+    API_AUDIENCE = "andela.com"
 
 
 class Development(Config):
@@ -40,6 +43,8 @@ class Testing(Config):
     SQLALCHEMY_DATABASE_URI = os.environ.get('TEST_DATABASE') or \
         "sqlite:///" + Config.BASE_DIR + "/dev_db.sqlite"
     PUBLIC_KEY = os.environ.get('PUBLIC_KEY_TEST')
+    ISSUER = "tests"
+    API_IDENTIFIER = "tests"
 
 
 class Staging(Development):

@@ -2,7 +2,8 @@
 
 import json
 import uuid
-from .base_test import BaseTestCase
+
+from .base_test import BaseTestCase, db
 
 
 class RoleTestCase(BaseTestCase):
@@ -62,7 +63,7 @@ class RoleTestCase(BaseTestCase):
         self.assertEqual(message, response_details["message"])
 
     def test_successops_can_create_society(self):
-        """Test if Success Ops role can access Society endpoint."""
+        """Test if success ops role can access Society endpoint."""
         new_society = dict(name="Gryffindor",
                            colorScheme="#333333",
                            logo="https://bit.ly/2FE1KI2",
@@ -83,7 +84,7 @@ class RoleTestCase(BaseTestCase):
 
     def test_create_role(self):
         """Test if role can be created."""
-        new_role = dict(name="Society President")
+        new_role = dict(name="Society President Test")
 
         response = self.client.post("/api/v1/roles",
                                     data=json.dumps(new_role),
@@ -100,7 +101,7 @@ class RoleTestCase(BaseTestCase):
 
     def test_create_existing_role(self):
         """Test if role can be created."""
-        new_role = dict(name="Success Ops")
+        new_role = dict(name="success ops")
 
         response = self.client.post("/api/v1/roles",
                                     data=json.dumps(new_role),
@@ -249,13 +250,15 @@ class RoleTestCaseEmpty(BaseTestCase):
 
     def test_get_all_roles_empty(self):
         """Test lack of roles in system is returned."""
+        db.drop_all()
+        db.create_all()
+
         response = self.client.get("api/v1/roles",
                                    headers=self.header,
                                    content_type='application/json')
 
         message = "Resources were not found"
         response_details = json.loads(response.data)
-
         self.assertIn(message, response_details["message"])
         self.assertEqual(response.status_code, 404)
 
@@ -287,7 +290,7 @@ class SocietyRoleTestCase(BaseTestCase):
         """Test the appointment of new President."""
         new_president = dict(name="Test User",
                              society="Phoenix",
-                             role="President")
+                             role="society president")
 
         response = self.client.put("/api/v1/roles/society-execs",
                                    data=json.dumps(new_president),
@@ -304,7 +307,7 @@ class SocietyRoleTestCase(BaseTestCase):
         """Test the appointment of new Vice President."""
         new_vice_president = dict(name="Test User",
                                   society="Sparks",
-                                  role="Vice President")
+                                  role="vice president")
 
         response = self.client.put("/api/v1/roles/society-execs",
                                    data=json.dumps(new_vice_president),
@@ -321,7 +324,7 @@ class SocietyRoleTestCase(BaseTestCase):
         """Test the appointment of new Secretary."""
         new_secretary = dict(name="Test User",
                              society="Invictus",
-                             role="Secretary")
+                             role="secretary")
 
         response = self.client.put("/api/v1/roles/society-execs",
                                    data=json.dumps(new_secretary),

@@ -1,17 +1,16 @@
 """Module for Logged Activities in Andela."""
 
-from flask import request, g
-from flask_restplus import Resource
+from flask import g, request
+from flask_restful import Resource
 from sqlalchemy import func
 
 from api.models import LoggedActivity, User, db
 from api.utils.auth import token_required
-from api.utils.marshmallow_schemas import (
-    user_logged_activities_schema, single_logged_activity_schema,
-    log_edit_activity_schema
-)
-from api.utils.helpers import (parse_log_activity_fields, ParsedResult,
+from api.utils.helpers import (ParsedResult, parse_log_activity_fields,
                                response_builder)
+from api.utils.marshmallow_schemas import (log_edit_activity_schema,
+                                           single_logged_activity_schema,
+                                           user_logged_activities_schema)
 
 
 class UserLoggedActivitiesAPI(Resource):

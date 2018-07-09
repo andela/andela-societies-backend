@@ -1,11 +1,11 @@
 """Activities Module."""
 from flask import g, request
-from flask_restplus import Resource
+from flask_restful import Resource
 
-from api.utils.auth import token_required, roles_required
 from api.models import Activity
-from api.utils.marshmallow_schemas import activity_schema
+from api.utils.auth import roles_required, token_required
 from api.utils.helpers import response_builder
+from api.utils.marshmallow_schemas import activity_schema
 
 
 class ActivitiesAPI(Resource):
@@ -13,7 +13,7 @@ class ActivitiesAPI(Resource):
 
     @classmethod
     @token_required
-    @roles_required(["Success Ops", "Society President"])
+    @roles_required(["success ops", "society president"])
     def post(cls):
         """Create an activity."""
         payload = request.get_json(silent=True)
