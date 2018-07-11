@@ -33,7 +33,7 @@ class PointRedemptionAPI(Resource):
 
         if errors:
             status_code = redemption_request_schema.context.get(
-                            'status_code')
+                'status_code')
             validation_status_code = status_code or 400
             return response_builder(errors, validation_status_code)
 
@@ -82,12 +82,12 @@ class PointRedemptionAPI(Resource):
                 400)
 
         redemp_request = RedemptionRequest.query.filter_by(
-                            uuid=redeem_id).first()
+            uuid=redeem_id).first()
         if not redemp_request:
             return response_builder(dict(
-                                status="fail",
-                                message="RedemptionRequest does not exist."),
-                                404)
+                status="fail",
+                message="RedemptionRequest does not exist."),
+                404)
 
         name = payload.get("name")
         value = payload.get("value")
@@ -120,19 +120,19 @@ class PointRedemptionAPI(Resource):
             search_term_name = request.args.get('name')
             if search_term_name:
                 redemp_request = RedemptionRequest.query.filter_by(
-                                        name=search_term_name).first()
+                    name=search_term_name).first()
                 return find_item(redemp_request)
 
             search_term_status = request.args.get('status')
             if search_term_status:
                 redemp_request = RedemptionRequest.query.filter_by(
-                                        status=search_term_status)
+                    status=search_term_status)
                 return paginate_items(redemp_request)
 
             search_term_society = request.args.get('society')
             if search_term_society:
                 society_query = Society.query.filter_by(
-                                name=search_term_society).first()
+                    name=search_term_society).first()
                 if not society_query:
                     return response_builder(dict(
                         status="success",
@@ -144,18 +144,18 @@ class PointRedemptionAPI(Resource):
                 redemp_request = (
                     RedemptionRequest.query.join(User,
                                                  RedemptionRequest.user).filter(
-                                        User.society_id ==
-                                        society_query.uuid
-                                        ))
+                        User.society_id ==
+                        society_query.uuid
+                    ))
                 return paginate_items(redemp_request)
 
             search_term_center = request.args.get("center")
             if search_term_center:
                 center_query = Center.query.filter_by(
-                            name=search_term_center).first()
+                    name=search_term_center).first()
 
                 redemp_request = RedemptionRequest.query.filter_by(
-                                        center=center_query)
+                    center=center_query)
                 return paginate_items(redemp_request)
 
         redemption_requests = RedemptionRequest.query
@@ -179,8 +179,8 @@ class PointRedemptionAPI(Resource):
 
         redemp_request.delete()
         return response_builder(dict(
-                status="success",
-                message="RedemptionRequest deleted successfully."), 200)
+            status="success",
+            message="RedemptionRequest deleted successfully."), 200)
 
 
 class PointRedemptionRequestNumeration(Resource):
@@ -209,14 +209,6 @@ class PointRedemptionRequestNumeration(Resource):
                 status="fail",
                 message="RedemptionRequest id must be provided."), 400)
 
-        try:
-            status = payload["status"]
-        except KeyError as e:
-            return response_builder(dict(
-                module="RedemptionRequest Module",
-                errors=e,
-                message="Missing fields"), 400)
-
         redemp_request = RedemptionRequest.query.get(redeem_id)
         if not redemp_request:
             return response_builder(dict(
@@ -225,17 +217,24 @@ class PointRedemptionRequestNumeration(Resource):
                 message="Resource does not exist."
             ), 404)
 
+        status = payload.get("status")
+        comment = payload.get("comment")
+        rejection_reason = payload.get("rejection")
+
         if status == "approved":
             user = redemp_request.user
             society = Society.query.get(user.society_id)
             society.used_points = redemp_request
             redemp_request.status = status
-        else:
+        elif status == "rejected":
             redemp_request.status = status
+            redemp_request.rejection = rejection_reason
+        elif comment:
+            redemp_request.comment = comment
 
         return response_builder(dict(
             message="RedemptionRequest status changed to {}".format(
-                                                        redemp_request.status),
+                redemp_request.status),
             status="success",
             data=redemp_request_serializer(redemp_request)
         ), 200)

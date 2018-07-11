@@ -301,13 +301,6 @@
             "index": "pypi",
             "version": "==2.3.1"
         },
-        "pycrypto": {
-            "hashes": [
-                "sha256:f2ce1e989b272cfcb677616763e0a2e7ec659effa67a88aa92b3a65528f60a3c"
-            ],
-            "index": "pypi",
-            "version": "==2.6.1"
-        },
         "pycryptodome": {
             "hashes": [
                 "sha256:008e0bfc02f8c409fbe31a1dd1ff3aa18b5c109b47a05603ca734506a7b3a8cb",
