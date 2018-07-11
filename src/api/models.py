@@ -256,3 +256,5 @@ class RedemptionRequest(Base):
     status = db.Column(db.String, default="pending", nullable=False)
     center_id = db.Column(db.String, db.ForeignKey('centers.uuid'),
                           nullable=False)
+    comment = db.Column(db.String)
+    rejection = db.Column(db.String)

@@ -367,3 +367,46 @@ class PointRedemptionApprovalTestCase(BaseTestCase):
 
         self.assertIn(message, response_details["message"])
         self.assertEqual(response.status_code, 200)
+
+    def test_point_redemption_rejection_successful(self):
+        """Test rejection of redemption request.
+
+        When rejected the value of the redemption request should not reflect on
+        the society._total_points.
+        """
+        approval_payload = dict(status="rejected",
+                                rejection="The request is outside the scope.")
+
+        response = self.client.put(
+                    f"api/v1/societies/redeem/verify/{self.redemp_req.uuid}",
+                    data=json.dumps(approval_payload),
+                    headers=self.success_ops,
+                    content_type='application/json'
+        )
+
+        message = "status changed to {}".format(approval_payload["status"])
+        response_details = json.loads(response.data)
+
+        self.assertIn(message, response_details["message"])
+        self.assertEqual(response.status_code, 200)
+
+    def test_point_redemption_info_request_successful(self):
+        """Test query of redemption request.
+
+        When the redemption request is not clear the CIO may request for
+        more information from the Society President.
+        """
+        approval_payload = dict(comment="I'm not sure I understand.")
+
+        response = self.client.put(
+                    f"api/v1/societies/redeem/verify/{self.redemp_req.uuid}",
+                    data=json.dumps(approval_payload),
+                    headers=self.success_ops,
+                    content_type='application/json'
+        )
+
+        message = "status changed"
+        response_details = json.loads(response.data)
+
+        self.assertIn(message, response_details["message"])
+        self.assertEqual(response.status_code, 200)
