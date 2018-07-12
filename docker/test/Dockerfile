@@ -13,6 +13,8 @@ RUN sed -i "s/http:\/\/archive./http:\/\/nz.archive./g" /etc/apt/sources.list
 # Install current stable versions of pip and wheel
 RUN pip install pip==10.0.0 wheel==0.31.0
 
+RUN apt-get -y update && apt-get -y upgrade && apt-get install -y rabbitmq-server
+
 VOLUME /build
 
 WORKDIR /application
