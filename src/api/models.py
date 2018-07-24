@@ -104,10 +104,12 @@ class Center(Base):
     __tablename__ = 'centers'
     members = db.relationship('User',
                               backref='center',
-                              lazy='dynamic')
+                              lazy='dynamic',
+                              cascade="all, delete, delete-orphan")
     cohorts = db.relationship('Cohort',
                               backref='center',
-                              lazy='dynamic')
+                              lazy='dynamic',
+                              cascade="all, delete, delete-orphan")
     redemption_requests = db.relationship(
         'RedemptionRequest', backref='center', lazy='dynamic',
         order_by='desc(RedemptionRequest.created_at)'
@@ -118,7 +120,7 @@ class Cohort(Base):
     """Models cohorts available in Andela."""
 
     __tablename__ = 'cohorts'
-    center_id = db.Column(db.String, db.ForeignKey('centers.uuid'))
+    center_id = db.Column(db.String, db.ForeignKey('centers.uuid'),)
     society_id = db.Column(db.String, db.ForeignKey('societies.uuid'))
 
     members = db.relationship('User', backref='cohort')

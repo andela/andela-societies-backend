@@ -8,7 +8,8 @@ import sys
 from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager, Shell, prompt_bool
 
-from api.utils.initial_data import test_data, production_data
+from api.utils.initial_data import (production_data,
+                                    test_dev_activities_seed_data)
 from api.models import Activity, Society, User, db, Center, Role, Cohort
 from app import create_app
 from run_tests import test
@@ -48,17 +49,10 @@ def seed():
         print("\n\n\t\tYou probably don't wanna do that. Exiting...\n")
         sys.exit()
 
-    data_mapping = {
-        "Production": production_data,
-        "Development": test_data,
-        "Testing": test_data,
-        "Staging": production_data
-    }
-
     if environment.lower() in ["production", "staging"]:
         print("Seeding data to DB: NOTE create, migrate and upgrade your DB")
         try:
-            db.session.add_all(data_mapping.get(environment))
+            db.session.add_all(production_data)
             return print("Data dumped in DB succefully.")
         except Exception as e:
             db.session.rollback()
@@ -81,7 +75,8 @@ def seed():
                 return print("\nError while creating tables: ", e)
 
         try:
-            db.session.add_all(data_mapping.get(environment))
+            db.session.add_all(production_data +
+                               test_dev_activities_seed_data())
             return print("\n\n\nTables seeded successfully.\n\n\n")
         except Exception as e:
             db.session.rollback()
