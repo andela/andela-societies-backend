@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 674aca47c075
+Revision ID: 7d327a0fb0cf
 Revises: 
-Create Date: 2018-07-11 16:36:33.205955
+Create Date: 2018-07-24 17:10:37.313600
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '674aca47c075'
+revision = '7d327a0fb0cf'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -29,7 +29,7 @@ def upgrade():
     sa.Column('supports_multiple_participants', sa.Boolean(), nullable=True),
     sa.PrimaryKeyConstraint('uuid')
     )
-    op.create_table('countries',
+    op.create_table('centers',
     sa.Column('uuid', sa.String(), nullable=False),
     sa.Column('name', sa.String(), nullable=True),
     sa.Column('photo', sa.String(), nullable=True),
@@ -68,9 +68,9 @@ def upgrade():
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('modified_at', sa.DateTime(), nullable=True),
     sa.Column('description', sa.String(), nullable=True),
-    sa.Column('country_id', sa.String(), nullable=True),
+    sa.Column('center_id', sa.String(), nullable=True),
     sa.Column('society_id', sa.String(), nullable=True),
-    sa.ForeignKeyConstraint(['country_id'], ['countries.uuid'], ),
+    sa.ForeignKeyConstraint(['center_id'], ['centers.uuid'], ),
     sa.ForeignKeyConstraint(['society_id'], ['societies.uuid'], ),
     sa.PrimaryKeyConstraint('uuid')
     )
@@ -83,10 +83,10 @@ def upgrade():
     sa.Column('name', sa.String(), nullable=False),
     sa.Column('email', sa.String(), nullable=False),
     sa.Column('society_id', sa.String(), nullable=True),
-    sa.Column('country_id', sa.String(), nullable=True),
+    sa.Column('center_id', sa.String(), nullable=True),
     sa.Column('cohort_id', sa.String(), nullable=True),
+    sa.ForeignKeyConstraint(['center_id'], ['centers.uuid'], ),
     sa.ForeignKeyConstraint(['cohort_id'], ['cohorts.uuid'], ),
-    sa.ForeignKeyConstraint(['country_id'], ['countries.uuid'], ),
     sa.ForeignKeyConstraint(['society_id'], ['societies.uuid'], ),
     sa.PrimaryKeyConstraint('uuid'),
     sa.UniqueConstraint('email')
@@ -113,11 +113,13 @@ def upgrade():
     sa.Column('modified_at', sa.DateTime(), nullable=True),
     sa.Column('description', sa.String(), nullable=True),
     sa.Column('user_id', sa.String(), nullable=False),
+    sa.Column('society_id', sa.String(), nullable=True),
     sa.Column('value', sa.Integer(), nullable=False),
     sa.Column('status', sa.String(), nullable=False),
-    sa.Column('country_id', sa.String(), nullable=False),
-    sa.Column('society_id', sa.String(), nullable=True),
-    sa.ForeignKeyConstraint(['country_id'], ['countries.uuid'], ),
+    sa.Column('center_id', sa.String(), nullable=False),
+    sa.Column('comment', sa.String(), nullable=True),
+    sa.Column('rejection', sa.String(), nullable=True),
+    sa.ForeignKeyConstraint(['center_id'], ['centers.uuid'], ),
     sa.ForeignKeyConstraint(['society_id'], ['societies.uuid'], ),
     sa.ForeignKeyConstraint(['user_id'], ['users.uuid'], ),
     sa.PrimaryKeyConstraint('uuid')
@@ -173,6 +175,6 @@ def downgrade():
     op.drop_table('cohorts')
     op.drop_table('societies')
     op.drop_table('roles')
-    op.drop_table('countries')
+    op.drop_table('centers')
     op.drop_table('activity_types')
     # ### end Alembic commands ###

@@ -129,9 +129,6 @@ sparks = Society(name="sparks")
 invictus = Society(name="invictus")
 societies = [phoenix, istelle, sparks, invictus]
 
-# cohorts
-cohort_14_ke = Cohort(name='Cohort 14 Test', center=kenya)
-
 # roles available
 roles = [
          Role(uuid="-KXGy1EB1oimjQgFim6F", name="success"),
@@ -144,94 +141,100 @@ roles = [
          Role(name="society secretary")
          ]
 
-# users
-# member
-member = User(
-    uuid="-KdQsMtixI2U0y_-yJEH",
-    name="Test User",
-    photo="https://lh6.googleusercontent.com/-1DhBLOJentg/AAAAAAAAA"
-          "AI/AAAAAAAAABc/ImeP_cAI/photo.jpg?sz=50",
-    email="test.user.societies@andela.com",
-    center=kenya,
-    cohort=cohort_14_ke,
-    society=phoenix
-)
-member.roles.append(roles[2])
 
-# president
-president = User(
-    uuid="-KdQsMtixG4U0y_-yJEH",
-    name="Test President",
-    photo="https://lh6.googleusercontent.com/-1DhBLOJentg/AAAAAAAAA"
-          "AI/AAAAAAnAABc/ImeP_cAI/photo.jpg?sz=50",
-    email="test.president.societies@andela.com",
-    center=kenya,
-    cohort=cohort_14_ke,
-    society=phoenix
-)
-president.roles.append(roles[5])
+def test_dev_user_seed_data():
 
-# success ops
-success_ops = User(
-    uuid="-KdQsMtixG4U0y_-yJEF",
-    name="Test success ops",
-    photo="https://lh6.googleusercontent.com/-1DhBLOJentg/AAAAAAAAA"
-          "AI/AAAAAAnAABc/ImeP_cAI/photo.jpg?sz=50",
-    email="test.successops.societies@andela.com",
-    center=kenya
-)
-success_ops.roles.append(roles[3])
+    # cohorts
+    cohort_14_ke = Cohort(name='Cohort 14 Test', center=kenya)
+    # users
+    # member
+    member = User(
+        uuid="-KdQsMtixI2U0y_-yJEH",
+        name="Test User",
+        photo="https://lh6.googleusercontent.com/-1DhBLOJentg/AAAAAAAAA"
+              "AI/AAAAAAAAABc/ImeP_cAI/photo.jpg?sz=50",
+        email="test.user.societies@andela.com",
+        center=kenya,
+        cohort=cohort_14_ke,
+        society=phoenix
+    )
+    member.roles.append(roles[2])
 
-users = [member, president, success_ops]
+    # president
+    president = User(
+        uuid="-KdQsMtixG4U0y_-yJEH",
+        name="Test President",
+        photo="https://lh6.googleusercontent.com/-1DhBLOJentg/AAAAAAAAA"
+              "AI/AAAAAAnAABc/ImeP_cAI/photo.jpg?sz=50",
+        email="test.president.societies@andela.com",
+        center=kenya,
+        cohort=cohort_14_ke,
+        society=phoenix
+    )
+    president.roles.append(roles[5])
 
-# test activities
-python_hackathon = Activity(
-    name="Hacktober Fest", activity_type=hackathon,
-    activity_date=datetime.date.today() + datetime.timedelta(days=7),
-    added_by=president
-)
-interview_2017 = Activity(
-    name="2017-feb-bootcamp-17", activity_type=interview,
-    activity_date=datetime.date.today() + datetime.timedelta(days=14),
-    added_by=president)
-open_saturdays_2018 = Activity(
-    name="2018-feb-meetup", activity_type=open_saturdays,
-    activity_date=datetime.date.today() + datetime.timedelta(days=21),
-    added_by=president
-)
+    # success ops
+    success_ops = User(
+        uuid="-KdQsMtixG4U0y_-yJEF",
+        name="Test success ops",
+        photo="https://lh6.googleusercontent.com/-1DhBLOJentg/AAAAAAAAA"
+              "AI/AAAAAAnAABc/ImeP_cAI/photo.jpg?sz=50",
+        email="test.successops.societies@andela.com",
+        center=kenya
+    )
+    success_ops.roles.append(roles[3])
 
-member.activities.extend([python_hackathon, interview_2017,
-                          open_saturdays_2018])
-
-# Logged Activities
-hackathon_points = LoggedActivity(
-    value=hackathon.value,
-    activity=python_hackathon,
-    user=member, society=phoenix,
-    activity_type=hackathon,
-    status='approved', approver_id=success_ops.uuid,
-    reviewer_id=president.uuid,
-    activity_date=python_hackathon.activity_date
-)
-interview_points = LoggedActivity(
-    value=interview.value * 5,
-    activity=interview_2017,
-    user=member, society=sparks,
-    activity_type=interview,
-    status='rejected', approver_id=success_ops.uuid,
-    reviewer_id=president.uuid,
-    activity_date=interview_2017.activity_date
-)
-open_saturday_points = LoggedActivity(
-    value=open_saturdays.value,
-    activity=open_saturdays_2018,
-    user=member, society=invictus,
-    activity_type=open_saturdays,
-    activity_date=open_saturdays_2018.activity_date
-)
+    return [member, president, success_ops]
 
 
-logged_activities = [hackathon_points, interview_points, open_saturday_points]
-test_data = (activity_types + societies + users + logged_activities
-             + centers + cohorts + roles)
+def test_dev_activities_seed_data():
+    member, president, success_ops = test_dev_user_seed_data()
+    # test activities
+    python_hackathon = Activity(
+        name="Hacktober Fest", activity_type=hackathon,
+        activity_date=datetime.date.today() + datetime.timedelta(days=7),
+        added_by=president
+    )
+    interview_2017 = Activity(
+        name="2017-feb-bootcamp-17", activity_type=interview,
+        activity_date=datetime.date.today() + datetime.timedelta(days=14),
+        added_by=president)
+    open_saturdays_2018 = Activity(
+        name="2018-feb-meetup", activity_type=open_saturdays,
+        activity_date=datetime.date.today() + datetime.timedelta(days=21),
+        added_by=president
+    )
+
+    member.activities.extend([python_hackathon, interview_2017,
+                              open_saturdays_2018])
+
+    # Logged Activities
+    hackathon_points = LoggedActivity(
+        value=hackathon.value,
+        activity=python_hackathon,
+        user=member, society=phoenix,
+        activity_type=hackathon,
+        status='approved', approver_id=success_ops.uuid,
+        reviewer_id=president.uuid,
+        activity_date=python_hackathon.activity_date
+    )
+    interview_points = LoggedActivity(
+        value=interview.value * 5,
+        activity=interview_2017,
+        user=member, society=sparks,
+        activity_type=interview,
+        status='rejected', approver_id=success_ops.uuid,
+        reviewer_id=president.uuid,
+        activity_date=interview_2017.activity_date
+    )
+    open_saturday_points = LoggedActivity(
+        value=open_saturdays.value,
+        activity=open_saturdays_2018,
+        user=member, society=invictus,
+        activity_type=open_saturdays,
+        activity_date=open_saturdays_2018.activity_date
+    )
+    return [hackathon_points, interview_points, open_saturday_points]
+
+
 production_data = activity_types + centers + cohorts + roles + societies
