@@ -29,6 +29,12 @@ function addEnvFile() {
           cat <<EOF >> ${ROOT_DIRECTORY}/src/.env
 PRIVATE_KEY_TEST=${PRIVATE_KEY_TEST}
 PUBLIC_KEY_TEST=${PUBLIC_KEY_TEST}
+MAIL_GUN_URL=${MAIL_GUN_URL}
+MAIL_GUN_API_KEY=${MAIL_GUN_API_KEY}
+CELERY_BROKER_URL=${CELERY_BROKER_URL}
+CELERY_BACKEND=${CELERY_BACKEND}
+SENDER_CREDS=${SENDER_CREDS}
+
 EOF
         success "lsEnvironment file has been created successfully"
         return

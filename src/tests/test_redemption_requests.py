@@ -27,6 +27,7 @@ class PointRedemptionBaseTestCase(BaseTestCase):
         new_request = dict(
             reason="T-shirt Funds Request",
             value=2500,
+            user_id=self.test_user.uuid,
             center="Nigeria"
             )
 
