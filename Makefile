@@ -38,7 +38,7 @@ help:
 	} \
     { lastLine = $$0 }' $(MAKEFILE_LIST)
 	@echo ''
-    
+
 ## Generate .env file from the provided sample
 env_file:
 	@ chmod +x scripts/utils.sh && scripts/utils.sh addEnvFile
@@ -68,7 +68,7 @@ release:env_file
 	@ echo " "
 	@ docker-compose -p $(DOCKER_REL_PROJECT) -f $(DOCKER_REL_COMPOSE_FILE) build app
 	@ docker-compose -p $(DOCKER_REL_PROJECT) -f $(DOCKER_REL_COMPOSE_FILE) run -d app
-	
+
 ## Tag the project image
 tag:
 	${INFO} "Tagging release image with tags $(TAG_ARGS)..."

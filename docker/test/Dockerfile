@@ -1,4 +1,4 @@
-FROM python:3.6
+FROM tonywaithaka/rappy:1
 
 MAINTAINER "Crispus Kamau <crispus.kamau@andela.com>"
 
@@ -6,6 +6,7 @@ LABEL application="andela-societies-backend"
 
 # Prevent dpkg errors
 ENV TERM=xterm-256color
+ENV MAIL_GUN_TEST="Insert MailGun thingy here."
 
 # Set mirrors to Nearest Zone for faster builds
 RUN sed -i "s/http:\/\/archive./http:\/\/nz.archive./g" /etc/apt/sources.list

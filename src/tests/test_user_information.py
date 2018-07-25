@@ -1,6 +1,4 @@
 """Module test user information reource."""
-
-
 import json
 from unittest import mock
 

@@ -1,9 +1,9 @@
 """RedemptionRequest Module."""
 
-from flask import g, request
-from flask_restful import Resource
+from flask import request, g, current_app
+from flask_restplus import Resource
 
-
+from api.utils.notifications.email_notices import send_email
 from api.utils.auth import token_required, roles_required
 from api.utils.helpers import find_item, paginate_items, response_builder
 from api.utils.helpers import serialize_redmp
@@ -40,7 +40,7 @@ class PointRedemptionAPI(Resource):
             return response_builder(errors, validation_status_code)
 
         center = Center.query.filter_by(name=result.get('center')).first()
-        # TODO: Before creating a redeption request make sure society has
+        # TODO: Before creating a redemption request make sure society has
         # enough points
 
         if center:
@@ -54,6 +54,16 @@ class PointRedemptionAPI(Resource):
             redemp_request.save()
             data, _ = redemption_schema.dump(redemp_request)
             data["center"], _ = basic_info_schema.dump(center)
+
+            send_email.delay(
+                sender=current_app.config["SENDER_CREDS"],
+                subject="RedemptionRequest for {}".format(
+                                    g.current_user.society.name),
+                message="Redemption Request reason:{}."
+                        "Redemption Request value: {} points".format(
+                    redemp_request.name, redemp_request.value),
+                recipients=["test.cio@andela.com"]
+            )
 
             return response_builder(dict(
                 message="Redemption request created. success ops will be in"
@@ -219,18 +229,44 @@ class PointRedemptionRequestNumeration(Resource):
 
         status = payload.get("status")
         comment = payload.get("comment")
+        rejection_reason = payload.get("rejection")
 
         if status == "approved":
             user = redemp_request.user
             society = Society.query.get(user.society_id)
             society.used_points = redemp_request
             redemp_request.status = status
+
+            send_email.delay(
+                sender=current_app.config["SENDER_CREDS"],
+                subject="RedemptionRequest for {}".format(
+                                    redemp_request.user.society.name),
+                message="Redemption Request on {} has been approved. Finance"
+                " will be in touch.".format(redemp_request.name),
+                recipients=[redemp_request.user.email]
+            )
+
         elif status == "rejected":
-            rejection_reason = payload.get("rejection")
             redemp_request.status = status
             redemp_request.rejection = rejection_reason
+            send_email.delay(
+                sender=current_app.config["SENDER_CREDS"],
+                subject="RedemptionRequest for {}".format(
+                                    redemp_request.user.society.name),
+                message="This redemption request has been rejected for this"
+                        " reason:".format(redemp_request.rejection),
+                recipients=[redemp_request.user.email]
+            )
+
         elif comment:
-            pass  # cover for requesting more information
+            send_email.delay(
+                sender=current_app.config["SENDER_CREDS"],
+                subject="More Info on RedemptionRequest for {}".format(
+                                    redemp_request.user.society.name),
+                message=comment,
+                recipients=[redemp_request.user.email]
+            )  # cover for requesting more information
+
         else:
             return response_builder(dict(
                 status="Failed",
@@ -244,6 +280,14 @@ class PointRedemptionRequestNumeration(Resource):
         serialized_redmption = serialize_redmp(redemp_request)
         serialized_approved_by, _ = basic_info_schema.dump(g.current_user)
         serialized_redmption["approvedBy"] = serialized_approved_by
+
+        send_email.delay(
+            sender=current_app.config["SENDER_CREDS"],
+            subject="RedemptionRequest for {}".format(
+                                redemp_request.user.society.name),
+            message="This is a test message",
+            recipients=[redemp_request.user.email]
+        )
 
         return response_builder(dict(
             status="success",
