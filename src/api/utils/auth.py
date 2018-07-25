@@ -121,9 +121,9 @@ def store_user_details(payload, token):
 
     # set current user in flask global variable, g
     user.roles = [
-        Role.query.filter_by(name=role).first() for role in roles
-        if role != "Andelan" and Role.query.filter_by(
-            name=role).first() is not None]
+        Role.query.filter_by(name=role.lower()).first() for role in roles
+        if role and role != "Andelan" and Role.query.filter_by(
+                name=role.lower()).first() is not None]
     user.save()
     return user
 
