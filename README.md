@@ -70,7 +70,7 @@ $ pip install -r requirements.txt
 ```
 export SECRET="Thequickbrownfoxjumpedoverthelazydog"
 export APP_SETTINGS=Development
-export DATABASE_URL=database_url_for_development_environment
+export DEV_DATABASE=database_url_for_development_environment
 export TEST_DATABASE=database_url_for_testing_environment
 export ANDELA_API_URL=https://api.andela.com/api/v1/
 export DEV_TOKEN=token_from_signed_in_webapps
@@ -101,6 +101,23 @@ PEP8 has deprecated; instead use pycodestyle for the same effect
 $ cd src
 $ pycodestyle .
 
+```
+
+## Database Seeding
+
+You will need the following extra environment variables to seed the database.
+```
+export PRIVATE_KEY_TEST=""
+export PUBLIC_KEY_TEST=""
+export PUBLIC_KEY=""
+export DEV_TOKEN=""
+export APP_SETTINGS="Development"
+```
+The value of this variables are obtained from the TTL, or the DevOps engineer in the team.
+
+Seed the database.
+```
+$ python manage.py db seed
 ```
 
 ## Deployment 🚀
