@@ -7,10 +7,11 @@ from sqlalchemy import func
 from api.models import LoggedActivity, User, db
 from api.utils.auth import token_required
 from api.utils.helpers import (ParsedResult, parse_log_activity_fields,
-                               response_builder)
-from api.utils.marshmallow_schemas import (log_edit_activity_schema,
-                                           single_logged_activity_schema,
-                                           user_logged_activities_schema)
+                               response_builder, paginate_items)
+from api.utils.marshmallow_schemas import (
+    log_edit_activity_schema, single_logged_activity_schema,
+    logged_activities_schema, user_logged_activities_schema
+)
 
 
 class UserLoggedActivitiesAPI(Resource):
@@ -34,9 +35,9 @@ class UserLoggedActivitiesAPI(Resource):
         points_earned = db.session.query(
             func.sum(LoggedActivity.value)
         ).filter(
-                LoggedActivity.user_id == user_id,
-                LoggedActivity.status == 'approved'
-            ).scalar()
+            LoggedActivity.user_id == user_id,
+            LoggedActivity.status == 'approved'
+        ).scalar()
 
         return response_builder(dict(
             data=user_logged_activities_schema.dump(
@@ -97,6 +98,37 @@ class LoggedActivitiesAPI(Resource):
         return response_builder(dict(
                                 message="Data for creation must be provided."),
                                 400)
+
+    @classmethod
+    def get(cls):
+        """Get all logged activities"""
+        paginate = request.args.get("paginate", "true")
+        message = "all Logged activities fetched successfully"
+
+        if paginate.lower() == "false":
+            logged_activities = LoggedActivity.query.all()
+            count = LoggedActivity.query.count()
+            data = {"count": count}
+        else:
+            logged_activities = LoggedActivity.query
+            pagination_result = paginate_items(logged_activities,
+                                               serialize=False)
+            logged_activities = pagination_result.data
+            data = {
+                "count": pagination_result.count,
+                "page": pagination_result.page,
+                "pages": pagination_result.pages,
+                "previous_url": pagination_result.previous_url,
+                "next_url": pagination_result.next_url
+            }
+
+        data.update(dict(
+            loggedActivities=logged_activities_schema.dump(
+                logged_activities
+            ).data))
+
+        return response_builder(dict(data=data, message=message,
+                                     status="success"), 200)
 
 
 class LoggedActivityAPI(Resource):
@@ -160,7 +192,13 @@ class LoggedActivityAPI(Resource):
 
         if not logged_activity:
             return response_builder(dict(
-                message='Logged Activity does not exist!'), 404)
+                message='Logged Activity does not exist!'
+            ), 404)
+
+        if logged_activity.status != 'in review':
+            return response_builder(dict(
+                message='You are not allowed to perform this operation'
+            ), 403)
 
         logged_activity.delete()
         return response_builder(dict(), 204)

@@ -118,6 +118,12 @@ class LoggedActivitySchema(BaseSchema):
         return
 
 
+class LoggedActivitiesSchema(LoggedActivitySchema):
+    date = fields.Date(attribute='activity_date', dump_to='activityDate')
+    society = fields.Nested('BaseSchema', only=('uuid', 'name'))
+    user = fields.String(attribute='user.name', dump_to='owner')
+
+
 class ActivitySchema(BaseSchema):
     """Creates a validation schema for activities."""
 
@@ -136,7 +142,7 @@ class ActivitySchema(BaseSchema):
     activity_date = fields.Date(
         required=True, dump_to='activityDate', load_from='activityDate',
         error_messages={
-                'required': {'message': 'An activity date is required.'}
+            'required': {'message': 'An activity date is required.'}
         })
     added_by_id = fields.String(
         dump_only=True, dump_to='addedById', load_from='addedById'
@@ -291,11 +297,14 @@ class RedemptionSchema(BaseSchema):
 activity_types_schema = ActivityTypesSchema(many=True)
 new_activity_type_schema = ActivityTypesSchema()
 activity_schema = ActivitySchema()
+
 single_logged_activity_schema = LoggedActivitySchema()
 log_edit_activity_schema = LogEditActivitySchema()
 user_logged_activities_schema = LoggedActivitySchema(
     many=True, exclude=('society', 'society_id')
 )
+logged_activities_schema = LoggedActivitiesSchema(many=True)
+
 role_schema = RoleSchema()
 cohort_schema = CohortSchema()
 base_schema = BaseSchema()
