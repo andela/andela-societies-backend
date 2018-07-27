@@ -11,9 +11,14 @@ from api.models import (Activity, ActivityType, Cohort, Center, Role, Society,
 from api.utils.marshmallow_schemas import basic_info_schema, redemption_schema
 
 ParsedResult = namedtuple(
-        'ParsedResult',
-        ['activity', 'activity_type', 'activity_date', 'activity_value']
-    )
+    'ParsedResult',
+    ['activity', 'activity_type', 'activity_date', 'activity_value']
+)
+
+PaginatedResult = namedtuple(
+    'PaginatedResult',
+    ['data', 'count', 'page', 'pages', 'previous_url', 'next_url']
+)
 
 
 def parse_log_activity_fields(result):
@@ -25,8 +30,8 @@ def parse_log_activity_fields(result):
 
         activity_type = activity.activity_type
         if activity_type.supports_multiple_participants and \
-                not (result.get('no_of_participants')
-                     and result.get('description')):
+                not (result.get('no_of_participants') and
+                     result.get('description')):
             return response_builder(dict(
                 message='Please send the number of interviewees and'
                 ' their names in the description'
@@ -63,10 +68,10 @@ def parse_log_activity_fields(result):
     )
 
 
-def paginate_items(fetched_data):
-    """Pagniate all roles for display."""
-    _page = int(request.args.get('page') or current_app.config['DEFAULT_PAGE'])
-    _limit = int(request.args.get('limit') or current_app.config['PAGE_LIMIT'])
+def paginate_items(fetched_data, serialize=True):
+    """Paginate all roles for display."""
+    _page = request.args.get('page', type=int) or current_app.config['DEFAULT_PAGE']
+    _limit = request.args.get('limit', type=int) or current_app.config['PAGE_LIMIT']
     page = current_app.config['DEFAULT_PAGE'] if _page < 0 else _page
     limit = current_app.config['PAGE_LIMIT'] if _limit < 0 else _limit
 
@@ -86,24 +91,38 @@ def paginate_items(fetched_data):
             previous_url = url_for(request.endpoint, limit=limit,
                                    page=page-1, _external=True)
 
-        data_list = []
-        for _fetched_item in fetched_data.items:
-            if isinstance(_fetched_item, RedemptionRequest):
-                data_item = serialize_redmp(_fetched_item)
-                data_list.append(data_item)
-            else:
-                data_item = _fetched_item.serialize()
-                data_list.append(data_item)
+        if serialize:
+            data_list = []
+            for _fetched_item in fetched_data.items:
+                if isinstance(_fetched_item, RedemptionRequest):
+                    data_item = serialize_redmp(_fetched_item)
+                    data_list.append(data_item)
+                else:
+                    data_item = _fetched_item.serialize()
+                    data_list.append(data_item)
+        else:
+            data_list = fetched_data.items
+
+            return PaginatedResult(
+                data_list, fetched_data.total, fetched_data.page,
+                fetched_data.pages, previous_url, next_url
+            )
 
         return response_builder(dict(
             status="success",
             data=data_list,
             count=fetched_data.total,
+            pages=fetched_data.pages,
             nextUrl=next_url,
             previousUrl=previous_url,
             currentPage=fetched_data.page,
             message="fetched successfully."
         ), 200)
+
+    if not serialize:
+        return PaginatedResult(
+            [], 0, None, 0, None, None
+        )
 
     return response_builder(dict(
         status="success",
@@ -177,7 +196,7 @@ def response_builder(data, status_code=200):
     return response
 
 
-def add_extra_user_info(token, user_id, url=os.environ.get('ANDELA_API_URL')):# pragma: no cover
+def add_extra_user_info(token, user_id, url=os.environ.get('ANDELA_API_URL')):  # pragma: no cover
     """Retrive user information from ANDELA API.
 
     params:
@@ -216,7 +235,7 @@ def add_extra_user_info(token, user_id, url=os.environ.get('ANDELA_API_URL')):# 
             uuid=api_response.json().get('location').get('id')).first()
         if not location:
             location = Center(
-                    uuid=api_response.json().get('location').get('id'))
+                uuid=api_response.json().get('location').get('id'))
     return cohort, location, api_response
 
 

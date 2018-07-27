@@ -63,7 +63,7 @@ class BaseTestCase(TestCase):
             }
         },
         "exp": exp_date + datetime.timedelta(days=1)
-        }
+    }
 
     test_auth_role_payload = {
         "UserInfo": {
@@ -181,17 +181,17 @@ class BaseTestCase(TestCase):
         self.success_ops = {
             "Authorization": self.generate_token(self.test_successops_payload),
             "Content-Type": "application/json"
-            }
+        }
         self.society_president = {
             "Authorization": self.generate_token(
-                                self.test_society_president_role_payload),
+                self.test_society_president_role_payload),
             "Content-Type": "application/json"
-            }
+        }
         self.cio = {
             "Authorization": self.generate_token(
-                                self.test_cio_role_payload),
+                self.test_cio_role_payload),
             "Content-Type": "application/json"
-            }
+        }
         self.bad_token_header = {
             "Authorization": self.generate_token(
                 {"I don't know": "what to put here"}
@@ -251,7 +251,7 @@ class BaseTestCase(TestCase):
             center=self.nigeria,
             cohort=self.cohort_1_Nig,
             society=self.phoenix
-            )
+        )
         self.test_user_2 = User(
             uuid="-KdQsawesome_usedk2cckjfbi",
             name="Test User2",

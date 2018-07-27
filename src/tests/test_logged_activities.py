@@ -4,7 +4,7 @@ import json
 
 from api.models import LoggedActivity
 
-from.base_test import BaseTestCase
+from .base_test import BaseTestCase
 
 
 class LoggedActivitiesTestCase(BaseTestCase):
@@ -55,6 +55,54 @@ class LoggedActivitiesTestCase(BaseTestCase):
 
         message = "There are no logged activities for that user."
         self.assertEqual(response_content['message'], message)
+
+    def test_get_all_paginated_logged_activities(self):
+        """
+        Test fetching all paginated logged activities.
+
+        When this is done by an authenticated user it should not fail.
+        """
+        response = self.client.get(
+            f'/api/v1/logged-activities',
+            headers=self.header
+        )
+
+        # test that request was successful
+        self.assertEqual(response.status_code, 200)
+
+        response_content = json.loads(response.get_data(as_text=True))
+        logged_activities_count = LoggedActivity.query.limit(
+            self.app.config['PAGE_LIMIT']
+        ).count()
+
+        # test that response data count matches database query count
+        self.assertEqual(logged_activities_count,
+                         response_content['data']['count'])
+
+    def test_get_all_unpaginated_logged_activities(self):
+        """
+        Test fetching all unpaginated logged activities.
+
+        When this is done by an authenticated user it should not fail.
+        """
+        response = self.client.get(
+            f'/api/v1/logged-activities?paginate=false',
+            headers=self.header
+        )
+
+        # test that request was successful
+        self.assertEqual(response.status_code, 200)
+
+        response_content = json.loads(response.get_data(as_text=True))
+        logged_activities_count = LoggedActivity.query.count()
+
+        # test that response data count matches database query count and
+        # page key doesn't exist
+        with self.assertRaises(KeyError):
+            response_content['data']['page']
+
+        self.assertEqual(logged_activities_count,
+                         response_content['data']['count'])
 
     def test_get_logged_activities_message_when_user_does_not_exist(self):
         """Test that a 404 error is thrown when a user does not exist."""
@@ -122,7 +170,7 @@ class LogActivityTestCase(BaseTestCase):
         # test that request is now successful
         self.assertEqual(response.status_code, 201)
 
-    def test_log_activity_type_that_supports_multi_participants_requires_no_of_participants(self):
+    def test_log_activity_type_that_supports_multi_participants(self):
         """
         Test that logging an interview activity fails
         without the no_of_interviewees field.
@@ -405,7 +453,7 @@ class DeleteLoggedActivityTestCase(BaseTestCase):
         self.log_alibaba_challenge.save()
 
         logged_activity = LoggedActivity.query.filter_by(
-                          name='my logged activity').first()
+            name='my logged activity').first()
 
         response = self.client.delete(
             '/api/v1/logged-activities/'+logged_activity.uuid,
@@ -414,7 +462,7 @@ class DeleteLoggedActivityTestCase(BaseTestCase):
 
         self.assertEqual(response.status_code, 204)
 
-    def test_delete_nonexistant_logged_activity(self):
+    def test_delete_nonexistent_logged_activity(self):
         """Test a scenario where a logged activity
         to be deleted does not exist.
         """
@@ -426,6 +474,24 @@ class DeleteLoggedActivityTestCase(BaseTestCase):
         )
 
         self.assertTrue(response.status_code == 404)
+        response_details = json.loads(response.get_data(as_text=True))
+
+        self.assertEqual(message, response_details['message'])
+
+    def test_delete_nonpending_logged_activity(self):
+        """Test a scenario where a logged activity
+        to be deleted does not exist.
+        """
+        message = 'You are not allowed to perform this operation'
+        self.log_alibaba_challenge.status = 'approved'
+        self.log_alibaba_challenge.save()
+
+        response = self.client.delete(
+            f'/api/v1/logged-activities/{self.log_alibaba_challenge.uuid}',
+            headers=self.header
+        )
+
+        self.assertEqual(response.status_code, 403)
         response_details = json.loads(response.get_data(as_text=True))
 
         self.assertEqual(message, response_details['message'])
