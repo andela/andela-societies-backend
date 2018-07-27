@@ -5,7 +5,7 @@ from flask_restful import Resource
 from sqlalchemy import func
 
 from api.models import LoggedActivity, User, db
-from api.utils.auth import token_required
+from api.utils.auth import token_required, roles_required
 from api.utils.helpers import (ParsedResult, parse_log_activity_fields,
                                response_builder, paginate_items)
 from api.utils.marshmallow_schemas import (
@@ -78,17 +78,19 @@ class LoggedActivitiesAPI(Resource):
 
             # log activity
             logged_activity = LoggedActivity(
-                name=result.get('name'), description=result.get('description'),
-                society=society, user=g.current_user,
+                name=result.get('name'),
+                description=result.get('description'),
+                society=society,
+                user=g.current_user,
                 activity=parsed_result.activity,
-                photo=result.get('photo'), value=parsed_result.activity_value,
+                photo=result.get('photo'),
+                value=parsed_result.activity_value,
                 no_of_participants=result.get('no_of_participants'),
                 activity_type=parsed_result.activity_type,
                 activity_date=parsed_result.activity_date
             )
 
-            db.session.add(logged_activity)
-            db.session.commit()
+            logged_activity.save()
 
             return response_builder(dict(
                 data=single_logged_activity_schema.dump(logged_activity).data,
@@ -172,7 +174,7 @@ class LoggedActivityAPI(Resource):
             logged_activity.activity_type = parsed_result.activity_type
             logged_activity.activity_date = parsed_result.activity_date
 
-            db.session.commit()
+            logged_activity.save()
 
             return response_builder(dict(
                 data=single_logged_activity_schema.dump(logged_activity).data,
@@ -202,3 +204,36 @@ class LoggedActivityAPI(Resource):
 
         logged_activity.delete()
         return response_builder(dict(), 204)
+
+
+class SecretaryReviewLoggedAcivityApi(Resource):
+    """Enable society secretary to verify logged activities."""
+
+    decorators = [token_required]
+
+    @classmethod
+    @roles_required(['society secretary'])
+    def put(cls, logged_activity_id):
+        """Put method on logged Activity resource."""
+        payload = request.get_json(silent=True)
+
+        if 'status' not in payload:
+            return response_builder(dict(message='status is required.'),
+                                    400)
+
+        logged_activity = LoggedActivity.query.filter_by(
+            uuid=logged_activity_id).first()
+        if not logged_activity:
+            return response_builder(dict(message='Logged activity not found'),
+                                    404)
+
+        if not (payload.get('status') in ['pending', 'rejected']):
+            return response_builder(dict(message='Invalid status value.'),
+                                    400)
+        logged_activity.status = payload.get('status')
+        logged_activity.save()
+
+        return response_builder(
+            dict(data=single_logged_activity_schema.dump(logged_activity).data,
+                 message="successfully changed status"),
+            200)
