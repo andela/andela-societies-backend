@@ -1,20 +1,22 @@
 """Main app module."""
 
+from flask import Flask, jsonify
+from flask_cors import CORS
+from flask_restful import Api
+
 from api.endpoints.activity_types import ActivityTypesAPI
 from api.endpoints.activities import ActivitiesAPI
 from api.endpoints.societies import SocietyResource, AddCohort
 from api.endpoints.redemption_requests import PointRedemptionAPI
 from api.endpoints.redemption_requests import PointRedemptionRequestNumeration
 from api.endpoints.users import UserAPI
-from api.endpoints.logged_activities import UserLoggedActivitiesAPI
+from api.endpoints.logged_activities import (UserLoggedActivitiesAPI,
+                                             SecretaryReviewLoggedAcivityApi)
 from api.endpoints.logged_activities import LoggedActivitiesAPI
 from api.endpoints.logged_activities import LoggedActivityAPI
 from api.endpoints.roles import RoleAPI, SocietyRoleAPI
 from api.models import db
-from flask import Flask, jsonify
-from flask_cors import CORS
-from flask_restful import Api
-from flask_sslify import SSLify
+
 
 try:
     from .config import configuration
@@ -36,10 +38,6 @@ def create_app(environment="Development"):
     db.init_app(app)
 
     api = Api(app=app)
-
-    # to redirect all incoming production requests to https
-    if environment.lower() == "production" or "staging":
-        SSLify(app, subdomains=True, permanent=True)
 
     # enable cross origin resource sharing
     CORS(app)
@@ -83,6 +81,14 @@ def create_app(environment="Development"):
         endpoint='user_logged_activities'
     )
 
+    # society secretary logged Activity endpoint
+    api.add_resource(
+        SecretaryReviewLoggedAcivityApi,
+        '/api/v1/logged-activity/verify/<string:logged_activity_id>',
+        '/api/v1/logged-activity/verify/<string:logged_activity_id>/',
+        endpoint='secretary_logged_activity'
+    )
+
     # user endpoints
     api.add_resource(
         UserAPI,
@@ -93,17 +99,16 @@ def create_app(environment="Development"):
 
     # society endpoints
     api.add_resource(
-        SocietyResource, "/api/v1/societies", "/api/v1/societies/",
+        SocietyResource,
+        "/api/v1/societies",
+        "/api/v1/societies/",
+        "/api/v1/societies/<string:society_id>",
+        "/api/v1/societies/<string:society_id>/",
+
         endpoint="society"
     )
 
-    api.add_resource(
-        SocietyResource,
-        "/api/v1/societies/<string:society_id>",
-        "/api/v1/societies/<string:society_id>/",
-        endpoint="society_detail"
-    )
-
+    # redemption endpoints
     api.add_resource(
         PointRedemptionAPI, "/api/v1/societies/redeem",
         "/api/v1/societies/redeem/",
