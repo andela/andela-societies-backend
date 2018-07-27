@@ -160,6 +160,20 @@ class BaseTestCase(TestCase):
         # test client
         self.client = self.app.test_client()
 
+        token_payloads_list = [
+             self.incomplete_payload,
+             self.expired_payload,
+             self.test_cio_role_payload,
+             self.test_society_president_role_payload,
+             self.test_auth_role_payload
+        ]
+
+        for token_payload in token_payloads_list:
+            token_payload.update({
+                'iss': self.app.config['API_ISSUER'],
+                'aud': self.app.config['API_AUDIENCE']
+            })
+
         self.header = {
             "Authorization": self.generate_token(self.test_user_payload),
             "Content-Type": "application/json"

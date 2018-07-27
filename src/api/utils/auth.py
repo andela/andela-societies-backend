@@ -43,14 +43,26 @@ def token_required(f):
             public_key = base64.b64decode(
                 current_app.config['PUBLIC_KEY']).decode("utf-8")
 
-            payload = jwt.decode(authorization_token,
-                                 public_key,
-                                 algorithms=['RS256'],
-                                 options={
-                                     'verify_signature': True,
-                                     'verify_exp': True
-                                 }
-                                 )
+            try:
+                payload = jwt.decode(authorization_token,
+                                     public_key,
+                                     algorithms=['RS256'],
+                                     options={
+                                         'verify_signature': True,
+                                         'verify_exp': True
+                                     },
+                                     audience=current_app.config['API_AUDIENCE'],
+                                     issuer=current_app.config['API_ISSUER']
+                )
+            except JWTError:
+                 payload = jwt.decode(authorization_token,
+                                     public_key,
+                                     algorithms=['RS256'],
+                                     options={
+                                         'verify_signature': True,
+                                         'verify_exp': True
+                                     }
+                )
         except ExpiredSignatureError:
             expired_response = "The authorization token supplied is expired"
             return response_builder(dict(message=expired_response), 401)
