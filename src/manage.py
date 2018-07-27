@@ -8,8 +8,7 @@ import sys
 from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager, Shell, prompt_bool
 
-from api.utils.initial_data import (production_data,
-                                    test_dev_activities_seed_data)
+from api.utils.initial_data import generete_initial_data_run_time_env
 from api.models import Activity, Society, User, db, Center, Role, Cohort
 from app import create_app
 from run_tests import test
@@ -52,6 +51,8 @@ def seed():
     if environment.lower() in ["production", "staging"]:
         print("Seeding data to DB: NOTE create, migrate and upgrade your DB")
         try:
+            production_data = generete_initial_data_run_time_env()\
+                .get('production_data')
             db.session.add_all(production_data)
             return print("Data dumped in DB succefully.")
         except Exception as e:
@@ -70,13 +71,14 @@ def seed():
                 db.session.remove()
                 db.drop_all()
                 db.create_all()
-                print("\nTables created succesfully.\n")
+                print("\nTables created successfully.\n")
             except Exception as e:
+                db.session.rollback()
                 return print("\nError while creating tables: ", e)
 
         try:
-            db.session.add_all(production_data +
-                               test_dev_activities_seed_data())
+            dev_data = generete_initial_data_run_time_env().get('dev_data')
+            db.session.add_all(dev_data)
             return print("\n\n\nTables seeded successfully.\n\n\n")
         except Exception as e:
             db.session.rollback()
@@ -101,7 +103,7 @@ def link_society_cohort(cohort_name, society_name):
 
         society.cohorts.append(cohort)
         if society.save():
-            message = f'Cohort:{cohort_name} succefully'
+            message = f'Cohort:{cohort_name} successfully'
             message += f' added to society:{society_name}'
             return print(message)
         else:

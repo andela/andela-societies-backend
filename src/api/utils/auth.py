@@ -23,6 +23,31 @@ def auth_response(status_code, message):
     return response
 
 
+def verify_token(authorization_token, public_key, audience=None, issuer=None):
+    """Validate token."""
+    try:
+        payload = jwt.decode(
+            authorization_token,
+            public_key,
+            algorithms=['RS256'],
+            options={
+                'verify_signature': True,
+                'verify_exp': True
+            },
+            audience=audience,
+            issuer=issuer)
+    except JWTError:
+        payload = jwt.decode(
+            authorization_token,
+            public_key,
+            algorithms=['RS256'],
+            options={
+                'verify_signature': True,
+                'verify_exp': True
+            })
+    return payload
+
+
 # authorization decorator
 def token_required(f):
     """Authenticate that a valid Token is present."""
@@ -42,27 +67,10 @@ def token_required(f):
             # decode token
             public_key = base64.b64decode(
                 current_app.config['PUBLIC_KEY']).decode("utf-8")
-
-            try:
-                payload = jwt.decode(authorization_token,
-                                     public_key,
-                                     algorithms=['RS256'],
-                                     options={
-                                         'verify_signature': True,
-                                         'verify_exp': True
-                                     },
-                                     audience=current_app.config['API_AUDIENCE'],
-                                     issuer=current_app.config['API_ISSUER']
-                )
-            except JWTError:
-                 payload = jwt.decode(authorization_token,
-                                     public_key,
-                                     algorithms=['RS256'],
-                                     options={
-                                         'verify_signature': True,
-                                         'verify_exp': True
-                                     }
-                )
+            payload = verify_token(authorization_token,
+                                   public_key,
+                                   current_app.config['API_AUDIENCE'],
+                                   current_app.config['API_ISSUER'])
         except ExpiredSignatureError:
             expired_response = "The authorization token supplied is expired"
             return response_builder(dict(message=expired_response), 401)
@@ -140,8 +148,12 @@ def store_user_details(payload, token):
     return user
 
 
-def roles_required(roles):  # roles should be a list
-    """Ensure only authorised roles may access sensitive data."""
+def roles_required(roles):
+    """Ensure only authorised roles may access sensitive data.
+
+    params:
+        roles (list): [str]
+    """
     def check_user_role(f):
         @wraps(f)
         def decorated(*args, **kwargs):

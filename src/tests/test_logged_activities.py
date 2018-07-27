@@ -2,9 +2,8 @@
 import datetime
 import json
 
-from api.models import LoggedActivity
-
 from .base_test import BaseTestCase
+from api.models import LoggedActivity
 
 
 class LoggedActivitiesTestCase(BaseTestCase):
@@ -444,6 +443,78 @@ class EditLoggedActivityTestCase(BaseTestCase):
 
         self.assertEqual(response.status_code, 400)
 
+    def test_secretary_edit_logged_activity_works(self):
+        """Test secretaty can change status to pending."""
+        payload = {'status': 'pending'}
+        uuid = self.log_alibaba_challenge.uuid
+        response = self.client.put(
+            f'/api/v1/logged-activity/verify/{uuid}',
+            data=json.dumps(payload),
+            headers=self.society_secretary
+        )
+        response_payload = json.loads(response.data)
+        self.assertEqual(response_payload.get('data').get('status'),
+                         payload.get('status'))
+        self.assertEqual(response.status_code, 200)
+
+    def test_secretary_edit_reject_activity_works(self):
+        """Test secretary can change status to rejected."""
+        payload = {'status': 'rejected'}
+        uuid = self.log_alibaba_challenge.uuid
+
+        response = self.client.put(
+            f'/api/v1/logged-activity/verify/{uuid}',
+            data=json.dumps(payload),
+            headers=self.society_secretary
+        )
+
+        response_payload = json.loads(response.data)
+        self.assertEqual(response_payload.get('data').get('status'),
+                         payload.get('status'))
+        self.assertEqual(response.status_code, 200)
+
+    def test_secretary_edit_invalid_input(self):
+        """Test invalid input is rejected."""
+        payload = {'status': 'invalid'}
+        uuid = self.log_alibaba_challenge.uuid
+        response = self.client.put(
+            f'/api/v1/logged-activity/verify/{uuid}',
+            data=json.dumps(payload),
+            headers=self.society_secretary
+        )
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_secretary_edit_non_existent_logged_activity(self):
+        """Test edit non-existent activity returns 404"""
+        payload = {'status': 'invalid'}
+
+        response = self.client.put(
+            f'/api/v1/logged-activity/verify/-KlHerwfafcvavefa',
+            data=json.dumps(payload),
+            headers=self.society_secretary
+        )
+
+        response_payload = json.loads(response.data)
+        self.assertEqual(response_payload.get('message'),
+                         'Logged activity not found')
+        self.assertEqual(response.status_code, 404)
+
+    def test_secretary_edit_logged_activity_empty_payload(self):
+        """Test edit activity with empty payload returns 400"""
+        payload = {}
+
+        response = self.client.put(
+            f'/api/v1/logged-activity/verify/-KlHerwfafcvavefa',
+            data=json.dumps(payload),
+            headers=self.society_secretary
+        )
+
+        response_payload = json.loads(response.data)
+        self.assertEqual(response_payload.get('message'),
+                         'status is required.')
+        self.assertEqual(response.status_code, 400)
+
 
 class DeleteLoggedActivityTestCase(BaseTestCase):
     """Delete logged activity test cases."""
@@ -456,7 +527,7 @@ class DeleteLoggedActivityTestCase(BaseTestCase):
             name='my logged activity').first()
 
         response = self.client.delete(
-            '/api/v1/logged-activities/'+logged_activity.uuid,
+            '/api/v1/logged-activities/' + logged_activity.uuid,
             headers=self.header
         )
 

@@ -324,7 +324,7 @@ class SocietyRoleTestCase(BaseTestCase):
         """Test the appointment of new Secretary."""
         new_secretary = dict(name="Test User",
                              society="Invictus",
-                             role="secretary")
+                             role="society secretary")
 
         response = self.client.put("/api/v1/roles/society-execs",
                                    data=json.dumps(new_secretary),
