@@ -146,6 +146,13 @@ def create_app(environment="Development"):
         endpoint="society_execs_roles"
     )
 
+    # enable health check ping to API
+    @app.route('/')
+    def health_check_url():
+        response = jsonify(dict(message='Welcome to Andela societies API.'))
+        response.status_code = 200
+        return response
+
     # handle default 404 exceptions with a custom response
     @app.errorhandler(404)
     def resource_not_found(error):
