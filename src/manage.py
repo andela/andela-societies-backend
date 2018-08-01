@@ -2,6 +2,7 @@
 
 """Entry point for app, contain commands to configure and run the app."""
 
+import csv
 import os
 import sys
 
@@ -85,29 +86,45 @@ def seed():
             return print("\n\n\nFailed:\n", e, "\n\n")
 
 
+def linker(cohort_name, society_name):
+    cohort = Cohort.query.filter_by(name=cohort_name).first()
+    if not cohort:
+        return print(
+            f'Error cohort by name: {cohort_name} does not exist in DB.')
+    if (cohort.society and
+        not prompt_bool(f'Cohort:{cohort_name} has society:{cohort.society} '
+                        ' already! \n Do you want to change to '
+                        f'{society_name}?')):
+        return 0
+
+    society = Society.query.filter_by(name=society_name).first()
+    if not society:
+        return print(
+            f'Error society with name:{society_name} does not exist.')
+
+    society.cohorts.append(cohort)
+    if society.save():
+        message = f'Cohort:{cohort_name} succefully'
+        message += f' added to society:{society_name}'
+        return print(message)
+    else:
+        print('Error something went wrong when saving to DB. :-)')
+
+
 @manager.command
-def link_society_cohort(cohort_name, society_name):
+def link_society_cohort_csv_data(path='data/cohort_data.csv'):
     """CLI tool, link cohort with society."""
-    with app.app_context():
-        cohort = Cohort.query.filter_by(name=cohort_name).first()
-        if not cohort:
-            return print(
-                f'Error cohort by name: {cohort_name} does not exist in DB.')
-        if cohort.society:
-            prompt_bool('Cohort has society already!\n Do you want to change?')
-
-        society = Society.query.filter_by(name=society_name).first()
-        if not society:
-            return print(
-                f'Error society with name:{society_name} does not exist.')
-
-        society.cohorts.append(cohort)
-        if society.save():
-            message = f'Cohort:{cohort_name} successfully'
-            message += f' added to society:{society_name}'
-            return print(message)
-        else:
-            print('Error something went wrong when saving to DB. :-)')
+    with open(path) as raw_data:
+        csv_reader = csv.reader(raw_data)
+        societies = None
+        i = 0
+        for row in csv_reader:
+            if not i:
+                societies = row
+                i = 1
+            else:
+                for cohort_name, society_name in zip(row, societies):
+                    linker(cohort_name.lower(), society_name.lower())
 
 
 @manager.command
