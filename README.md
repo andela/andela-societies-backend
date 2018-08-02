@@ -120,6 +120,9 @@ Seed the database.
 $ python manage.py db seed
 ```
 
+## Set Up Notifications Package
+ - [Check this out to set up the Notifications Package](src/api/utils/notifications/README_notifications.md)
+
 ## Deployment 🚀
 
 - [Check this out to deploy to heroku](https://devcenter.heroku.com/articles/getting-started-with-python#introduction)
