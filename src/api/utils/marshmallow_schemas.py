@@ -136,7 +136,7 @@ class ActivitySchema(BaseSchema):
     activity_date = fields.Date(
         required=True, dump_to='activityDate', load_from='activityDate',
         error_messages={
-                'required': {'message': 'An activity date is required.'}
+            'required': {'message': 'An activity date is required.'}
         })
     added_by_id = fields.String(
         dump_only=True, dump_to='addedById', load_from='addedById'
@@ -282,10 +282,14 @@ class RedemptionRequestSchema(BaseSchema):
 class RedemptionSchema(BaseSchema):
     """Redemption serializer/validator."""
 
-    status = fields.String(dump_only=True, dump_to='status',
-                           validate=[validate.Length(max=36)])
-    value = fields.Integer(dump_only=True, dump_to='value',
-                           validate=[validate.Length(max=36)])
+    status = fields.String(dump_only=True, validate=[validate.Length(max=36)])
+    value = fields.Integer(dump_only=True)
+
+
+class AcceptRejectSchema(Schema):
+    """Redemption serializer/validator."""
+
+    status = fields.String(validate=[validate.OneOf(['approved', 'rejected'])])
 
 
 activity_types_schema = ActivityTypesSchema(many=True)
@@ -302,5 +306,7 @@ base_schema = BaseSchema()
 user_schema = UserSchema()
 basic_info_schema = BaseSchema()
 society_schema = SocietySchema()
+
 redemption_request_schema = RedemptionRequestSchema()
 redemption_schema = RedemptionSchema()
+accept_reject_schema = AcceptRejectSchema()

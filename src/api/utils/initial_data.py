@@ -131,15 +131,15 @@ societies = [phoenix, istelle, sparks, invictus]
 
 # roles available
 roles = [
-         Role(uuid="-KXGy1EB1oimjQgFim6F", name="success"),
-         Role(uuid="-KXGy1EB1oimjQgFim6L", name="finance"),
-         Role(uuid="-KXGy1EB1oimjQgFim6C", name="fellow"),
-         Role(uuid="-KkLwgbeJUO0dQKsEk1i", name="success ops"),
-         Role(uuid="-KiihfZoseQeqC6bWTau", name="andelan"),
-         Role(name="society president"),
-         Role(name="society vice president"),
-         Role(name="society secretary")
-         ]
+    Role(uuid="-KXGy1EB1oimjQgFim6F", name="success"),
+    Role(uuid="-KXGy1EB1oimjQgFim6L", name="finance"),
+    Role(uuid="-KXGy1EB1oimjQgFim6C", name="fellow"),
+    Role(uuid="-KkLwgbeJUO0dQKsEk1i", name="success ops"),
+    Role(uuid="-KiihfZoseQeqC6bWTau", name="andelan"),
+    Role(name="society president"),
+    Role(name="society vice president"),
+    Role(name="society secretary")
+]
 
 
 def test_dev_user_seed_data():
@@ -172,6 +172,7 @@ def test_dev_user_seed_data():
         society=phoenix
     )
     president.roles.append(roles[5])
+    president.roles.append(roles[2])
 
     # success ops
     success_ops = User(

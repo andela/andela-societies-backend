@@ -122,7 +122,7 @@ class LogActivityTestCase(BaseTestCase):
         # test that request is now successful
         self.assertEqual(response.status_code, 201)
 
-    def test_log_activity_type_that_supports_multi_participants_requires_no_of_participants(self):
+    def test_log_activity_type_that_supports_multi_participants(self):
         """
         Test that logging an interview activity fails
         without the no_of_interviewees field.
@@ -396,6 +396,81 @@ class EditLoggedActivityTestCase(BaseTestCase):
 
         self.assertEqual(response.status_code, 400)
 
+    def test_success_ops_approve_reject_logged_activity_is_successful(self):
+        """
+        Test that success ops can successfully approve or reject a pending
+        logged activity
+        """
+        self.successops_role.save()
+        self.log_alibaba_challenge.status = 'pending'
+        self.log_alibaba_challenge.save()
+
+        response = self.client.patch(
+            f'/api/v1/logged-activities/{self.log_alibaba_challenge.uuid}',
+            data=json.dumps({'status': 'approved'}), headers=self.success_ops
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        message = 'Activity approved successfully'
+        self.assertEqual(
+            json.loads(response.get_data(as_text=True))['message'], message
+        )
+
+    def test_success_ops_approve_logged_activity_fails_in_review(self):
+        """
+        Test that success ops cannot approve or reject a logged activity still
+        in review
+        """
+
+        self.successops_role.save()
+        response = self.client.patch(
+            f'/api/v1/logged-activities/{self.log_alibaba_challenge.uuid}',
+            data=json.dumps({'status': 'approved'}), headers=self.success_ops
+        )
+
+        self.assertEqual(response.status_code, 403)
+
+        message = 'Logged activity is still in review'
+        self.assertEqual(
+            json.loads(response.get_data(as_text=True))['message'], message
+        )
+
+    def test_success_ops_approve_non_existent_logged_activity(self):
+        """
+        Test that success ops cannot approve or reject a non existent
+        logged activity
+        """
+
+        self.successops_role.save()
+        response = self.client.patch(
+            f'/api/v1/logged-activities/icompletelydontexist',
+            data=json.dumps({'status': 'approved'}), headers=self.success_ops
+        )
+
+        self.assertEqual(response.status_code, 404)
+
+        message = 'Logged activity does not exist'
+        self.assertEqual(
+            json.loads(response.get_data(as_text=True))['message'], message
+        )
+
+    def test_success_ops_approve_logged_activity_with_invalid_status(self):
+        """
+        Test that success ops cannot modify a logged activity's status with
+        anything other than approved or rejected
+        """
+        self.successops_role.save()
+        self.log_alibaba_challenge.status = 'pending'
+        self.log_alibaba_challenge.save()
+
+        response = self.client.patch(
+            f'/api/v1/logged-activities/{self.log_alibaba_challenge.uuid}',
+            data=json.dumps({'status': 'in review'}), headers=self.success_ops
+        )
+
+        self.assertEqual(response.status_code, 400)
+
 
 class DeleteLoggedActivityTestCase(BaseTestCase):
     """Delete logged activity test cases."""
@@ -405,7 +480,7 @@ class DeleteLoggedActivityTestCase(BaseTestCase):
         self.log_alibaba_challenge.save()
 
         logged_activity = LoggedActivity.query.filter_by(
-                          name='my logged activity').first()
+            name='my logged activity').first()
 
         response = self.client.delete(
             '/api/v1/logged-activities/'+logged_activity.uuid,

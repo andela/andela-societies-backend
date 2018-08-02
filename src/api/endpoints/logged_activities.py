@@ -5,12 +5,13 @@ from flask_restful import Resource
 from sqlalchemy import func
 
 from api.models import LoggedActivity, User, db
-from api.utils.auth import token_required
+from api.utils.auth import token_required, roles_required
 from api.utils.helpers import (ParsedResult, parse_log_activity_fields,
                                response_builder)
-from api.utils.marshmallow_schemas import (log_edit_activity_schema,
-                                           single_logged_activity_schema,
-                                           user_logged_activities_schema)
+from api.utils.marshmallow_schemas import (
+    log_edit_activity_schema, single_logged_activity_schema,
+    user_logged_activities_schema, accept_reject_schema
+)
 
 
 class UserLoggedActivitiesAPI(Resource):
@@ -34,9 +35,9 @@ class UserLoggedActivitiesAPI(Resource):
         points_earned = db.session.query(
             func.sum(LoggedActivity.value)
         ).filter(
-                LoggedActivity.user_id == user_id,
-                LoggedActivity.status == 'approved'
-            ).scalar()
+            LoggedActivity.user_id == user_id,
+            LoggedActivity.status == 'approved'
+        ).scalar()
 
         return response_builder(dict(
             data=user_logged_activities_schema.dump(
@@ -106,7 +107,7 @@ class LoggedActivityAPI(Resource):
 
     @classmethod
     def put(cls, logged_activity_id=None):
-        """Log a new activity."""
+        """Edit a logged activity."""
         payload = request.get_json(silent=True)
 
         if payload:
@@ -150,6 +151,38 @@ class LoggedActivityAPI(Resource):
         return response_builder(dict(
                                 message="Data for creation must be provided."),
                                 400)
+
+    @classmethod
+    @roles_required(['success ops'])
+    def patch(cls, logged_activity_id):
+        """Approve or reject a logged activity"""
+
+        result, error = accept_reject_schema.load(
+            request.get_json(silent=True)
+        )
+
+        if error:
+            return response_builder(dict(validationErrors=error), 400)
+
+        logged_activity = LoggedActivity.query.get(logged_activity_id)
+        if not logged_activity:
+            return response_builder(dict(
+                message='Logged activity does not exist'
+            ), 404)
+
+        if logged_activity.status not in ['pending', 'approved', 'rejected']:
+            return response_builder(dict(
+                status='fail', message='Logged activity is still in review'
+            ), 403)
+
+        status = result['status']
+        logged_activity.status = status
+        logged_activity.save()
+
+        return response_builder(dict(
+            data=single_logged_activity_schema.dump(logged_activity).data,
+            status='success', message=f'Activity {status} successfully'
+        ), 200)
 
     @classmethod
     def delete(cls, logged_activity_id=None):
