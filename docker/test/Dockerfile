@@ -7,6 +7,7 @@ LABEL application="andela-societies-backend"
 # Prevent dpkg errors
 ENV TERM=xterm-256color
 ENV MAIL_GUN_TEST="Insert MailGun thingy here."
+ENV CIO="test.cio@andela.com"
 
 # Set mirrors to Nearest Zone for faster builds
 RUN sed -i "s/http:\/\/archive./http:\/\/nz.archive./g" /etc/apt/sources.list

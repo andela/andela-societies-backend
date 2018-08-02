@@ -62,7 +62,7 @@ class PointRedemptionAPI(Resource):
                 message="Redemption Request reason:{}."
                         "Redemption Request value: {} points".format(
                     redemp_request.name, redemp_request.value),
-                recipients=["test.cio@andela.com"]
+                recipients=[current_app.config["CIO"]]
             )
 
             return response_builder(dict(

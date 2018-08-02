@@ -28,6 +28,7 @@ class Config(object):
     SENDER_CREDS = os.environ.get("SENDER_CREDS")
     CELERY_BACKEND = os.environ.get("CELERY_BACKEND")
     CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL")
+    CIO = os.environ.get("CIO")
 
 
 class Development(Config):
