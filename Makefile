@@ -4,6 +4,7 @@ ORG_NAME ?= bench-projects
 # File names
 DOCKER_TEST_COMPOSE_FILE := docker/test/docker-compose.yml
 DOCKER_REL_COMPOSE_FILE := docker/release/docker-compose.yml
+DOCKER_DB_COMPOSE_FILE := docker/database/docker-compose.yml
 
 # Docker compose project names
 DOCKER_TEST_PROJECT := "$(PROJECT_NAME)test"
@@ -33,7 +34,7 @@ help:
 		if (message) { \
 			command = substr($$1, 0, index($$1, ":")-1); \
 			message = substr(lastLine, RSTART + 3, RLENGTH); \
-			printf "  ${YELLOW}%-$(TARGET_MAX_CHAR_NUM)s${RESET} %s\n", command, message; \
+			printf "  ${YELLOW_S}%-$(TARGET_MAX_CHAR_NUM)s${RESET} %s\n", command, message; \
 		} \
 	} \
     { lastLine = $$0 }' $(MAKEFILE_LIST)
@@ -43,6 +44,32 @@ help:
 env_file:
 	@ chmod +x scripts/utils.sh && scripts/utils.sh addEnvFile
 	@ echo " "
+
+## Upgrade the application database
+upgrade:
+	@ echo "${YELLOW}====> Building the docker images${WHITE}"
+	@ docker-compose -f $(DOCKER_DB_COMPOSE_FILE) build
+	@ echo "${GREEN}====> Images built${WHITE}"
+	@ echo "${YELLOW}====>Running database containers in the background${WHITE}"
+	@ docker-compose -f $(DOCKER_DB_COMPOSE_FILE) run -d --name  database database
+	@ docker-compose -f $(DOCKER_DB_COMPOSE_FILE) run --name  application application python manage.py db upgrade -d prod-stag-migrations 
+	@ echo "${GREEN}====>Application migrated${WHITE}"
+	@ docker-compose -f $(DOCKER_DB_COMPOSE_FILE) down -v --rmi all
+	@ echo "${GREEN}====>Migration images, containers and networks cleared${WHITE}"
+
+## Destroy services and images built for migration
+upgrade-destroy:
+	@ echo "${YELLOW}====>Stoping any running container with the name application or database${WHITE}"
+	@ docker container ps -q --filter "name=database" --filter "name=application" | xargs -I ARGS docker container stop ARGS
+	@ echo "${GREEN}====>Containers with the name application and database stopped"
+	@ echo "${YELLOW}====>Deleting containers with the name application or database${WHITE}"
+	@ docker container ps -aq --filter "name=database" --filter "name=application" | xargs -I ARGS docker container rm ARGS
+	@ echo "${GREEN}====>Containers with the name application or database removed"	
+	@ echo "${YELLOW}====>Deleting networks with the name database_migration${WHITE}"
+	@ docker network ls --filter "name=database_migration" -q | xargs -I ARGS docker network rm ARGS
+	@ echo "${GREEN}====>Networks with the name migration-net deleted${WHITE}"
+	@ docker images -f "reference=application:migration" -q | xargs -I ARGS docker image rmi -f ARGS
+	@ docker images -f "reference=database:migration" -q | xargs -I ARGS docker image rmi -f ARGS
 
 ## Run project test cases
 test:env_file
@@ -87,7 +114,7 @@ destroy:
 	@ docker-compose -p $(DOCKER_TEST_PROJECT) -f $(DOCKER_TEST_COMPOSE_FILE) down -v
 	${INFO} "Removing dangling images..."
 	@ docker images -q -f dangling=true -f label=application=$(REPO_NAME) | xargs -I ARGS docker rmi -f ARGS
-	${INFO} "Clean complete"
+	${SUCCESS} "Clean complete"
 
 ifeq (tag,$(firstword $(MAKECMDGOALS)))
   TAG_ARGS := $(word 2, $(MAKECMDGOALS))
@@ -98,9 +125,10 @@ ifeq (tag,$(firstword $(MAKECMDGOALS)))
 endif
 
   # COLORS
-GREEN  := $(shell tput -Txterm setaf 2)
-YELLOW := $(shell tput -Txterm setaf 3)
-WHITE  := $(shell tput -Txterm setaf 7)
+GREEN  := `tput setaf 2`
+YELLOW := `tput setaf 3`
+WHITE  := `tput setaf 7`
+YELLOW_S := $(shell tput -Txterm setaf 3)
 NC := "\e[0m"
 RESET  := $(shell tput -Txterm sgr0)
 # Shell Functions

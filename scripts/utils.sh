@@ -7,6 +7,7 @@ ROOT_DIRECTORY=$(dirname $DIRECTORY)
 red=$(tput setaf 1)
 green=$(tput setaf 76)
 tan=$(tput setaf 3)
+white=$(tput setaf 7)
 
 success() {
   printf "${green}===> %s${reset}\n" "$@"
@@ -18,6 +19,10 @@ error() {
 
 warning() {
   printf "${tan}===> %s${reset}\n" "$@"
+}
+
+reset(){
+  printf "${white}"
 }
 
 function addEnvFile() {
@@ -41,6 +46,7 @@ EOF
     fi
 
     warning "Skipping, Environment file already exist"
+    reset
 }
 
 "$@"

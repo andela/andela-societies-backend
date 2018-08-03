@@ -1,0 +1,30 @@
+version: '3.0'
+services:
+  database:
+    build:
+      context: ../../
+      dockerfile: docker/database/Dockerfile
+    environment:
+      CLOUD_SQL_SERVICE_KEY: $CLOUD_SQL_SERVICE_KEY
+      CLOUDSQL_CONNECTION_NAME: $CLOUDSQL_CONNECTION_NAME
+    ports:
+      - "3300:3300"
+    networks:
+      - migration
+    image: database:migration
+
+  application:
+    build:
+      context: ../../
+      dockerfile: docker/release/Dockerfile
+    environment:
+      APP_SETTINGS: $APP_SETTINGS
+      DATABASE_URL: $DATABASE_URL
+      ANDELA_API_URL: $ANDELA_API_URL
+      PUBLIC_KEY: $PUBLIC_KEY
+    networks:
+      - migration
+    image: application:migration
+  
+networks:
+  migration:
