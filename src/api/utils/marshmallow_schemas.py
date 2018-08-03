@@ -188,7 +188,7 @@ class LogEditActivitySchema(BaseSchema):
         validate=[validate.Length(max=36)], load_from='activityId'
     )
     activity_type_id = fields.String(
-        validate=[validate.Length(max=36)], load_from='activityTypeId'
+        validate=[validate.Length(max=36)], load_from='activityTypeId', required=False
     )
     date = fields.Date()
     no_of_participants = fields.Integer(load_from='noOfParticipants')
@@ -196,12 +196,13 @@ class LogEditActivitySchema(BaseSchema):
     @validates_schema
     def validate_logged_activity(self, data):
         """Validate the logged activity."""
-        if (data.get('activity_type_id') and data.get('activity_id')) or not \
-                data.get('activity_type_id') and not data.get('activity_id'):
-            raise ValidationError(
-                'Please send either an activityTypeId or an activityId only',
-                'error'
-            )
+        if not self.context.get('edit'):
+            if (data.get('activity_type_id') and data.get('activity_id')) or not \
+                    data.get('activity_type_id') and not data.get('activity_id'):
+                raise ValidationError(
+                    'Please send either an activityTypeId or an activityId only',
+                    'error'
+                )
 
         if data.get('activity_type_id') and not(data.get('date')
                                                 and data.get('description')):
