@@ -144,7 +144,9 @@ class LoggedActivityAPI(Resource):
         payload = request.get_json(silent=True)
 
         if payload:
+            log_edit_activity_schema.context = {'edit': True}
             result, errors = log_edit_activity_schema.load(payload)
+            log_edit_activity_schema.context = {}
 
             if errors:
                 return response_builder(dict(validationErrors=errors), 400)
@@ -160,7 +162,11 @@ class LoggedActivityAPI(Resource):
                 return response_builder(dict(
                     message='Not allowed. Activity is already in pre-approval.'
                 ), 401)
+            if not result.get('activity_type_id'):
+                result['activity_type_id'] = logged_activity.activity_type_id
 
+            if not result.get('date'):
+                result['date'] = logged_activity.activity_date
             parsed_result = parse_log_activity_fields(result)
             if not isinstance(parsed_result, ParsedResult):
                 return parsed_result
