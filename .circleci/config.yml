@@ -21,7 +21,29 @@ jobs:
           path: test-reports
           destination: test-reports
 
-  deploy:
+  upgrade-database:
+    <<: *defaults
+    steps:
+      - checkout
+      - setup_remote_docker:
+          version: 17.11.0-ce
+      - run:
+          name: upgrade database
+          command: |
+            bash scripts/upgrade.sh
+
+  deploy-staging:
+    <<: *defaults
+    steps:
+      - checkout
+      - setup_remote_docker:
+          version: 17.11.0-ce
+      - run:
+          name: deploy application
+          command: |
+            bash scripts/deploy.sh
+
+  deploy-master:
     <<: *defaults
     steps:
       - checkout
@@ -37,11 +59,24 @@ workflows:
   test_and_deploy:
     jobs:
       - test
-      - deploy:
+      - upgrade-database:
           requires:
             - test
           filters:
             branches:
               only:
                 - staging
+      - deploy-staging:
+          requires:
+            - upgrade-database
+          filters:
+            branches:
+              only:
+                - staging
+      - deploy-master:
+          requires:
+            - test
+          filters:
+            branches:
+              only:
                 - master
