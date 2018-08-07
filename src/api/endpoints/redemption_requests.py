@@ -192,7 +192,7 @@ class PointRedemptionAPI(Resource):
             message="RedemptionRequest deleted successfully."), 200)
 
 
-class PointRedemptionRequestNumeration(Resource):
+class RedemptionRequestNumeration(Resource):
     """
     Approve or reject Redemption Requests.
 
@@ -237,13 +237,21 @@ class PointRedemptionRequestNumeration(Resource):
             society.used_points = redemp_request
             redemp_request.status = status
 
+            # Get the relevant Finance Center to respond on RedemptionRequest
+            if str(redemp_request.center.name.lower()) == 'kampala':
+                finance_email = str(redemp_request.center.name.lower())+".fin"
+                "ance@andela.com"
+            else:
+                finance_email = str(redemp_request.center.name.lower())+"-fin"
+                "ance@andela.com"
+
             send_email.delay(
                 sender=current_app.config["SENDER_CREDS"],
                 subject="RedemptionRequest for {}".format(
                                     redemp_request.user.society.name),
                 message="Redemption Request on {} has been approved. Finance"
                 " will be in touch.".format(redemp_request.name),
-                recipients=[redemp_request.user.email]
+                recipients=[redemp_request.user.email, finance_email]
             )
 
         elif status == "rejected":
@@ -277,20 +285,81 @@ class PointRedemptionRequestNumeration(Resource):
         redemp_request.save()
         mes = f"Redemption request status changed to {status}."
 
-        serialized_redmption = serialize_redmp(redemp_request)
+        serialized_redemption = serialize_redmp(redemp_request)
         serialized_approved_by, _ = basic_info_schema.dump(g.current_user)
-        serialized_redmption["approvedBy"] = serialized_approved_by
-
-        send_email.delay(
-            sender=current_app.config["SENDER_CREDS"],
-            subject="RedemptionRequest for {}".format(
-                                redemp_request.user.society.name),
-            message="This is a test message",
-            recipients=[redemp_request.user.email]
-        )
+        serialized_redemption["approvedBy"] = serialized_approved_by
 
         return response_builder(dict(
             status="success",
-            data=serialized_redmption,
+            data=serialized_redemption,
+            message=mes
+        ), 200)
+
+
+class RedemptionRequestFunds(Resource):
+    """
+    Mark Redemption Requests are complete.
+
+    The Finance Department marks the redemption request as complete once the
+    funds have been sent out.
+    """
+
+    decorators = [token_required]
+
+    @roles_required(["finance"])
+    def put(self, redeem_id=None):
+        """Complete Redemption Requests and mark them so."""
+        payload = request.get_json(silent=True)
+
+        if not payload:
+            return response_builder(dict(
+                message="Data for editing must be provided",
+                status="fail"
+            ), 400)
+
+        if not redeem_id:
+            return response_builder(dict(
+                status="fail",
+                message="RedemptionRequest id must be provided."), 400)
+
+        redemp_request = RedemptionRequest.query.get(redeem_id)
+        if not redemp_request:
+            return response_builder(dict(
+                data=None,
+                status="fail",
+                message="Resource does not exist."
+            ), 404)
+
+        status = payload.get("status")
+
+        if status == "completed":
+            redemp_request.status = status
+
+            send_email.delay(
+                sender=current_app.config["SENDER_CREDS"],
+                subject="RedemptionRequest for {}".format(
+                                    redemp_request.user.society.name),
+                message="Redemption Request on {} has been completed. Finance"
+                " has wired the money to the reciepient.".format(
+                    redemp_request.name),
+                recipients=[redemp_request.user.email,
+                            current_app.config["CIO"]]
+            )
+        else:
+            return response_builder(dict(
+                status="Failed",
+                message="Invalid status.",
+            ), 400)
+
+        redemp_request.save()
+        mes = f"Redemption request status changed to {redemp_request.status}."
+
+        serialized_redemption = serialize_redmp(redemp_request)
+        serialized_completed_by, _ = basic_info_schema.dump(g.current_user)
+        serialized_redemption["completedBy"] = serialized_completed_by
+
+        return response_builder(dict(
+            status="success",
+            data=serialized_redemption,
             message=mes
         ), 200)
