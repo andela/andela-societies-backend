@@ -334,7 +334,7 @@ class PointRedemptionBaseTestCase(BaseTestCase):
 
 
 class PointRedemptionApprovalTestCase(BaseTestCase):
-    """Test class for Society point redemption approval/rejection."""
+    """Test class for point redemption completion/approval/rejection."""
 
     def setUp(self):
         """Set up all needed variables."""
@@ -342,6 +342,7 @@ class PointRedemptionApprovalTestCase(BaseTestCase):
         self.president_role.save()
         self.v_president_role.save()
         self.successops_role.save()
+        self.finance_role.save()
         self.invictus.save()
         self.istelle.save()
         self.sparks.save()
@@ -407,6 +408,27 @@ class PointRedemptionApprovalTestCase(BaseTestCase):
         )
 
         message = "status changed"
+        response_details = json.loads(response.data)
+
+        self.assertIn(message, response_details["message"])
+        self.assertEqual(response.status_code, 200)
+
+    def test_point_redemption_completion_successful(self):
+        """Test completion of RedemptionRequest.
+
+        When a redemption request funds have been sent out the redemption
+        reequest should be marked as completed.
+        """
+        completion_payload = dict(status="completed")
+
+        response = self.client.put(
+                    f"api/v1/societies/redeem/funds/{self.redemp_req.uuid}",
+                    data=json.dumps(completion_payload),
+                    headers=self.finance,
+                    content_type='application/json'
+        )
+
+        message = "completed"
         response_details = json.loads(response.data)
 
         self.assertIn(message, response_details["message"])
