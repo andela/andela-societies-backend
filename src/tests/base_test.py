@@ -83,6 +83,22 @@ class BaseTestCase(TestCase):
         "exp": exp_date + datetime.timedelta(days=1)
     }
 
+    test_finance_payload = {
+        "UserInfo": {
+            "email": "test.cio@andela.com",
+            "first_name": "Test",
+            "id": "-Ktest_id",
+            "last_name": "Finance",
+            "name": "test test",
+            "picture": "https://www.link.com",
+            "roles": {
+                    "Andelan": "-Ktest_andelan_id",
+                    "finance": "-KXGy1EB1oimjQgFim6L"
+            }
+        },
+        "exp": exp_date + datetime.timedelta(days=1)
+    }
+
     test_auth_role_payload = {
         "UserInfo": {
             "email": "test.test@andela.com",
@@ -199,7 +215,8 @@ class BaseTestCase(TestCase):
              self.expired_payload,
              self.test_cio_role_payload,
              self.test_society_president_role_payload,
-             self.test_auth_role_payload
+             self.test_auth_role_payload,
+             self.test_finance_payload
         ]
 
         for token_payload in token_payloads_list:
@@ -230,6 +247,11 @@ class BaseTestCase(TestCase):
         self.cio = {
             "Authorization": self.generate_token(
                 self.test_cio_role_payload),
+            "Content-Type": "application/json"
+        }
+        self.finance = {
+            "Authorization": self.generate_token(
+                self.test_finance_payload),
             "Content-Type": "application/json"
         }
         self.bad_token_header = {
