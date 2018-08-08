@@ -8,7 +8,8 @@ from api.endpoints.activity_types import ActivityTypesAPI
 from api.endpoints.activities import ActivitiesAPI
 from api.endpoints.societies import SocietyResource, AddCohort
 from api.endpoints.redemption_requests import PointRedemptionAPI
-from api.endpoints.redemption_requests import PointRedemptionRequestNumeration
+from api.endpoints.redemption_requests import RedemptionRequestNumeration
+from api.endpoints.redemption_requests import RedemptionRequestFunds
 from api.endpoints.users import UserAPI
 from api.endpoints.logged_activities import (UserLoggedActivitiesAPI,
                                              SecretaryReviewLoggedAcivityApi)
@@ -123,10 +124,17 @@ def create_app(environment="Development"):
     )
 
     api.add_resource(
-        PointRedemptionRequestNumeration,
+        RedemptionRequestNumeration,
         "/api/v1/societies/redeem/verify/<string:redeem_id>",
         "/api/v1/societies/redeem/verify/<string:redeem_id>/",
-        endpoint="point_redemption_numeration"
+        endpoint="redemption_numeration"
+    )
+
+    api.add_resource(
+        RedemptionRequestFunds,
+        "/api/v1/societies/redeem/funds/<string:redeem_id>",
+        "/api/v1/societies/redeem/funds/<string:redeem_id>/",
+        endpoint="redemption_request_funds"
     )
 
     # Add Cohort to society

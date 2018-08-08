@@ -239,13 +239,13 @@ def add_extra_user_info(token, user_id, url=os.environ.get('ANDELA_API_URL')):  
     return cohort, location, api_response
 
 
-def serialize_redmp(redmption):
+def serialize_redmp(redemption):
     """To serialize and package redeptions."""
-    serial_data, _ = redemption_schema.dump(redmption)
-    seriallized_user, _ = basic_info_schema.dump(redmption.user)
+    serial_data, _ = redemption_schema.dump(redemption)
+    seriallized_user, _ = basic_info_schema.dump(redemption.user)
     serilaized_society, _ = basic_info_schema.dump(
-        Society.query.get(redmption.user.society_id))
+        Society.query.get(redemption.user.society_id))
     serial_data["user"] = seriallized_user
     serial_data["society"] = serilaized_society
-    serial_data["center"], _ = basic_info_schema.dump(redmption.center)
+    serial_data["center"], _ = basic_info_schema.dump(redemption.center)
     return serial_data
