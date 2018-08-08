@@ -16,7 +16,7 @@ class UserTestCase(BaseTestCase):
             photo="https://lh6.googleusercontent.com/-1DhBLOJentg/AAAAAAAAA"
                   "AI/AAAAAAAAABc/ImM13eP_cAI/photo.jpg?sz=50",
             email="test.user@andela.com",
-            center=self.kenya,
+            center=self.nairobi,
             cohort=self.cohort_12_Ke)
 
         self.assertTrue(test_user.save())
@@ -36,7 +36,7 @@ class UserTestCase(BaseTestCase):
             photo="https://lh6.googleusercontent.com/-1DhBLOJentg/AAAAAAAAA"
                   "AI/AAAAAAAAABc/ImM13eP_cAI/photo.jpg?sz=50",
             email="test.user@andela.com",
-            center=self.kenya,
+            center=self.nairobi,
             cohort=self.cohort_12_Ke)
 
         test_user.save()
@@ -101,7 +101,7 @@ class SocietyTestCase(BaseTestCase):
             photo="https://lh6.googleusercontent.com/-1DhBLOJentg/AAAAAAAAA"
                   "AI/AAAAAAAAABc/ImM13eP_cAI/photo.jpg?sz=50",
             email="test.user@andela.com",
-            center=self.kenya,
+            center=self.nairobi,
             cohort=self.cohort_12_Ke)
 
         self.phoenix.members.extend([test_user, self.test_user])
@@ -219,7 +219,7 @@ class CohortTestCase(BaseTestCase):
 
     def test_create_cohort(self):
         """Test creation of a cohort."""
-        cohort_1_Nig = Cohort(name="cohort-1", center=self.nigeria)
+        cohort_1_Nig = Cohort(name="cohort-1", center=self.lagos)
         self.assertTrue(cohort_1_Nig.save())
 
 
@@ -228,9 +228,9 @@ class CenterTestCase(BaseTestCase):
 
     def test_create_center(self):
         """Test create a center."""  # bwahahahahah
-        self.uganda = Center(name='Uganda')
+        self.kampala = Center(name='Kampala')
 
-        self.assertTrue(self.uganda.save())
+        self.assertTrue(self.kampala.save())
 
 
 class RoleTestCase(BaseTestCase):
