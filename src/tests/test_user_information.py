@@ -23,7 +23,7 @@ class UserInformationTestCase(BaseTestCase):
     def setUp(self):
         """Set up patch information for every test."""
         super().setUp()
-        self.kenya.save()
+        self.nairobi.save()
         self.cohort_12_Ke.save()
         self.society = Society(name="iStelle")
         self.society.cohorts.append(self.cohort_12_Ke)
@@ -32,7 +32,7 @@ class UserInformationTestCase(BaseTestCase):
         cohort = self.cohort_12_Ke
         self.patcher = mock.patch('api.utils.auth.add_extra_user_info',
                                   return_value=info_mock(200,
-                                                         location=self.kenya,
+                                                         location=self.nairobi,
                                                          cohort=cohort,
                                                          society=self.society))
         self.patcher.start()
@@ -51,7 +51,7 @@ class UserInformationTestCase(BaseTestCase):
 
         response_data = json.loads(response.data)
 
-        expected_location_data, _ = basic_info_schema.dump(self.nigeria)
+        expected_location_data, _ = basic_info_schema.dump(self.lagos)
         self.assertDictEqual(response_data.get('data').get('location'),
                              expected_location_data)
         expected_society_data, _ = basic_info_schema.dump(self.phoenix)
