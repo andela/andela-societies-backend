@@ -14,6 +14,7 @@ from api.endpoints.logged_activities import (UserLoggedActivitiesAPI,
                                              SecretaryReviewLoggedAcivityApi)
 from api.endpoints.logged_activities import LoggedActivitiesAPI
 from api.endpoints.logged_activities import LoggedActivityAPI
+from api.endpoints.logged_activities import LoggedActivityApprovalAPI
 from api.endpoints.roles import RoleAPI, SocietyRoleAPI
 from api.models import db
 
@@ -149,6 +150,12 @@ def create_app(environment="Development"):
         SocietyRoleAPI, "/api/v1/roles/society-execs",
         "/api/v1/roles/society-execs/",
         endpoint="society_execs_roles"
+    )
+
+    api.add_resource(LoggedActivityApprovalAPI,
+        "/api/v1/approve/logged-activities",
+        "/api/v1/approve/logged-activities/",
+        endpoint="approve_logged_activities"
     )
 
     # enable health check ping to API
