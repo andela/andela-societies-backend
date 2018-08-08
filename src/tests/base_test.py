@@ -262,9 +262,9 @@ class BaseTestCase(TestCase):
         }
 
         # test centers
-        self.kenya = Center(name='Kenya')
-        self.uganda = Center(name='Uganda')
-        self.nigeria = Center(name='Nigeria')
+        self.nairobi = Center(name='Nairobi')
+        self.kampala = Center(name='Kampala')
+        self.lagos = Center(name='Lagos')
 
         # test societies
         self.phoenix = Society(name="Phoenix",
@@ -301,9 +301,9 @@ class BaseTestCase(TestCase):
         self.cio_role = Role(uuid="-KXGionceu24i2y", name="cio")
 
         # test cohorts
-        self.cohort_12_Ke = Cohort(name="cohort-12", center=self.kenya)
-        self.cohort_12_Ug = Cohort(name="cohort-12", center=self.uganda)
-        self.cohort_1_Nig = Cohort(name="cohort-1", center=self.nigeria)
+        self.cohort_12_Ke = Cohort(name="cohort-12", center=self.nairobi)
+        self.cohort_12_Ug = Cohort(name="cohort-12", center=self.kampala)
+        self.cohort_1_Nig = Cohort(name="cohort-1", center=self.lagos)
 
         # test users
         self.test_user = User(
@@ -311,7 +311,7 @@ class BaseTestCase(TestCase):
             name="Test User",
             photo="https://www.link.com",
             email="test.user.societies@andela.com",
-            center=self.nigeria,
+            center=self.lagos,
             cohort=self.cohort_1_Nig,
             society=self.phoenix
         )
@@ -320,7 +320,7 @@ class BaseTestCase(TestCase):
             name="Test User2",
             photo="https://www.link.com",
             email="test.user2.societies@andela.com",
-            center=self.uganda,
+            center=self.kampala,
             cohort=self.cohort_12_Ug,
             society=self.sparks
         )
@@ -329,7 +329,7 @@ class BaseTestCase(TestCase):
             name="Test User3",
             photo="https://www.link.com",
             email="test.user3.societies@andela.com",
-            center=self.kenya,
+            center=self.nairobi,
             cohort=self.cohort_12_Ke,
             society=self.invictus
         )
@@ -340,7 +340,7 @@ class BaseTestCase(TestCase):
             photo="https://lh6.googleusercontent.com/-1DhBLOJentg/AAAAAAAAA"
                   "AI/AAAAAAnAABc/ImeP_cAI/photo.jpg?sz=50",
             email="test.president.societies@andela.com",
-            center=self.kenya,
+            center=self.nairobi,
             cohort=self.cohort_12_Ke,
             society=self.phoenix
         )
@@ -352,7 +352,7 @@ class BaseTestCase(TestCase):
             photo="https://lh6.googleusercontent.com/-1DhBLOJentg/AAAAAAAAA"
                   "AI/AAAAAAnAABc/ImeP_cAI/photo.jpg?sz=50",
             email="test.vice_president.societies@andela.com",
-            center=self.kenya,
+            center=self.nairobi,
             cohort=self.cohort_12_Ke,
             society=self.sparks
         )
@@ -364,7 +364,7 @@ class BaseTestCase(TestCase):
             photo="https://lh6.googleusercontent.com/-1DhBLOJentg/AAAAAAAAA"
                   "AI/AAAAAAnAABc/ImeP_cAI/photo.jpg?sz=50",
             email="test.secretary.societies@andela.com",
-            center=self.kenya,
+            center=self.nairobi,
             cohort=self.cohort_12_Ke,
             society=self.invictus
         )
@@ -399,7 +399,7 @@ class BaseTestCase(TestCase):
             added_by=self.president
         )
         self.bootcamp_xiv = Activity(
-            name='Bootcamp XIV Interviews - Kenya',
+            name='Bootcamp XIV Interviews - Nairobi',
             activity_type=self.interview,
             activity_date=datetime.date.today() + datetime.timedelta(days=14),
             added_by=self.president

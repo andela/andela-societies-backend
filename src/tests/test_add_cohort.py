@@ -12,7 +12,7 @@ class AddCohortTestCase(BaseTestCase):
         self.success_role.save()
 
     def test_add_society(self):
-        self.kenya.save()
+        self.nairobi.save()
         self.istelle.save()
         self.cohort_12_Ke.save()
 
@@ -102,7 +102,7 @@ class AddCohortTestCase(BaseTestCase):
             message="Error Invalid societyId."))
 
     def test_add_society_conflicting_data(self):
-        self.kenya.save()
+        self.nairobi.save()
         self.istelle.save()
         self.istelle.cohorts.append(self.cohort_12_Ke)
         self.cohort_12_Ke.save()

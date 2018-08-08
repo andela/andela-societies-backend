@@ -22,13 +22,13 @@ class PointRedemptionBaseTestCase(BaseTestCase):
 
     def test_create_redemption_request(self):
         """Test creation of Redemption Request through endpoint."""
-        self.nigeria.save()
+        self.lagos.save()
 
         new_request = dict(
             reason="T-shirt Funds Request",
             value=2500,
             user_id=self.test_user.uuid,
-            center="Nigeria"
+            center="Lagos"
             )
 
         response = self.client.post("api/v1/societies/redeem",
