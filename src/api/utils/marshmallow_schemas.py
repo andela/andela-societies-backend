@@ -81,8 +81,8 @@ class LoggedActivitySchema(BaseSchema):
 
     status = fields.String()
     points = fields.Integer(attribute='value')
-    date = fields.Date(attribute='activity_date')
-    user = fields.String(attribute='user.name')
+    date = fields.Date(attribute='activity_date', dump_to='activityDate', load_from='activityDate')
+    owner = fields.String(attribute='user.name')
     activity_id = fields.String(dump_to='activityId', load_from='activityId')
     activity = fields.String(attribute='activity.name')
     category = fields.String(attribute='activity_type.name')
@@ -305,7 +305,6 @@ user_logged_activities_schema = LoggedActivitySchema(
     many=True, exclude=('society', 'society_id')
 )
 logged_activities_schema = LoggedActivitiesSchema(many=True)
-
 role_schema = RoleSchema()
 cohort_schema = CohortSchema()
 base_schema = BaseSchema()
