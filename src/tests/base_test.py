@@ -416,6 +416,16 @@ class BaseTestCase(TestCase):
             activity_type=self.hackathon
         )
 
+        self.log_alibaba_challenge2 = LoggedActivity(
+            name="my second logged activity",
+            description="Participated in this event",
+            value=2500,
+            user=self.test_user,
+            activity=self.alibaba_ai_challenge,
+            society=self.sparks,
+            activity_type=self.hackathon
+        )
+
         self.redemp_req = RedemptionRequest(
             name="T-shirt Funds Request",
             value=2500,
