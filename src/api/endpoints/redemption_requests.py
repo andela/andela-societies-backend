@@ -239,11 +239,11 @@ class RedemptionRequestNumeration(Resource):
 
             # Get the relevant Finance Center to respond on RedemptionRequest
             if str(redemp_request.center.name.lower()) == 'kampala':
-                finance_email = str(redemp_request.center.name.lower())+".fin"
-                "ance@andela.com"
+                finance_email = redemp_request.center.name.lower() + \
+                    ".finance@andela.com"
             else:
-                finance_email = str(redemp_request.center.name.lower())+"-fin"
-                "ance@andela.com"
+                finance_email = redemp_request.center.name.lower() + \
+                    "-finance@andela.com"
 
             send_email.delay(
                 sender=current_app.config["SENDER_CREDS"],

@@ -16,9 +16,9 @@ from api.models import (ActivityType, Activity, Center, LoggedActivity,
 def centre_societies_roles_data_dev():
     """Generate center societies and role data"""
     # test centers
-    kenya = Center(name='Kenya')
-    uganda = Center(name='Uganda')
-    nigeria = Center(name='Nigeria')
+    nairobi = Center(name='Nairobi')
+    kampala = Center(name='Kampala')
+    lagos = Center(name='Lagos')
 
     # societies
     phoenix = Society(name="phoenix")
@@ -38,7 +38,7 @@ def centre_societies_roles_data_dev():
             Role(name="society secretary")
          )
 
-    return (roles, kenya, uganda, nigeria, phoenix, istelle, sparks, invictus)
+    return (roles, nairobi, kampala, lagos, phoenix, istelle, sparks, invictus)
 
 
 # setup dev user info to access Andela API
@@ -147,12 +147,12 @@ def activity_types_data():
 
 
 def test_dev_user_seed_data(args):
-    (kenya,
+    (nairobi,
      phoenix,
      roles) = args
 
     # cohorts
-    cohort_14_ke = Cohort(name='Cohort 14 Test', center=kenya)
+    cohort_14_ke = Cohort(name='Cohort 14 Test', center=nairobi)
     # users
     # member
     member = User(
@@ -161,7 +161,7 @@ def test_dev_user_seed_data(args):
         photo="https://lh6.googleusercontent.com/-1DhBLOJentg/AAAAAAAAA"
               "AI/AAAAAAAAABc/ImeP_cAI/photo.jpg?sz=50",
         email="test.user.societies@andela.com",
-        center=kenya,
+        center=nairobi,
         cohort=cohort_14_ke,
         society=phoenix
     )
@@ -174,7 +174,7 @@ def test_dev_user_seed_data(args):
         photo="https://lh6.googleusercontent.com/-1DhBLOJentg/AAAAAAAAA"
               "AI/AAAAAAnAABc/ImeP_cAI/photo.jpg?sz=50",
         email="test.president.societies@andela.com",
-        center=kenya,
+        center=nairobi,
         cohort=cohort_14_ke,
         society=phoenix
     )
@@ -187,7 +187,7 @@ def test_dev_user_seed_data(args):
         photo="https://lh6.googleusercontent.com/-1DhBLOJentg/AAAAAAAAA"
               "AI/AAAAAAnAABc/ImeP_cAI/photo.jpg?sz=50",
         email="test.successops.societies@andela.com",
-        center=kenya
+        center=nairobi
     )
     success_ops.roles.append(roles[3])
 
@@ -254,9 +254,9 @@ def generete_initial_data_run_time_env():
     """
 
     # generete dev data cohort, societies, roles
-    (roles, kenya, uganda, nigeria, phoenix,
+    (roles, nairobi, kampala, lagos, phoenix,
      istelle, sparks, invictus) = centre_societies_roles_data_dev()
-    centers = (kenya, uganda, nigeria)
+    centers = (nairobi, kampala, lagos)
     societies = (phoenix, istelle, sparks, invictus)
 
     api_cohorts = api_centers = ()
@@ -275,7 +275,7 @@ def generete_initial_data_run_time_env():
 
     # generate user data
     args = (
-        kenya,
+        nairobi,
         phoenix,
         roles
     )
