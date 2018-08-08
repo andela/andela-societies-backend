@@ -1,0 +1,40 @@
+version: '2.1'
+volumes:
+  webroot:
+    driver: local
+
+services:
+  app:
+    build:
+      context: ../../
+      dockerfile: docker/release/Dockerfile
+    links:
+      - database
+    environment:
+      APP_SETTINGS: Staging
+      DATABASE_URL: postgresql://soc:soc@database:5432/db
+    env_file:
+      - ../../src/.env
+    command:
+      - gunicorn
+      - -b 0.0.0.0:8000
+      - -w 5
+      - manage:app
+    ports:
+      - "8000:8000"
+
+    # postgres database image
+  database:
+    image: postgres
+    restart: always
+    expose:
+      - "5432"
+    environment:
+      POSTGRES_USER: soc
+      POSTGRES_PASSWORD: soc
+      POSTGRES_DB: db
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
