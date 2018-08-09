@@ -4,8 +4,8 @@ from unittest import mock
 
 from flask import Response
 
-from tests.base_test import BaseTestCase, Center, Cohort, Society
-from api.utils.marshmallow_schemas import basic_info_schema
+from .base_test import BaseTestCase, Center, Cohort, Society
+from ..api.utils.marshmallow_schemas import basic_info_schema
 
 
 def info_mock(status_code, society=None, location=None, cohort=None, data=None):

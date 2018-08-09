@@ -1,8 +1,7 @@
 """Test suite for Society Module."""
 import json
 import uuid
-from .base_test import BaseTestCase
-from api.models import Society, Role, db
+from .base_test import BaseTestCase, Society, Role, db
 
 
 class SocietyBaseTestCase(BaseTestCase):

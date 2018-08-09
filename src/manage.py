@@ -14,7 +14,7 @@ from api.models import Activity, Society, User, db, Center, Role, Cohort
 from app import create_app
 from run_tests import test
 
-app = create_app(environment=os.environ.get('APP_SETTINGS', "Development"))
+app = create_app(environment=os.environ.get('APP_SETTINGS', "Production"))
 manager = Manager(app)
 
 

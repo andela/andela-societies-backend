@@ -69,11 +69,11 @@ class BaseTestCase(TestCase):
 
     test_successops_payload = {
         "UserInfo": {
-            "email": "test.test@andela.com",
+            "email": "test.successops@andela.com",
             "first_name": "test",
             "id": "-Ktest_id",
             "last_name": "test",
-            "name": "test test",
+            "name": "test success ops",
             "picture": "https://www.link.com",
             "roles": {
                     "Andelan": "-Ktest_andelan_id",

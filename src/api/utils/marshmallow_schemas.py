@@ -120,7 +120,7 @@ class LoggedActivitySchema(BaseSchema):
 
 class LoggedActivitiesSchema(LoggedActivitySchema):
     date = fields.Date(attribute='activity_date', dump_to='activityDate')
-    society = fields.Nested('BaseSchema', only=('uuid', 'name'))
+    society = fields.Nested(BaseSchema, only=('uuid', 'name'))
     user = fields.String(attribute='user.name', dump_to='owner')
 
 
@@ -271,7 +271,7 @@ class RedemptionRequestSchema(BaseSchema):
         load_from='reason',
         required=True,
         error_messages={
-            'required': {'message': 'A name is required.'}
+            'required': {'message': 'A reason is required.'}
         })
     value = fields.Integer(
         load_from='points',

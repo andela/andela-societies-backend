@@ -149,7 +149,6 @@ class User(Base):
                                  secondary='user_activity',
                                  lazy='dynamic',
                                  backref='participants')
-    roles = db.relationship('Role', secondary='user_role', backref='user')
     redemption_requests = db.relationship(
         'RedemptionRequest', backref='user', lazy='dynamic',
         order_by='desc(RedemptionRequest.created_at)'
@@ -160,7 +159,8 @@ class Role(Base):
     """Models Roles to which all Andelans have."""
 
     __tablename__ = 'roles'
-    users = db.relationship('User', secondary='user_role', backref='role')
+    users = db.relationship('User', secondary='user_role', lazy='dynamic',
+                            backref=db.backref('roles', lazy='dynamic'))
 
 
 class Society(Base):
