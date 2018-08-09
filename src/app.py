@@ -27,7 +27,7 @@ except ImportError:
     from config import configuration
 
 
-def create_app(environment="Development"):
+def create_app(environment="Production"):
     """Factory Method that creates an instance of the app with the given env.
 
     Args:

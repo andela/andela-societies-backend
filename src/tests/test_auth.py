@@ -1,5 +1,5 @@
 """Authorization Test Suite."""
-from tests.base_test import BaseTestCase
+from .base_test import BaseTestCase
 
 
 class AuthTestCase(BaseTestCase):
