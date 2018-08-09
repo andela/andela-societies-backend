@@ -26,9 +26,15 @@ class Config(object):
     MAIL_GUN_URL = os.environ.get('MAIL_GUN_URL')
     MAIL_GUN_API_KEY = os.environ.get('MAIL_GUN_API_KEY')
     SENDER_CREDS = os.environ.get("SENDER_CREDS")
+    NOTIFICATIONS_SENDER = os.getenv('NOTIFICATIONS_SENDER')
     CELERY_BACKEND = os.environ.get("CELERY_BACKEND")
     CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL")
     CIO = os.environ.get("CIO")
+
+    SUCCESS_OPS_NEWSLETTER_DAY = os.getenv(
+        'SUCCESS_OPS_NEWSLETTER_DAY', 'mon'
+        # can be int or valid cron day string
+    )
 
 
 class Development(Config):
@@ -52,6 +58,8 @@ class Testing(Config):
     ISSUER = "tests"
     API_IDENTIFIER = "tests"
     MAIL_GUN_TEST = os.environ.get('MAIL_GUN_TEST')
+    NOTIFICATIONS_SENDER = os.getenv('TESTS_NOTIFICATIONS_SENDER',
+                                     'notifications@tests.com')
 
 
 class Staging(Development):

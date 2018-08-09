@@ -1,9 +1,9 @@
 """Models TestSuite."""
 
-from api.models import (Activity, ActivityType, Cohort, Center,
-                        LoggedActivity, Society, User, Role, RedemptionRequest)
-from tests.base_test import BaseTestCase
-
+from .base_test import (
+    BaseTestCase, Activity, ActivityType, Cohort, Center,
+    LoggedActivity, Society, User, Role, RedemptionRequest
+)
 
 class UserTestCase(BaseTestCase):
     """Test models."""
@@ -12,7 +12,7 @@ class UserTestCase(BaseTestCase):
         """Test we can create user objects."""
         test_user = User(
             uuid="-KdQsMt4M0ixIy_-yWTSZ",
-            name="Test User",
+            name="Test User Model",
             photo="https://lh6.googleusercontent.com/-1DhBLOJentg/AAAAAAAAA"
                   "AI/AAAAAAAAABc/ImM13eP_cAI/photo.jpg?sz=50",
             email="test.user@andela.com",

@@ -5,10 +5,13 @@ from collections import namedtuple
 
 
 import requests
-from flask import Response, current_app, jsonify, request, url_for
+from flask import (
+    Response, current_app, jsonify, request, url_for
+)
 from api.models import (Activity, ActivityType, Cohort, Center, Role, Society,
-                        RedemptionRequest)
+                        RedemptionRequest, LoggedActivity, db)
 from api.utils.marshmallow_schemas import basic_info_schema, redemption_schema
+
 
 ParsedResult = namedtuple(
     'ParsedResult',

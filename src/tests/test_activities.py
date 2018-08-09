@@ -2,8 +2,7 @@
 import datetime
 import json
 
-from api.models import ActivityType
-from tests.base_test import BaseTestCase
+from .base_test import BaseTestCase, ActivityType
 
 
 class ActivitiesTestCase(BaseTestCase):

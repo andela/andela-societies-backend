@@ -103,7 +103,7 @@ class LoggedActivitiesAPI(Resource):
 
     @classmethod
     def get(cls):
-        """Get all logged activities"""
+        """Get all logged activities."""
         paginate = request.args.get("paginate", "true")
         message = "all Logged activities fetched successfully"
 
@@ -140,7 +140,7 @@ class LoggedActivityAPI(Resource):
 
     @classmethod
     def put(cls, logged_activity_id=None):
-        """Log a new activity."""
+        """Edit an activity."""
         payload = request.get_json(silent=True)
 
         if payload:
@@ -254,7 +254,6 @@ class LoggedActivityApprovalAPI(Resource):
     @roles_required(["success ops"])
     def put(cls, logged_activity_id=None):
         """Put method for approving logged Activity resource."""
-
         # TODO: Adding of redemption points needs to be factored into this
         payload = request.get_json(silent=True)
 
@@ -281,7 +280,7 @@ class LoggedActivityApprovalAPI(Resource):
                     continue
                 unique_activities_ids.add(logged_activities)
 
-            if len(unique_activities_ids) == 0:
+            if not unique_activities_ids:
                 return response_builder(dict(
                     status='failed',
                     message='Invalid logged activities or no pending logged activities in request'),
@@ -289,6 +288,7 @@ class LoggedActivityApprovalAPI(Resource):
             else:
                 for unique_activities_id in list(unique_activities_ids):
                     unique_activities_id.status = 'approved'
+                    unique_activities_id.society.total_points = unique_activities_id
 
                 user_logged_activities = logged_activities_schema.dump(
                     unique_activities_ids).data
@@ -320,7 +320,6 @@ class LoggedActivityRejectionAPI(Resource):
     @roles_required(["success ops"])
     def put(cls, logged_activity_id):
         """Put method for rejecting logged activity resource."""
-
         logged_activity = LoggedActivity.query.filter_by(
             uuid=logged_activity_id).first()
 
@@ -346,4 +345,3 @@ class LoggedActivityRejectionAPI(Resource):
                     message='This logged activity is either in-review, approved or already rejected'
                     ),
                     406)
-

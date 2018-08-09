@@ -116,18 +116,31 @@ class SocietyRoleAPI(Resource):
         society = Society.query.filter_by(name=payload.get("society")).first()
         role_change = Role.query.filter_by(name=payload.get("role")).first()
 
-        query_user_role_changing = User.query.join(user_role).join(
-                                   Role).filter(
-                                   user_role.c.role_uuid
-                                   == role_change.uuid).all()
+        if not role_change:
+            return response_builder(dict(
+                message="Create role to be appended.",
+                status="fail"
+            ), 404)
 
-        for user in query_user_role_changing:
-            if user.society_id == society.uuid:
-                old_exec = user
-            else:
-                old_exec = None
+        query_user_role_changing = role_change.users.filter_by(
+            society=society
+        ).one_or_none()
 
-        new_exec = User.query.filter_by(name=payload.get("name")).first()
+        if query_user_role_changing and \
+                query_user_role_changing.society_id == society.uuid:
+            old_exec = query_user_role_changing
+        else:
+            old_exec = None
+
+        new_exec = User.query.filter_by(name=payload.get("name"),
+                                        society=society).first()
+
+        if not new_exec:
+            return response_builder(dict(
+                message="New Executive member not found or does not" \
+                        " belong to society.",
+                status="fail"
+            ), 404)
 
         # Remove the old role from the outgoing exceutive
         if not old_exec:
@@ -135,24 +148,15 @@ class SocietyRoleAPI(Resource):
                 message="Previous Executive not found.",
                 status="fail"
             ), 404)
-        try:
-            for role in old_exec.roles:
-                if role.uuid == role_change.uuid:
-                    old_exec.roles.remove(role)
-        except ValueError:
-            return response_builder(dict(
-                message="Role not found in outgoing_exec",
-                status="fail"
-            ), 404)
 
-        if not Role.query.filter_by(name="society president").first():
-            return response_builder(dict(
-                message="Create role to be appended.",
-                status="fail"
-            ), 404)
+        for role in old_exec.roles.all():
+            if role.uuid == role_change.uuid:
+                old_exec.roles.remove(role)
 
         new_exec.roles.append(Role.query.filter_by(
-                                    name=payload.get("role")).first())
+            name=payload.get("role")).first())
+        new_exec.save()
+
         return response_builder(dict(
             data=new_exec.serialize(),
             message="{} has been appointed {} of {}".format(new_exec.name,

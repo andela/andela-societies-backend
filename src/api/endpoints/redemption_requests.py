@@ -34,14 +34,17 @@ class PointRedemptionAPI(Resource):
         result, errors = redemption_request_schema.load(payload)
 
         if errors:
-            status_code = redemption_request_schema.context.get(
-                'status_code')
-            validation_status_code = status_code or 400
-            return response_builder(errors, validation_status_code)
+            return response_builder(errors, 400)
+
+        if result.get('value') > g.current_user.society.remaining_points:
+            return response_builder(dict(
+                message="Redemption request value exceeds your society's "\
+                        "remaining points",
+                status="fail"
+            ), 406)
+
 
         center = Center.query.filter_by(name=result.get('center')).first()
-        # TODO: Before creating a redemption request make sure society has
-        # enough points
 
         if center:
             redemp_request = RedemptionRequest(

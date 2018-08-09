@@ -25,3 +25,6 @@ omit =
     */marshmallow_schemas.py
     run_tests.py
     */initial_data.py
+
+# for some reason coverage keeps raising a missing blub file error in the src directory when generating a html report. This is a temporary solution before the root cause can be determined.
+ignore_errors = True
