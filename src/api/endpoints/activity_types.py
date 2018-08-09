@@ -35,12 +35,12 @@ class ActivityTypesAPI(Resource):
             validation_status_code = status_code or 400
             return response_builder(errors, validation_status_code)
 
-        support_mutiple = result["supports_multiple_participants"]
+        support_multiple = result.get("supports_multiple_participants")
         activity_type = ActivityType(
                 name=result["name"],
                 description=result["description"],
                 value=result["value"],
-                supports_multiple_participants=support_mutiple
+                supports_multiple_participants=support_multiple
         )
         activity_type.save()
         return response_builder(dict(

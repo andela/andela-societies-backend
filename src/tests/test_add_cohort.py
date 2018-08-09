@@ -1,7 +1,8 @@
 """Test adding cohorts and getting cohorts from societies."""
 
 import json
-from tests.base_test import BaseTestCase, Role
+
+from .base_test import BaseTestCase, Role
 
 
 class AddCohortTestCase(BaseTestCase):

@@ -276,13 +276,9 @@ class SocietyRoleTestCase(BaseTestCase):
         self.successops_token = {"Authorization":
                                  self.generate_token(
                                   self.test_successops_payload)}
-        self.president.roles.append(self.president_role)
         self.president.save()
-        self.vice_president.roles.append(self.v_president_role)
         self.vice_president.save()
-        self.secretary.roles.append(self.secretary_role)
         self.secretary.save()
-        self.test_user.save()
         self.test_user_2.save()
         self.test_user_3.save()
 
@@ -297,6 +293,9 @@ class SocietyRoleTestCase(BaseTestCase):
                                    headers=self.successops_token,
                                    content_type='application/json')
 
+        self.assertIn(self.president_role, self.test_user.roles.all())
+        self.assertNotIn(self.president_role, self.president.roles.all())
+
         message = "has been appointed"
         response_details = json.loads(response.data)
 
@@ -305,7 +304,7 @@ class SocietyRoleTestCase(BaseTestCase):
 
     def test_reassign_society_vice_president(self):
         """Test the appointment of new Vice President."""
-        new_vice_president = dict(name="Test User",
+        new_vice_president = dict(name="Test User2",
                                   society="Sparks",
                                   role="vice president")
 
@@ -317,12 +316,15 @@ class SocietyRoleTestCase(BaseTestCase):
         message = "has been appointed"
         response_details = json.loads(response.data)
 
+        self.assertNotIn(self.v_president_role, self.vice_president.roles.all())
+        self.assertIn(self.v_president_role, self.test_user_2.roles.all())
+
         self.assertIn(message, response_details["message"])
         self.assertEqual(response.status_code, 200)
 
     def test_reassign_society_secretary(self):
         """Test the appointment of new Secretary."""
-        new_secretary = dict(name="Test User",
+        new_secretary = dict(name="Test User3",
                              society="Invictus",
                              role="society secretary")
 
@@ -331,8 +333,32 @@ class SocietyRoleTestCase(BaseTestCase):
                                    headers=self.successops_token,
                                    content_type='application/json')
 
+        self.assertIn(self.secretary_role, self.test_user_3.roles.all())
+        self.assertNotIn(self.secretary_role, self.secretary.roles.all())
+
         message = "has been appointed"
         response_details = json.loads(response.data)
 
         self.assertIn(message, response_details["message"])
         self.assertEqual(response.status_code, 200)
+
+    def test_reassign_executive_position_to_non_member(self):
+        """Test the appointment of new Secretary."""
+        new_secretary = dict(name="Test User2",
+                             society="Phoenix",
+                             role="society president")
+
+        response = self.client.put("/api/v1/roles/society-execs",
+                                   data=json.dumps(new_secretary),
+                                   headers=self.successops_token,
+                                   content_type='application/json')
+
+        self.assertNotIn(self.president_role, self.test_user_2.roles.all())
+        self.assertIn(self.president_role, self.president.roles.all())
+
+        message = "New Executive member not found or does not " \
+                  "belong to society."
+        response_details = json.loads(response.data)
+
+        self.assertEqual(message, response_details["message"])
+        self.assertEqual(response.status_code, 404)

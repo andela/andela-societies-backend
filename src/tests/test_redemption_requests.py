@@ -22,6 +22,7 @@ class PointRedemptionBaseTestCase(BaseTestCase):
 
     def test_create_redemption_request(self):
         """Test creation of Redemption Request through endpoint."""
+        self.phoenix._total_points = 5000
         self.lagos.save()
 
         new_request = dict(
@@ -29,7 +30,7 @@ class PointRedemptionBaseTestCase(BaseTestCase):
             value=2500,
             user_id=self.test_user.uuid,
             center="Lagos"
-            )
+        )
 
         response = self.client.post("api/v1/societies/redeem",
                                     data=json.dumps(new_request),
@@ -41,6 +42,32 @@ class PointRedemptionBaseTestCase(BaseTestCase):
 
         self.assertIn(message, response_details["message"])
         self.assertEqual(response.status_code, 201)
+
+    def test_create_redemption_request_when_remaining_points_inadequate(self):
+        """
+        Test that creating a redemption request fails when a society
+        does not have enough remaining points
+        """
+        self.lagos.save()
+
+        new_request = dict(
+            reason="T-shirt Funds Request",
+            value=2500,
+            user_id=self.test_user.uuid,
+            center="Lagos"
+        )
+
+        response = self.client.post("api/v1/societies/redeem",
+                                    data=json.dumps(new_request),
+                                    headers=self.society_president,
+                                    content_type='application/json')
+
+        message = "Redemption request value exceeds your society's" \
+                  " remaining points"
+        response_details = json.loads(response.data)
+
+        self.assertEqual(message, response_details["message"])
+        self.assertEqual(response.status_code, 406)
 
     def test_create_redemption_request_no_payload(self):
         """Test RedemptionRequest creation without payload fails."""
