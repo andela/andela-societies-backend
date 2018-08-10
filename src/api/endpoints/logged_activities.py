@@ -309,3 +309,41 @@ class LoggedActivityApprovalAPI(Resource):
             return response_builder(dict(
                                 message='Data for creation must be provided.'),
                                 400)
+
+
+class LoggedActivityRejectionAPI(Resource):
+    """Allows success-ops to reject at least one Logged Activities."""
+
+    decorators = [token_required]
+
+    @classmethod
+    @roles_required(["success ops"])
+    def put(cls, logged_activity_id):
+        """Put method for rejecting logged activity resource."""
+
+        logged_activity = LoggedActivity.query.filter_by(
+            uuid=logged_activity_id).first()
+
+        if not logged_activity:
+            return response_builder(dict(message='Logged activity not found'),
+                                    404)
+
+        if logged_activity.status == 'pending':
+            logged_activity.status = 'rejected'
+
+            user_logged_activity = single_logged_activity_schema.dump(logged_activity).data
+            user_logged_activity['society'] = {'id': user_logged_activity['societyId'],
+                    'name': user_logged_activity['society']}
+            del user_logged_activity['societyId']
+
+            return response_builder(dict(
+                    data=user_logged_activity,
+                    message='Activity successfully rejected'),
+                    200)
+        else:
+            return response_builder(dict(
+                    status='failed',
+                    message='This logged activity is either in-review, approved or already rejected'
+                    ),
+                    406)
+
