@@ -212,7 +212,7 @@ class LoggedActivityAPI(Resource):
         return response_builder(dict(), 204)
 
 
-class SecretaryReviewLoggedAcivityApi(Resource):
+class SecretaryReviewLoggedActivityApi(Resource):
     """Enable society secretary to verify logged activities."""
 
     decorators = [token_required]
