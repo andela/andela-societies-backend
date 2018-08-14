@@ -447,7 +447,7 @@ class EditLoggedActivityTestCase(BaseTestCase):
         payload = {'status': 'pending'}
         uuid = self.log_alibaba_challenge.uuid
         response = self.client.put(
-            f'/api/v1/logged-activity/verify/{uuid}',
+            f'/api/v1/logged-activities/review/{uuid}',
             data=json.dumps(payload),
             headers=self.society_secretary
         )
@@ -462,7 +462,7 @@ class EditLoggedActivityTestCase(BaseTestCase):
         uuid = self.log_alibaba_challenge.uuid
 
         response = self.client.put(
-            f'/api/v1/logged-activity/verify/{uuid}',
+            f'/api/v1/logged-activities/review/{uuid}',
             data=json.dumps(payload),
             headers=self.society_secretary
         )
@@ -477,7 +477,7 @@ class EditLoggedActivityTestCase(BaseTestCase):
         payload = {'status': 'invalid'}
         uuid = self.log_alibaba_challenge.uuid
         response = self.client.put(
-            f'/api/v1/logged-activity/verify/{uuid}',
+            f'/api/v1/logged-activities/review/{uuid}',
             data=json.dumps(payload),
             headers=self.society_secretary
         )
@@ -489,7 +489,7 @@ class EditLoggedActivityTestCase(BaseTestCase):
         payload = {'status': 'invalid'}
 
         response = self.client.put(
-            f'/api/v1/logged-activity/verify/-KlHerwfafcvavefa',
+            '/api/v1/logged-activities/review/-KlHerwfafcvavefa',
             data=json.dumps(payload),
             headers=self.society_secretary
         )
@@ -504,7 +504,7 @@ class EditLoggedActivityTestCase(BaseTestCase):
         payload = {}
 
         response = self.client.put(
-            f'/api/v1/logged-activity/verify/-KlHerwfafcvavefa',
+            '/api/v1/logged-activities/review/-KlHerwfafcvavefa',
             data=json.dumps(payload),
             headers=self.society_secretary
         )

@@ -87,6 +87,7 @@ def seed():
 
 
 def linker(cohort_name, society_name):
+    """Link Cohorts with Society."""
     cohort = Cohort.query.filter_by(name=cohort_name).first()
     if not cohort:
         return print(

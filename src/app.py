@@ -12,7 +12,7 @@ from api.endpoints.redemption_requests import RedemptionRequestNumeration
 from api.endpoints.redemption_requests import RedemptionRequestFunds
 from api.endpoints.users import UserAPI
 from api.endpoints.logged_activities import (UserLoggedActivitiesAPI,
-                                             SecretaryReviewLoggedAcivityApi)
+                                             SecretaryReviewLoggedActivityApi)
 from api.endpoints.logged_activities import LoggedActivitiesAPI
 from api.endpoints.logged_activities import LoggedActivityAPI
 from api.endpoints.logged_activities import (LoggedActivityApprovalAPI,
@@ -86,9 +86,9 @@ def create_app(environment="Production"):
 
     # society secretary logged Activity endpoint
     api.add_resource(
-        SecretaryReviewLoggedAcivityApi,
-        '/api/v1/logged-activity/verify/<string:logged_activity_id>',
-        '/api/v1/logged-activity/verify/<string:logged_activity_id>/',
+        SecretaryReviewLoggedActivityApi,
+        '/api/v1/logged-activities/review/<string:logged_activity_id>',
+        '/api/v1/logged-activities/review/<string:logged_activity_id>/',
         endpoint='secretary_logged_activity'
     )
 

@@ -38,11 +38,10 @@ class PointRedemptionAPI(Resource):
 
         if result.get('value') > g.current_user.society.remaining_points:
             return response_builder(dict(
-                message="Redemption request value exceeds your society's "\
+                message="Redemption request value exceeds your society's "
                         "remaining points",
                 status="fail"
             ), 406)
-
 
         center = Center.query.filter_by(name=result.get('center')).first()
 
@@ -69,7 +68,7 @@ class PointRedemptionAPI(Resource):
             )
 
             return response_builder(dict(
-                message="Redemption request created. success ops will be in"
+                message="Redemption request created. Success Ops will be in"
                         " touch soon.",
                 status="success",
                 data=serialize_redmp(redemp_request)
@@ -128,7 +127,8 @@ class PointRedemptionAPI(Resource):
 
     @classmethod
     @token_required
-    @roles_required(["cio", "society president", "vice president", "secretary"])
+    @roles_required(["cio", "society president", "vice president",
+                     "secretary"])
     def get(cls, redeem_id=None):
         """Get Redemption Requests."""
         if redeem_id:
