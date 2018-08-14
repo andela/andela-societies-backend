@@ -83,6 +83,7 @@ class LoggedActivitySchema(BaseSchema):
     points = fields.Integer(attribute='value')
     date = fields.Date(attribute='activity_date', dump_to='activityDate', load_from='activityDate')
     owner = fields.String(attribute='user.name')
+    owner_photo = fields.Url(attribute='user.photo')
     activity_id = fields.String(dump_to='activityId', load_from='activityId')
     activity = fields.String(attribute='activity.name')
     category = fields.String(attribute='activity_type.name')
@@ -240,17 +241,13 @@ class CohortSchema(BaseSchema):
 class SocietySchema(BaseSchema):
     """Validation/Serialize Schema for Society."""
 
-    _total_points = fields.String(dump_only=True, dump_to='totalPoints',
-                                  validate=[validate.Length(max=36)])
+    _total_points = fields.Integer(dump_only=True, dump_to='totalPoints')
 
-    _used_points = fields.String(dump_only=True, dump_to='usedPoints',
-                                 validate=[validate.Length(max=36)])
+    _used_points = fields.Integer(dump_only=True, dump_to='usedPoints')
 
-    remaining_points = fields.String(dump_only=True, dump_to='remainingPoints',
-                                     validate=[validate.Length(max=36)])
+    remaining_points = fields.Integer(dump_only=True, dump_to='remainingPoints')
 
-    color_scheme = fields.String(dump_only=True, dump_to='colorScheme',
-                                 validate=[validate.Length(max=36)])
+    color_scheme = fields.String(dump_only=True, dump_to='colorScheme')
 
 
 class UserSchema(BaseSchema):
@@ -291,8 +288,7 @@ class RedemptionSchema(BaseSchema):
 
     status = fields.String(dump_only=True, dump_to='status',
                            validate=[validate.Length(max=36)])
-    value = fields.Integer(dump_only=True, dump_to='value',
-                           validate=[validate.Length(max=36)])
+    value = fields.Integer(dump_only=True, dump_to='value')
 
 
 activity_types_schema = ActivityTypesSchema(many=True)
