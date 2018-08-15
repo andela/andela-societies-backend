@@ -1,6 +1,6 @@
 """Module for Logged Activities in Andela."""
 
-from flask import g, request
+from flask import g, request, current_app
 from flask_restful import Resource
 from sqlalchemy import func
 
@@ -12,6 +12,7 @@ from api.utils.marshmallow_schemas import (
     log_edit_activity_schema, single_logged_activity_schema,
     logged_activities_schema, user_logged_activities_schema
 )
+from api.utils.notifications.email_notices import send_email
 
 
 class UserLoggedActivitiesAPI(Resource):
@@ -85,10 +86,21 @@ class LoggedActivitiesAPI(Resource):
                 activity=parsed_result.activity,
                 photo=result.get('photo'),
                 value=parsed_result.activity_value,
-                no_of_participants=result.get('no_of_participants'),
                 activity_type=parsed_result.activity_type,
                 activity_date=parsed_result.activity_date
             )
+
+            if logged_activity.activity_type == 'Bootcamp Interviews':
+                if not result['no_of_participants']:
+                    return response_builder(dict(
+                                            message="Data for creation must be"
+                                                    " provided. (no_of_"
+                                                    "participants)"),
+                                            400)
+                else:
+                    logged_activity.no_of_participants = result[
+                                                         'no_of_participants'
+                                                         ]
 
             logged_activity.save()
 
@@ -212,7 +224,7 @@ class LoggedActivityAPI(Resource):
         return response_builder(dict(), 204)
 
 
-class SecretaryReviewLoggedActivityApi(Resource):
+class SecretaryReviewLoggedActivityAPI(Resource):
     """Enable society secretary to verify logged activities."""
 
     decorators = [token_required]
@@ -266,39 +278,49 @@ class LoggedActivityApprovalAPI(Resource):
 
             if len(logged_activities_ids) > 20:
                 return response_builder(dict(
-                    message='Sorry, you can not approve more than 20 logged_activities at a go'), 406)
+                    message='Sorry, you can not approve more than 20'
+                            ' logged_activities at a go'), 406)
 
-            if not isinstance(logged_activities_ids, list) or not logged_activities_ids:
+            if not isinstance(logged_activities_ids, list) or \
+                    not logged_activities_ids:
                 return response_builder(dict(
-                    message='A List/Array with at least one logged activity id is needed!'), 400)
+                    message='A List/Array with at least one logged activity'
+                            ' id is needed!'), 400)
 
             unique_activities_ids = set([])
             for logged_activities_id in logged_activities_ids:
-                logged_activities = LoggedActivity.query.get(logged_activities_id)
-                if logged_activities is None or logged_activities.redeemed\
-                or logged_activities.status in  ['rejected', 'in review', 'approved']:
+                logged_activities = LoggedActivity.query.get(
+                                                        logged_activities_id
+                                                        )
+                if logged_activities is None or logged_activities.redeemed \
+                    or logged_activities.status in ['rejected', 'in review',
+                                                    'approved']:
                     continue
                 unique_activities_ids.add(logged_activities)
 
             if not unique_activities_ids:
                 return response_builder(dict(
                     status='failed',
-                    message='Invalid logged activities or no pending logged activities in request'),
+                    message='Invalid logged activities or no pending logged'
+                            ' activities in request'),
                     400)
             else:
                 for unique_activities_id in list(unique_activities_ids):
                     unique_activities_id.status = 'approved'
-                    unique_activities_id.society.total_points = unique_activities_id
+                    unique_activities_id.society.total_points = \
+                        unique_activities_id
 
                 user_logged_activities = logged_activities_schema.dump(
                     unique_activities_ids).data
 
-                # NOTE: this code works as expected, shipping it out for the MVP
-                # further optimization will be done from line 254 - 257
+                # NOTE: this code works as expected, shipping it out for the
+                # MVP further optimization will be done from line 254 - 257
                 # using marshmallow
                 for user_logged_activity in user_logged_activities:
-                    user_logged_activity['society'] = {'id': user_logged_activity['societyId'],
-                    'name': user_logged_activity['society']}
+                    user_logged_activity['society'] = {
+                        'id': user_logged_activity['societyId'],
+                        'name': user_logged_activity['society']
+                        }
                     del user_logged_activity['society']['id']
                     del user_logged_activity['societyId']
                 return response_builder(dict(
@@ -318,8 +340,12 @@ class LoggedActivityRejectionAPI(Resource):
 
     @classmethod
     @roles_required(["success ops"])
-    def put(cls, logged_activity_id):
+    def put(cls, logged_activity_id=None):
         """Put method for rejecting logged activity resource."""
+        if logged_activity_id is None:
+            return response_builder(dict(
+                message='loggedActivitiesIds is required'), 400)
+
         logged_activity = LoggedActivity.query.filter_by(
             uuid=logged_activity_id).first()
 
@@ -330,9 +356,12 @@ class LoggedActivityRejectionAPI(Resource):
         if logged_activity.status == 'pending':
             logged_activity.status = 'rejected'
 
-            user_logged_activity = single_logged_activity_schema.dump(logged_activity).data
-            user_logged_activity['society'] = {'id': user_logged_activity['societyId'],
-                    'name': user_logged_activity['society']}
+            user_logged_activity = single_logged_activity_schema.dump(
+                logged_activity).data
+            user_logged_activity['society'] = {
+                    'id': user_logged_activity['societyId'],
+                    'name': user_logged_activity['society']
+                    }
             del user_logged_activity['societyId']
 
             return response_builder(dict(
@@ -342,6 +371,61 @@ class LoggedActivityRejectionAPI(Resource):
         else:
             return response_builder(dict(
                     status='failed',
-                    message='This logged activity is either in-review, approved or already rejected'
-                    ),
-                    406)
+                    message='This logged activity is either in-review,'
+                            ' approved or already rejected'), 406)
+
+
+class LoggedActivityInfoAPI(Resource):
+    """Allows success-ops to request more info on a Logged Activity."""
+
+    decorators = [token_required]
+
+    @classmethod
+    @roles_required(["success ops"])
+    def put(cls, logged_activity_id=None):
+        """Put method for requesting more info on a logged activity."""
+        payload = request.get_json(silent=True)
+
+        if not payload:
+            return response_builder(dict(
+                message="Data for editing must be provided",
+                status="fail"
+            ), 400)
+
+        if not logged_activity_id:
+            return response_builder(dict(
+                status="fail",
+                message="LoggedActivity id must be provided."), 400)
+
+        logged_activity = LoggedActivity.query.get(logged_activity_id)
+
+        if not logged_activity:
+            return response_builder(dict(message='Logged activity not found'),
+                                    404)
+
+        comment = payload.get("comment")
+        if comment:
+            send_email.delay(
+                sender=current_app.config["SENDER_CREDS"],
+                subject="More Info on Logged Activity for {}".format(
+                                    logged_activity.user.society.name),
+                message="Success Ops needs more information on this"
+                        " logged activity: {}.\\n Context: {}."
+                        "\\nClick <a href='{}'>here</a>"
+                        " to view the logged activity and edit the"
+                        " description to give more informaton.".format(
+                            logged_activity.name, comment, request.host_url +
+                            '/api/v1/logged-activities/' +
+                            logged_activity.uuid
+                            ),
+                recipients=[logged_activity.user.email]
+            )
+        else:
+            return response_builder(dict(
+                status="fail",
+                message="Context for extra informaton must be provided."), 400)
+
+        return response_builder(dict(
+                status='success',
+                message='Extra information has been successfully requested'),
+                200)

@@ -93,9 +93,9 @@ class Base(db.Model):
             A dict object
         """
         dictionary_mapping = {
-            camel_case(attribute.name): str(getattr(self, attribute.name)) \
-            if not isinstance(getattr(self, attribute.name), int) \
-            else getattr(self, attribute.name) \
+            camel_case(attribute.name): str(getattr(self, attribute.name))
+            if not isinstance(getattr(self, attribute.name), int)
+            else getattr(self, attribute.name)
             for attribute in self.__table__.columns
         }
         return dictionary_mapping

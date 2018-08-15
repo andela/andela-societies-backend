@@ -12,11 +12,12 @@ from api.endpoints.redemption_requests import RedemptionRequestNumeration
 from api.endpoints.redemption_requests import RedemptionRequestFunds
 from api.endpoints.users import UserAPI
 from api.endpoints.logged_activities import (UserLoggedActivitiesAPI,
-                                             SecretaryReviewLoggedActivityApi)
+                                             SecretaryReviewLoggedActivityAPI)
 from api.endpoints.logged_activities import LoggedActivitiesAPI
 from api.endpoints.logged_activities import LoggedActivityAPI
 from api.endpoints.logged_activities import (LoggedActivityApprovalAPI,
-                                             LoggedActivityRejectionAPI)
+                                             LoggedActivityRejectionAPI,
+                                             LoggedActivityInfoAPI)
 from api.endpoints.roles import RoleAPI, SocietyRoleAPI
 from api.models import db
 
@@ -86,10 +87,34 @@ def create_app(environment="Production"):
 
     # society secretary logged Activity endpoint
     api.add_resource(
-        SecretaryReviewLoggedActivityApi,
+        SecretaryReviewLoggedActivityAPI,
         '/api/v1/logged-activities/review/<string:logged_activity_id>',
         '/api/v1/logged-activities/review/<string:logged_activity_id>/',
         endpoint='secretary_logged_activity'
+    )
+
+    # Success Ops Requesting more informaton on a logged activity
+    api.add_resource(
+        LoggedActivityInfoAPI,
+        '/api/v1/logged-activities/info/<string:logged_activity_id>',
+        '/api/v1/logged-activities/info/<string:logged_activity_id>/',
+        endpoint='info_on_logged_activity'
+    )
+
+    # Success-Ops Approval of LoggedActivities
+    api.add_resource(
+        LoggedActivityApprovalAPI,
+        "/api/v1/logged-activities/approve",
+        "/api/v1/logged-activities/approve/",
+        endpoint="approve_logged_activities"
+    )
+
+    # Success-Ops Rejection of LoggedActivities
+    api.add_resource(
+        LoggedActivityRejectionAPI,
+        "/api/v1/logged-activity/reject/<string:logged_activity_id>",
+        "/api/v1/logged-activity/reject/<string:logged_activity_id>/",
+        endpoint="reject_logged_activity"
     )
 
     # user endpoints
@@ -159,18 +184,6 @@ def create_app(environment="Production"):
         SocietyRoleAPI, "/api/v1/roles/society-execs",
         "/api/v1/roles/society-execs/",
         endpoint="society_execs_roles"
-    )
-
-    api.add_resource(LoggedActivityApprovalAPI,
-        "/api/v1/logged-activities/approve",
-        "/api/v1/logged-activities/approve/",
-        endpoint="approve_logged_activities"
-    )
-
-    api.add_resource(LoggedActivityRejectionAPI,
-        "/api/v1/logged-activity/reject/<string:logged_activity_id>",
-        "/api/v1/logged-activity/reject/<string:logged_activity_id>/",
-        endpoint="reject_logged_activity"
     )
 
     # enable health check ping to API

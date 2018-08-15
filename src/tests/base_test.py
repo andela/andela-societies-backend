@@ -216,7 +216,8 @@ class BaseTestCase(TestCase):
              self.test_cio_role_payload,
              self.test_society_president_role_payload,
              self.test_auth_role_payload,
-             self.test_finance_payload
+             self.test_finance_payload,
+             self.test_successops_payload
         ]
 
         for token_payload in token_payloads_list:
