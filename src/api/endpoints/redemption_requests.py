@@ -127,7 +127,7 @@ class PointRedemptionAPI(Resource):
 
     @classmethod
     @token_required
-    @roles_required(["cio", "society president", "vice president",
+    @roles_required(["finance", "cio", "society president", "vice president",
                      "secretary"])
     def get(cls, redeem_id=None):
         """Get Redemption Requests."""
@@ -251,10 +251,20 @@ class RedemptionRequestNumeration(Resource):
             send_email.delay(
                 sender=current_app.config["SENDER_CREDS"],
                 subject="RedemptionRequest for {}".format(
+                    redemp_request.user.society.name),
+                message="Redemption Request on {} has been approved. Click the link below"
+                        " <a href='{}'>here</a> to view more details.".format(
+                    redemp_request.name, request.host_url + 'api/v1/societies/redeem/' + redeem_id),
+                recipients=[finance_email]
+            )
+
+            send_email.delay(
+                sender=current_app.config["SENDER_CREDS"],
+                subject="RedemptionRequest for {}".format(
                                     redemp_request.user.society.name),
                 message="Redemption Request on {} has been approved. Finance"
                 " will be in touch.".format(redemp_request.name),
-                recipients=[redemp_request.user.email, finance_email]
+                recipients=[redemp_request.user.email]
             )
 
         elif status == "rejected":
