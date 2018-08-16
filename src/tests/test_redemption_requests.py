@@ -440,6 +440,34 @@ class PointRedemptionApprovalTestCase(BaseTestCase):
         self.assertIn(message, response_details["message"])
         self.assertEqual(response.status_code, 200)
 
+    def test_get_non_existing_point_redemption_details_by_finance(self):
+        """Test retrieval of Redemption Requests."""
+        response = self.client.get(
+                        f"api/v1/societies/redeem/{str(uuid.uuid4())}",
+                        headers=self.finance,
+                        content_type='application/json')
+        message = "does not exist"
+        response_details = json.loads(response.data)
+
+        self.assertIn(message, response_details["message"])
+        self.assertEqual(response.status_code, 404)
+
+    def test_get_point_redemption_details_by_finance(self):
+        """Test view of RedemptionRequest by finance.
+        """
+
+        response = self.client.get(
+                    f"api/v1/societies/redeem/{self.redemp_req.uuid}",
+                    headers=self.finance,
+                    content_type='application/json'
+        )
+
+        message = "fetched successfully"
+        response_details = json.loads(response.data)
+
+        self.assertIn(message, response_details["message"])
+        self.assertEqual(response.status_code, 200)
+
     def test_point_redemption_completion_successful(self):
         """Test completion of RedemptionRequest.
 
