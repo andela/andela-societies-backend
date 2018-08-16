@@ -82,7 +82,7 @@ target/
 .python-version
 
 # celery beat schedule file
-celerybeat-schedule
+celerybeat-schedule.db
 
 # SageMath parsed files
 *.sage.py
@@ -115,3 +115,6 @@ ENV/
 
 migrations/*
 .envrc
+
+.idea/
+.idea
