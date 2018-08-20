@@ -123,7 +123,8 @@ class Cohort(Base):
     """Models cohorts available in Andela."""
 
     __tablename__ = 'cohorts'
-    center_id = db.Column(db.String, db.ForeignKey('centers.uuid'),)
+    center_id = db.Column(db.String, db.ForeignKey('centers.uuid'),
+                          nullable=False)
     society_id = db.Column(db.String, db.ForeignKey('societies.uuid'))
 
     members = db.relationship('User', backref='cohort')
@@ -144,7 +145,6 @@ class User(Base):
         'LoggedActivity', backref='user', lazy='dynamic',
         order_by='desc(LoggedActivity.created_at)'
     )
-
     created_activities = db.relationship('Activity',
                                          backref='added_by',
                                          lazy='dynamic')
@@ -211,7 +211,7 @@ class ActivityType(Base):
     """Models activity types."""
 
     __tablename__ = 'activity_types'
-    value = db.Column(db.Integer)
+    value = db.Column(db.Integer, nullable=False)
     supports_multiple_participants = db.Column(db.Boolean, default=False)
 
     activities = db.relationship('Activity', backref='activity_type')
@@ -222,10 +222,11 @@ class Activity(Base):
 
     __tablename__ = 'activities'
     activity_type_id = db.Column(db.String,
-                                 db.ForeignKey('activity_types.uuid'))
+                                 db.ForeignKey('activity_types.uuid'),
+                                 nullable=False)
     activity_date = db.Column(db.Date)
     added_by_id = db.Column(db.String,
-                            db.ForeignKey('users.uuid'))
+                            db.ForeignKey('users.uuid'), nullable=False)
 
 
 class LoggedActivity(Base):
@@ -259,7 +260,8 @@ class RedemptionRequest(Base):
 
     __tablename__ = 'redemptions'
     user_id = db.Column(db.String, db.ForeignKey('users.uuid'), nullable=False)
-    society_id = db.Column(db.String, db.ForeignKey('societies.uuid'))
+    society_id = db.Column(db.String, db.ForeignKey('societies.uuid'),
+                           nullable=False)
     value = db.Column(db.Integer, nullable=False)
     status = db.Column(db.String, default="pending", nullable=False)
     center_id = db.Column(db.String, db.ForeignKey('centers.uuid'),

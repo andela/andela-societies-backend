@@ -85,7 +85,7 @@ class BaseTestCase(TestCase):
 
     test_finance_payload = {
         "UserInfo": {
-            "email": "test.cio@andela.com",
+            "email": "test.finance@andela.com",
             "first_name": "Test",
             "id": "-Ktest_id",
             "last_name": "Finance",
@@ -122,6 +122,22 @@ class BaseTestCase(TestCase):
             "id": "-KdQsMtixG4U0y_-yJEH",
             "last_name": "President",
             "name": "Test President",
+            "picture": "https://bit.ly/2MeuICK",
+            "roles": {
+                    "Andelan": "-Ktest_andelan_id",
+                    "society president": "-KXGyd2udi2"
+            }
+        },
+        "exp": exp_date + datetime.timedelta(days=1)
+    }
+
+    test_sparks_society_president_payload = {
+        "UserInfo": {
+            "email": "test.sparks.president.societies@andela.com",
+            "first_name": "Test Sparks",
+            "id": "-KdQsMtixG4U0y_-yJEHsparks",
+            "last_name": "President",
+            "name": "Test Sparks President",
             "picture": "https://bit.ly/2MeuICK",
             "roles": {
                     "Andelan": "-Ktest_andelan_id",
@@ -196,6 +212,7 @@ class BaseTestCase(TestCase):
     def setUp(self):
         """Configure test enviroment."""
         os.environ['APP_SETTINGS'] = 'Testing'
+        os.environ['MAIL_GUN_TEST'] = 'True'
 
         self.patcher = mock.patch('api.utils.auth.add_extra_user_info',
                                   return_value=(None, None, None))
@@ -211,13 +228,13 @@ class BaseTestCase(TestCase):
         self.client = self.app.test_client()
 
         token_payloads_list = [
-             self.incomplete_payload,
-             self.expired_payload,
-             self.test_cio_role_payload,
-             self.test_society_president_role_payload,
-             self.test_auth_role_payload,
-             self.test_finance_payload,
-             self.test_successops_payload
+            self.incomplete_payload,
+            self.expired_payload,
+            self.test_cio_role_payload,
+            self.test_society_president_role_payload,
+            self.test_auth_role_payload,
+            self.test_finance_payload,
+            self.test_successops_payload
         ]
 
         for token_payload in token_payloads_list:
@@ -239,12 +256,17 @@ class BaseTestCase(TestCase):
                 self.test_society_president_role_payload),
             "Content-Type": "application/json"
         }
+        self.sparks_society_president = {
+            "Authorization": self.generate_token(
+                self.test_sparks_society_president_payload),
+            "Content-Type": "application/json"
+        }
 
         self.society_secretary = {
             "Authorization": self.generate_token(
-                                self.test_society_secretary_payload),
+                self.test_society_secretary_payload),
             "Content-Type": "application/json"
-            }
+        }
         self.cio = {
             "Authorization": self.generate_token(
                 self.test_cio_role_payload),
@@ -303,6 +325,7 @@ class BaseTestCase(TestCase):
 
         # test cohorts
         self.cohort_12_Ke = Cohort(name="cohort-12", center=self.nairobi)
+        self.cohort_14_Ke = Cohort(name="cohort-14", center=self.nairobi)
         self.cohort_12_Ug = Cohort(name="cohort-12", center=self.kampala)
         self.cohort_1_Nig = Cohort(name="cohort-1", center=self.lagos)
 
@@ -341,8 +364,8 @@ class BaseTestCase(TestCase):
             photo="https://lh6.googleusercontent.com/-1DhBLOJentg/AAAAAAAAA"
                   "AI/AAAAAAnAABc/ImeP_cAI/photo.jpg?sz=50",
             email="test.president.societies@andela.com",
-            center=self.nairobi,
-            cohort=self.cohort_12_Ke,
+            center=self.lagos,
+            cohort=self.cohort_1_Nig,
             society=self.phoenix
         )
         self.president.roles.append(self.president_role)
@@ -366,7 +389,7 @@ class BaseTestCase(TestCase):
                   "AI/AAAAAAnAABc/ImeP_cAI/photo.jpg?sz=50",
             email="test.secretary.societies@andela.com",
             center=self.nairobi,
-            cohort=self.cohort_12_Ke,
+            cohort=self.cohort_14_Ke,
             society=self.invictus
         )
         self.secretary.roles.append(self.secretary_role)

@@ -194,7 +194,7 @@ class ActivitiesTestCase(BaseTestCase):
     def get_activity_type_id(name):
         """Get activity type id using its name."""
         activity_type = ActivityType.query.filter_by(
-                        name=name).first()
+            name=name).first()
         activity_type_id = activity_type.uuid
 
         return activity_type_id

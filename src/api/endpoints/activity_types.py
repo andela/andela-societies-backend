@@ -31,22 +31,22 @@ class ActivityTypesAPI(Resource):
 
         if errors:
             status_code = new_activity_type_schema.context.get(
-                            'status_code')
+                'status_code')
             validation_status_code = status_code or 400
             return response_builder(errors, validation_status_code)
 
         support_multiple = result.get("supports_multiple_participants")
         activity_type = ActivityType(
-                name=result["name"],
-                description=result["description"],
-                value=result["value"],
-                supports_multiple_participants=support_multiple
+            name=result["name"],
+            description=result["description"],
+            value=result["value"],
+            supports_multiple_participants=support_multiple
         )
         activity_type.save()
         return response_builder(dict(
-                    status="success",
-                    data=activity_type.serialize(),
-                    message="Activity type created successfully."
+            status="success",
+            data=activity_type.serialize(),
+            message="Activity type created successfully."
         ), 201)
 
     @classmethod
@@ -65,7 +65,9 @@ class ActivityTypesAPI(Resource):
             activity_type = ActivityType.query.get(act_types_id)
             return find_item(activity_type)
 
-        activity_type = ActivityType.query.filter_by(name=search_term).first()
+        activity_type = ActivityType.query.filter(
+            ActivityType.name.ilike(f'%{search_term}%')
+        ).first()
         return find_item(activity_type)
 
     @classmethod
@@ -102,11 +104,11 @@ class ActivityTypesAPI(Resource):
             target_activity_type.value = payload.get("value")
         if payload.get("supports_multiple_participant"):
             target_activity_type.supports_multiple_participants =\
-             payload.get("supports_multiple_participants")
+                payload.get("supports_multiple_participants")
         return response_builder(dict(
-                message="Edit successful",
-                path=target_activity_type.serialize(),
-                status="success",
+            message="Edit successful",
+            path=target_activity_type.serialize(),
+            status="success",
         ), 200)
 
     @classmethod

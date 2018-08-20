@@ -6,7 +6,7 @@ from collections import namedtuple
 
 import requests
 from flask import (
-    Response, current_app, jsonify, request, url_for
+    Response, current_app, jsonify, request, url_for, g
 )
 from api.models import (Activity, ActivityType, Cohort, Center, Role, Society,
                         RedemptionRequest, LoggedActivity, db)
@@ -199,7 +199,9 @@ def response_builder(data, status_code=200):
     return response
 
 
-def add_extra_user_info(token, user_id, url=os.environ.get('ANDELA_API_URL')):  # pragma: no cover
+def add_extra_user_info(
+    token, user_id, url=os.environ.get('ANDELA_API_URL')
+):  # pragma: no cover
     """Retrive user information from ANDELA API.
 
     params:
@@ -252,3 +254,23 @@ def serialize_redmp(redemption):
     serial_data["society"] = serilaized_society
     serial_data["center"], _ = basic_info_schema.dump(redemption.center)
     return serial_data
+
+
+def get_redemption_request(redeem_id):
+    if "society president" in [role.name for role in g.current_user.roles]:
+        redemp_request = g.current_user.society.redemptions.filter_by(
+            uuid=redeem_id).one_or_none()
+    else:
+        redemp_request = RedemptionRequest.query.get(redeem_id)
+    if not redemp_request:
+        return response_builder(dict(
+            status="fail",
+            message="RedemptionRequest does not exist."),
+            404)
+
+    if redemp_request.status != "pending":
+        return response_builder(dict(
+            status="fail",
+            message="RedemptionRequest already approved or rejected"), 403)
+
+    return redemp_request
