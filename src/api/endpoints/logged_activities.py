@@ -90,7 +90,7 @@ class LoggedActivitiesAPI(Resource):
                 activity_date=parsed_result.activity_date
             )
 
-            if logged_activity.activity_type == 'Bootcamp Interviews':
+            if logged_activity.activity_type.name == 'Bootcamp Interviews':
                 if not result['no_of_participants']:
                     return response_builder(dict(
                                             message="Data for creation must be"
@@ -99,8 +99,8 @@ class LoggedActivitiesAPI(Resource):
                                             400)
                 else:
                     logged_activity.no_of_participants = result[
-                                                         'no_of_participants'
-                                                         ]
+                        'no_of_participants'
+                    ]
 
             logged_activity.save()
 
@@ -279,7 +279,7 @@ class LoggedActivityApprovalAPI(Resource):
             if len(logged_activities_ids) > 20:
                 return response_builder(dict(
                     message='Sorry, you can not approve more than 20'
-                            ' logged_activities at a go'), 406)
+                            ' logged_activities at a go'), 403)
 
             if not isinstance(logged_activities_ids, list) or \
                     not logged_activities_ids:
@@ -290,8 +290,8 @@ class LoggedActivityApprovalAPI(Resource):
             unique_activities_ids = set([])
             for logged_activities_id in logged_activities_ids:
                 logged_activities = LoggedActivity.query.get(
-                                                        logged_activities_id
-                                                        )
+                    logged_activities_id
+                )
                 if logged_activities is None or logged_activities.redeemed \
                     or logged_activities.status in ['rejected', 'in review',
                                                     'approved']:
@@ -314,13 +314,13 @@ class LoggedActivityApprovalAPI(Resource):
                     unique_activities_ids).data
 
                 # NOTE: this code works as expected, shipping it out for the
-                # MVP further optimization will be done from line 254 - 257
+                # MVP further optimization will be done from line 319 - 325
                 # using marshmallow
                 for user_logged_activity in user_logged_activities:
                     user_logged_activity['society'] = {
                         'id': user_logged_activity['societyId'],
                         'name': user_logged_activity['society']
-                        }
+                    }
                     del user_logged_activity['society']['id']
                     del user_logged_activity['societyId']
                 return response_builder(dict(
@@ -329,8 +329,8 @@ class LoggedActivityApprovalAPI(Resource):
                     200)
         else:
             return response_builder(dict(
-                                message='Data for creation must be provided.'),
-                                400)
+                message='Data for creation must be provided.'),
+                400)
 
 
 class LoggedActivityRejectionAPI(Resource):
@@ -359,20 +359,20 @@ class LoggedActivityRejectionAPI(Resource):
             user_logged_activity = single_logged_activity_schema.dump(
                 logged_activity).data
             user_logged_activity['society'] = {
-                    'id': user_logged_activity['societyId'],
-                    'name': user_logged_activity['society']
-                    }
+                'id': user_logged_activity['societyId'],
+                'name': user_logged_activity['society']
+            }
             del user_logged_activity['societyId']
 
             return response_builder(dict(
-                    data=user_logged_activity,
-                    message='Activity successfully rejected'),
-                    200)
+                data=user_logged_activity,
+                message='Activity successfully rejected'),
+                200)
         else:
             return response_builder(dict(
-                    status='failed',
-                    message='This logged activity is either in-review,'
-                            ' approved or already rejected'), 406)
+                status='failed',
+                message='This logged activity is either in-review,'
+                ' approved or already rejected'), 403)
 
 
 class LoggedActivityInfoAPI(Resource):
@@ -408,7 +408,7 @@ class LoggedActivityInfoAPI(Resource):
             send_email.delay(
                 sender=current_app.config["SENDER_CREDS"],
                 subject="More Info on Logged Activity for {}".format(
-                                    logged_activity.user.society.name),
+                    logged_activity.user.society.name),
                 message="Success Ops needs more information on this"
                         " logged activity: {}.\\n Context: {}."
                         "\\nClick <a href='{}'>here</a>"
@@ -417,7 +417,7 @@ class LoggedActivityInfoAPI(Resource):
                             logged_activity.name, comment, request.host_url +
                             '/api/v1/logged-activities/' +
                             logged_activity.uuid
-                            ),
+                ),
                 recipients=[logged_activity.user.email]
             )
         else:
@@ -426,6 +426,6 @@ class LoggedActivityInfoAPI(Resource):
                 message="Context for extra informaton must be provided."), 400)
 
         return response_builder(dict(
-                status='success',
-                message='Extra information has been successfully requested'),
-                200)
+            status='success',
+            message='Extra information has been successfully requested'),
+            200)

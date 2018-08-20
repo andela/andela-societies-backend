@@ -5,6 +5,7 @@ from .base_test import (
     LoggedActivity, Society, User, Role, RedemptionRequest
 )
 
+
 class UserTestCase(BaseTestCase):
     """Test models."""
 
@@ -152,7 +153,8 @@ class ActivityTestCase(BaseTestCase):
     def test_create_activity(self):
         """Test creation of activity."""
         google_hash_code = Activity(name='Google Tough hackathon',
-                                    activity_type=self.hackathon)
+                                    activity_type=self.hackathon,
+                                    added_by=self.president)
         self.assertTrue(google_hash_code.save())
 
     def test_get_activity(self):
@@ -256,7 +258,8 @@ class RedemptionRequestTestCase(BaseTestCase):
             name="T-shirt Funds Request",
             value=2500,
             user=self.test_user,
-            center=self.test_user.center
+            center=self.test_user.center,
+            society=self.phoenix
         )
 
         self.assertTrue(self.redemp_req.save(),
