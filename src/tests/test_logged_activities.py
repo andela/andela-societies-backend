@@ -532,7 +532,8 @@ class LoggedActivityApprovalTestCase(BaseTestCase):
         self.log_alibaba_challenge2.save()
 
         self.payload = dict(
-            loggedActivitiesIds=[self.log_alibaba_challenge.uuid, self.log_alibaba_challenge2.uuid]
+            loggedActivitiesIds=[self.log_alibaba_challenge.uuid,
+                                 self.log_alibaba_challenge2.uuid]
         )
 
         response = self.client.put(
@@ -548,7 +549,6 @@ class LoggedActivityApprovalTestCase(BaseTestCase):
         self.assertEqual(response_details['message'], message)
         self.assertEqual(response_details['data'][0]['status'], 'approved')
 
-
     def test_approving_logged_activities_unsuccessful(self):
 
         """
@@ -563,7 +563,8 @@ class LoggedActivityApprovalTestCase(BaseTestCase):
         self.log_alibaba_challenge2.save()
 
         self.payload = dict(
-            loggedActivitiesIds=[self.log_alibaba_challenge.uuid, self.log_alibaba_challenge2.uuid]
+            loggedActivitiesIds=[self.log_alibaba_challenge.uuid,
+                                 self.log_alibaba_challenge2.uuid]
         )
 
         response = self.client.put(
@@ -578,7 +579,6 @@ class LoggedActivityApprovalTestCase(BaseTestCase):
         self.assertEqual(response.status_code, 401)
         self.assertEqual(response_details['message'], message)
 
-
     def test_approving_logged_activities_empty_request_fails(self):
 
         """
@@ -589,7 +589,8 @@ class LoggedActivityApprovalTestCase(BaseTestCase):
         self.successops_role.save()
 
         self.payload = dict(
-            loggedActivitiesIds=[self.log_alibaba_challenge.uuid, self.log_alibaba_challenge2.uuid]
+            loggedActivitiesIds=[self.log_alibaba_challenge.uuid,
+                                 self.log_alibaba_challenge2.uuid]
         )
 
         response = self.client.put(
@@ -602,7 +603,6 @@ class LoggedActivityApprovalTestCase(BaseTestCase):
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response_details['message'], message)
-
 
     def test_approving_logged_activities_id_is_string_fails(self):
 
@@ -628,7 +628,6 @@ class LoggedActivityApprovalTestCase(BaseTestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response_details['message'], message)
 
-
     def test_approving_over_twenty_logged_activities_fails(self):
 
         """
@@ -639,7 +638,7 @@ class LoggedActivityApprovalTestCase(BaseTestCase):
         self.successops_role.save()
         self.payload = dict(
             status='approved',
-            loggedActivitiesIds=['i' for count in range(0,21)]
+            loggedActivitiesIds=['i' for count in range(0, 21)]
         )
 
         response = self.client.put(
@@ -651,9 +650,8 @@ class LoggedActivityApprovalTestCase(BaseTestCase):
         message = 'Sorry, you can not approve more than 20 logged_activities at a go'
         response_details = json.loads(response.get_data(as_text=True))
 
-        self.assertEqual(response.status_code, 406)
+        self.assertEqual(response.status_code, 403)
         self.assertEqual(response_details['message'], message)
-
 
     def test_approving_when_all_logged_activities_invalid_fails(self):
 
@@ -685,7 +683,6 @@ class LoggedActivityApprovalTestCase(BaseTestCase):
 class LoggedActivityRejectTestCase(BaseTestCase):
     """Test to check rejection of Logged activities by success ops"""
 
-
     def test_reject_logged_activities_successful(self):
 
         """
@@ -708,7 +705,6 @@ class LoggedActivityRejectTestCase(BaseTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response_details['message'], message)
         self.assertEqual(response_details['data']['status'], 'rejected')
-
 
     def test_reject_invalid_logged_activities_unsuccessful(self):
 
@@ -749,8 +745,9 @@ class LoggedActivityRejectTestCase(BaseTestCase):
         message = 'This logged activity is either in-review, approved or already rejected'
         response_details = json.loads(response.get_data(as_text=True))
 
-        self.assertEqual(response.status_code, 406)
+        self.assertEqual(response.status_code, 403)
         self.assertEqual(response_details['message'], message)
+
 
 class DeleteLoggedActivityTestCase(BaseTestCase):
     """Delete logged activity test cases."""

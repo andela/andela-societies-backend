@@ -47,7 +47,8 @@ class RoleAPI(Resource):
         else:
             search_term = request.args.get('q')
             if search_term:
-                role = Role.query.filter_by(name=search_term).first()
+                role = Role.query.filter(Role.name.ilike(
+                    f'%{search_term}%')).first()
                 return find_item(role)
             else:
                 roles = Role.query
@@ -67,7 +68,7 @@ class RoleAPI(Resource):
                                     400)
         if not role_query:
             return response_builder(dict(status="fail",
-                                    message="Role id/name must be provided."),
+                                         message="Role id/name must be provided."),
                                     400)
 
         return edit_role(payload, role_query)
@@ -79,17 +80,17 @@ class RoleAPI(Resource):
         """Delete a role."""
         if not role_query:
             return response_builder(
-                        dict(status="fail",
-                             message="Role id must be provided."), 400)
+                dict(status="fail",
+                     message="Role id must be provided."), 400)
 
         role = Role.query.get(role_query)
         if not role:
             return response_builder(dict(status="fail",
-                                    message="Role does not exist."), 404)
+                                         message="Role does not exist."), 404)
 
         role.delete()
         return response_builder(dict(status="success",
-                                message="Role deleted successfully."), 200)
+                                     message="Role deleted successfully."), 200)
 
 
 class SocietyRoleAPI(Resource):
@@ -106,8 +107,8 @@ class SocietyRoleAPI(Resource):
                 message="Executive for change must be provided"
             ), 400)
 
-        if not payload.get("role") and payload.get("society") and payload.get(
-                                                                    "name"):
+        if not (payload.get("role") and payload.get("society") and payload.get(
+                "name")):
             return response_builder(dict(
                 message="Role, society and individual for change "
                         "must be provided"
@@ -119,6 +120,11 @@ class SocietyRoleAPI(Resource):
         if not role_change:
             return response_builder(dict(
                 message="Create role to be appended.",
+                status="fail"
+            ), 404)
+        if not society:
+            return response_builder(dict(
+                message="Society not found",
                 status="fail"
             ), 404)
 
@@ -137,12 +143,12 @@ class SocietyRoleAPI(Resource):
 
         if not new_exec:
             return response_builder(dict(
-                message="New Executive member not found or does not" \
+                message="New Executive member not found or does not"
                         " belong to society.",
                 status="fail"
             ), 404)
 
-        # Remove the old role from the outgoing exceutive
+        # Remove the old role from the outgoing executive
         if not old_exec:
             return response_builder(dict(
                 message="Previous Executive not found.",
@@ -153,13 +159,12 @@ class SocietyRoleAPI(Resource):
             if role.uuid == role_change.uuid:
                 old_exec.roles.remove(role)
 
-        new_exec.roles.append(Role.query.filter_by(
-            name=payload.get("role")).first())
+        new_exec.roles.append(role_change)
         new_exec.save()
 
         return response_builder(dict(
             data=new_exec.serialize(),
-            message="{} has been appointed {} of {}".format(new_exec.name,
-                                payload.get("role"), society.name),
+            message="{} has been appointed {} of {}".format(
+                new_exec.name, payload.get("role"), society.name),
             status="success"
         ), 200)

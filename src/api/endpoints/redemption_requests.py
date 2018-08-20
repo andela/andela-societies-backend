@@ -5,9 +5,13 @@ from flask_restplus import Resource
 
 from api.utils.notifications.email_notices import send_email
 from api.utils.auth import token_required, roles_required
-from api.utils.helpers import find_item, paginate_items, response_builder
+from api.utils.helpers import (
+    find_item, paginate_items, response_builder, get_redemption_request
+)
 from api.utils.helpers import serialize_redmp
-from api.utils.marshmallow_schemas import redemption_request_schema
+from api.utils.marshmallow_schemas import (
+    redemption_request_schema, edit_redemption_request_schema
+)
 from api.utils.marshmallow_schemas import basic_info_schema, redemption_schema
 from ..models import Society, RedemptionRequest, Center
 
@@ -41,7 +45,7 @@ class PointRedemptionAPI(Resource):
                 message="Redemption request value exceeds your society's "
                         "remaining points",
                 status="fail"
-            ), 406)
+            ), 403)
 
         center = Center.query.filter_by(name=result.get('center')).first()
 
@@ -49,6 +53,7 @@ class PointRedemptionAPI(Resource):
             redemp_request = RedemptionRequest(
                 name=result.get('name'),
                 value=result.get('value'),
+                description=result.get('description'),
                 user=g.current_user,
                 center=center,
                 society=g.current_user.society
@@ -60,7 +65,7 @@ class PointRedemptionAPI(Resource):
             send_email.delay(
                 sender=current_app.config["SENDER_CREDS"],
                 subject="RedemptionRequest for {}".format(
-                                    g.current_user.society.name),
+                    g.current_user.society.name),
                 message="Redemption Request reason:{}."
                         "Redemption Request value: {} points".format(
                     redemp_request.name, redemp_request.value),
@@ -92,23 +97,23 @@ class PointRedemptionAPI(Resource):
                 status="fail"
             ), 400)
 
+        result, errors = edit_redemption_request_schema.load(payload)
+        if errors:
+            return response_builder(errors, 400)
+
         if not redeem_id:
             return response_builder(dict(
                 status="fail",
                 message="Redemption Request to be edited must be provided"),
                 400)
 
-        redemp_request = RedemptionRequest.query.filter_by(
-            uuid=redeem_id).first()
-        if not redemp_request:
-            return response_builder(dict(
-                status="fail",
-                message="RedemptionRequest does not exist."),
-                404)
+        redemp_request = get_redemption_request(redeem_id)
+        if not isinstance(redemp_request, RedemptionRequest):
+            return redemp_request
 
-        name = payload.get("name")
-        value = payload.get("value")
-        desc = payload.get("description")
+        name = result.get("name")
+        value = result.get("value")
+        desc = result.get("description")
 
         if name:
             redemp_request.name = name
@@ -128,7 +133,7 @@ class PointRedemptionAPI(Resource):
     @classmethod
     @token_required
     @roles_required(["finance", "cio", "society president", "vice president",
-                     "secretary"])
+                     "secretary, success ops"])
     def get(cls, redeem_id=None):
         """Get Redemption Requests."""
         if redeem_id:
@@ -138,30 +143,30 @@ class PointRedemptionAPI(Resource):
             search_term_name = request.args.get('society')
             if search_term_name:
                 society = Society.query.filter_by(
-                                        name=search_term_name).first()
+                    name=search_term_name).first()
                 if not society:
                     mes = f"Society with name:{search_term_name} not found"
                     return {"message": mes}, 400
                 redemp_request = RedemptionRequest.query.filter_by(
-                                                society_id=society.uuid)
+                    society_id=society.uuid)
                 return paginate_items(redemp_request)
 
             search_term_status = request.args.get('status')
             if search_term_status:
                 redemp_request = RedemptionRequest.query.filter_by(
-                                        status=search_term_status)
+                    status=search_term_status)
                 return paginate_items(redemp_request)
 
             search_term_name = request.args.get('name')
             if search_term_name:
                 redemp_request = RedemptionRequest.query.filter_by(
-                                        name=search_term_name)
+                    name=search_term_name)
                 return paginate_items(redemp_request)
 
             search_term_center = request.args.get("center")
             if search_term_center:
                 center_query = Center.query.filter_by(
-                            name=search_term_center).first()
+                    name=search_term_center).first()
                 if not center_query:
                     mes = f"country with name:{search_term_center} not found"
                     return {"message": mes}, 400
@@ -183,11 +188,9 @@ class PointRedemptionAPI(Resource):
                 status="fail",
                 message="RedemptionRequest id must be provided."), 400)
 
-        redemp_request = RedemptionRequest.query.get(redeem_id)
-        if not redemp_request:
-            return response_builder(dict(
-                status="fail",
-                message="RedemptionRequest does not exist."), 404)
+        redemp_request = get_redemption_request(redeem_id)
+        if not isinstance(redemp_request, RedemptionRequest):
+            return redemp_request
 
         redemp_request.delete()
         return response_builder(dict(
@@ -217,6 +220,10 @@ class RedemptionRequestNumeration(Resource):
                 status="fail"
             ), 400)
 
+        result, errors = edit_redemption_request_schema.load(payload)
+        if errors:
+            return response_builder(errors, 400)
+
         if not redeem_id:
             return response_builder(dict(
                 status="fail",
@@ -230,9 +237,9 @@ class RedemptionRequestNumeration(Resource):
                 message="Resource does not exist."
             ), 404)
 
-        status = payload.get("status")
-        comment = payload.get("comment")
-        rejection_reason = payload.get("rejection")
+        status = result.get("status")
+        comment = result.get("comment")
+        rejection_reason = result.get("rejection")
 
         if status == "approved":
             user = redemp_request.user
@@ -254,14 +261,16 @@ class RedemptionRequestNumeration(Resource):
                     redemp_request.user.society.name),
                 message="Redemption Request on {} has been approved. Click the link below"
                         " <a href='{}'>here</a> to view more details.".format(
-                    redemp_request.name, request.host_url + 'api/v1/societies/redeem/' + redeem_id),
+                    redemp_request.name, request.host_url + 'api/v1/societies/redeem/' +
+                    redeem_id
+                ),
                 recipients=[finance_email]
             )
 
             send_email.delay(
                 sender=current_app.config["SENDER_CREDS"],
                 subject="RedemptionRequest for {}".format(
-                                    redemp_request.user.society.name),
+                    redemp_request.user.society.name),
                 message="Redemption Request on {} has been approved. Finance"
                 " will be in touch.".format(redemp_request.name),
                 recipients=[redemp_request.user.email]
@@ -273,7 +282,7 @@ class RedemptionRequestNumeration(Resource):
             send_email.delay(
                 sender=current_app.config["SENDER_CREDS"],
                 subject="RedemptionRequest for {}".format(
-                                    redemp_request.user.society.name),
+                    redemp_request.user.society.name),
                 message="This redemption request has been rejected for this"
                         " reason:".format(redemp_request.rejection),
                 recipients=[redemp_request.user.email]
@@ -283,7 +292,7 @@ class RedemptionRequestNumeration(Resource):
             send_email.delay(
                 sender=current_app.config["SENDER_CREDS"],
                 subject="More Info on RedemptionRequest for {}".format(
-                                    redemp_request.user.society.name),
+                    redemp_request.user.society.name),
                 message=comment,
                 recipients=[redemp_request.user.email]
             )  # cover for requesting more information
@@ -351,7 +360,7 @@ class RedemptionRequestFunds(Resource):
             send_email.delay(
                 sender=current_app.config["SENDER_CREDS"],
                 subject="RedemptionRequest for {}".format(
-                                    redemp_request.user.society.name),
+                    redemp_request.user.society.name),
                 message="Redemption Request on {} has been completed. Finance"
                 " has wired the money to the reciepient.".format(
                     redemp_request.name),

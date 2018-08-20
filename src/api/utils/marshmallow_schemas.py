@@ -81,7 +81,8 @@ class LoggedActivitySchema(BaseSchema):
 
     status = fields.String()
     points = fields.Integer(attribute='value')
-    date = fields.Date(attribute='activity_date', dump_to='activityDate', load_from='activityDate')
+    date = fields.Date(attribute='activity_date',
+                       dump_to='activityDate', load_from='activityDate')
     owner = fields.String(attribute='user.name')
     owner_photo = fields.Url(attribute='user.photo')
     activity_id = fields.String(dump_to='activityId', load_from='activityId')
@@ -205,8 +206,8 @@ class LogEditActivitySchema(BaseSchema):
                     'error'
                 )
 
-        if data.get('activity_type_id') and not(data.get('date')
-                                                and data.get('description')):
+        if data.get('activity_type_id') and not (data.get('date') and
+                                                 data.get('description')):
             raise ValidationError(
                 'Please send a date and description', 'error'
             )
@@ -283,12 +284,20 @@ class RedemptionRequestSchema(BaseSchema):
         })
 
 
+class EditRedemptionRequestSchema(BaseSchema):
+    """Edit RedemptionRequest validator."""
+    name = fields.String()
+    value = fields.Integer()
+    status = fields.String()
+    comment = fields.String()
+    rejection_reason = fields.String(load_from='rejection')
+
+
 class RedemptionSchema(BaseSchema):
     """Redemption serializer/validator."""
 
-    status = fields.String(dump_only=True, dump_to='status',
-                           validate=[validate.Length(max=36)])
-    value = fields.Integer(dump_only=True, dump_to='value')
+    status = fields.String(dump_only=True)
+    value = fields.Integer(dump_only=True)
 
 
 activity_types_schema = ActivityTypesSchema(many=True)
@@ -308,4 +317,5 @@ user_schema = UserSchema()
 basic_info_schema = BaseSchema()
 society_schema = SocietySchema()
 redemption_request_schema = RedemptionRequestSchema()
+edit_redemption_request_schema = EditRedemptionRequestSchema()
 redemption_schema = RedemptionSchema()

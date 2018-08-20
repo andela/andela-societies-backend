@@ -28,15 +28,15 @@ def centre_societies_roles_data_dev():
 
     # roles available
     roles = (
-            Role(uuid="-KXGy1EB1oimjQgFim6F", name="success"),
-            Role(uuid="-KXGy1EB1oimjQgFim6L", name="finance"),
-            Role(uuid="-KXGy1EB1oimjQgFim6C", name="fellow"),
-            Role(uuid="-KkLwgbeJUO0dQKsEk1i", name="success ops"),
-            Role(uuid="-KiihfZoseQeqC6bWTau", name="andelan"),
-            Role(name="society president"),
-            Role(name="society vice president"),
-            Role(name="society secretary")
-         )
+        Role(uuid="-KXGy1EB1oimjQgFim6F", name="success"),
+        Role(uuid="-KXGy1EB1oimjQgFim6L", name="finance"),
+        Role(uuid="-KXGy1EB1oimjQgFim6C", name="fellow"),
+        Role(uuid="-KkLwgbeJUO0dQKsEk1i", name="success ops"),
+        Role(uuid="-KiihfZoseQeqC6bWTau", name="andelan"),
+        Role(name="society president"),
+        Role(name="society vice president"),
+        Role(name="society secretary")
+    )
 
     return (roles, nairobi, kampala, lagos, phoenix, istelle, sparks, invictus)
 
@@ -58,8 +58,8 @@ def get_andela_api_cohort_location_data():
                                    public_key,
                                    "andela.com",
                                    "accounts.andela.com")
-            print('\n\n Getting Data from API : ', payload\
-                  .get('UserInfo').get('first_name'))
+            print('\n\n Getting Data from API : ',
+                  payload.get('UserInfo').get('first_name'))
 
             Bearer = 'Bearer '
             headers = {'Authorization': Bearer + authorization_token}
@@ -103,7 +103,8 @@ def activity_types_data():
     interview = ActivityType(name="Bootcamp Interviews",
                              description="Interviewing candidate for a fellow"
                              " recruiting event",
-                             value=20)
+                             value=20,
+                             supports_multiple_participants=True)
     open_saturdays = ActivityType(name="Open Saturdays Guides",
                                   description="Guide applicants with the"
                                   " recruitment team during open Saturdays",
@@ -142,8 +143,8 @@ def activity_types_data():
                                      " Andela e.g. via SheLovesCode",
                                      value=250)
     return (
-            interview, open_saturdays, tech_event, open_source, hackathon,
-            blog, app, mentor, marketing, press, outside_mentoring)
+        interview, open_saturdays, tech_event, open_source, hackathon,
+        blog, app, mentor, marketing, press, outside_mentoring)
 
 
 def test_dev_user_seed_data(args):
@@ -152,7 +153,8 @@ def test_dev_user_seed_data(args):
      roles) = args
 
     # cohorts
-    cohort_14_ke = Cohort(name='Cohort 14 Test', center=nairobi)
+    cohort_14_ke = Cohort(name='Cohort 14 Test', center=nairobi,
+                          society=phoenix)
     # users
     # member
     member = User(
@@ -165,7 +167,7 @@ def test_dev_user_seed_data(args):
         cohort=cohort_14_ke,
         society=phoenix
     )
-    member.roles.append(roles[2])
+    member.roles.extend([roles[2], roles[4]])
 
     # president
     president = User(
@@ -178,7 +180,7 @@ def test_dev_user_seed_data(args):
         cohort=cohort_14_ke,
         society=phoenix
     )
-    president.roles.append(roles[5])
+    president.roles.extend([roles[2], roles[4], roles[5]])
 
     # success ops
     success_ops = User(
@@ -189,7 +191,7 @@ def test_dev_user_seed_data(args):
         email="test.successops.societies@andela.com",
         center=nairobi
     )
-    success_ops.roles.append(roles[3])
+    success_ops.roles.extend([roles[3], roles[4]])
 
     return (member, president, success_ops)
 
@@ -229,6 +231,7 @@ def test_dev_activities_seed_data(args):
         reviewer_id=president.uuid,
         activity_date=python_hackathon.activity_date
     )
+    phoenix._total_points = hackathon_points.value
     interview_points = LoggedActivity(
         value=interview.value * 5,
         activity=interview_2017,
@@ -287,7 +290,7 @@ def generete_initial_data_run_time_env():
         president, member, success_ops,
         hackathon, interview, open_saturdays,
         phoenix, sparks, invictus
-     )
+    )
 
     (hackathon_points, interview_points,
      open_saturday_points) = test_dev_activities_seed_data(args)
