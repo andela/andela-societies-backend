@@ -119,6 +119,10 @@ Seed the database.
 ```
 $ python manage.py db seed
 ```
+## Running the sandbox
+Follow the instructions on this [link](docker/dev/sandbox.md) to run it.
+
+In case of any errors ask the DevOps Engineer in the team
 
 ## Set Up Notifications Package
  - [Check this out to set up the Notifications Package](src/api/utils/notifications/README_notifications.md)
