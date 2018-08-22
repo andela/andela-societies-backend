@@ -1,0 +1,42 @@
+version: '3.0'
+
+services:
+  backend:
+    build:
+      context: ../../
+      dockerfile: docker/dev/Dockerfile
+    image: soc-backend:sandbox
+    volumes:
+      - ../../logs:/var/log
+    depends_on:
+      - database
+    environment:
+      - POSTGRES_PASSWORD=soc
+      - POSTGRES_USER=soc
+      - POSTGRES_DB=soc-sandbox
+      - DATABASE_URL=postgresql://soc:soc@database:5432/soc-sandbox
+      - PRODUCTION_SEED=True
+      - APP_SETTINGS=Production
+    env_file:
+      - ../../src/.env
+    command: gunicorn -b 0.0.0.0:4022 --error-logfile /var/log/error.log --access-logfile /var/log/access.log manage:app
+    ports:
+      - "4022:4022"
+    networks:
+      - soc-network
+
+
+  database:
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=soc
+      - POSTGRES_USER=soc
+      - POSTGRES_DB=soc-sandbox
+    ports:
+      - "4023:5432"
+    networks:
+      - soc-network
+
+networks:
+  soc-network:

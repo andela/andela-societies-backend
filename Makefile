@@ -5,6 +5,7 @@ ORG_NAME ?= bench-projects
 DOCKER_TEST_COMPOSE_FILE := docker/test/docker-compose.yml
 DOCKER_REL_COMPOSE_FILE := docker/release/docker-compose.yml
 DOCKER_DB_COMPOSE_FILE := docker/database/docker-compose.yml
+DOCKER_DEV_COMPOSE_FILE := docker/dev/docker-compose.yml
 
 # Docker compose project names
 DOCKER_TEST_PROJECT := "$(PROJECT_NAME)test"
@@ -26,7 +27,7 @@ endif
 help:
 	@echo ''
 	@echo 'Usage:'
-	@echo '${YELLOW} make ${RESET} ${GREEN}<target> [options]${RESET}'
+	@echo "${YELLOW} make ${RESET} ${GREEN}<target> [options]${RESET}"
 	@echo ''
 	@echo 'Targets:'
 	@awk '/^[a-zA-Z\-\_0-9]+:/ { \
@@ -44,6 +45,57 @@ help:
 env_file:
 	@ chmod +x scripts/utils.sh && scripts/utils.sh addEnvFile
 	@ echo " "
+
+## Start the backend application
+start:status
+	@ echo "${YELLOW}====> Building the andela societies backend image.${WHITE}"
+	@ docker-compose -f $(DOCKER_DEV_COMPOSE_FILE) build --no-cache backend
+	@ echo "${GREEN}====> Image built. Image name is \"soc-backend:sandbox\"${WHITE}"
+	@ echo "${YELLOW}====> Carrying out healthchecks on the database${WHITE}"
+	@ docker-compose -p soc -f $(DOCKER_DEV_COMPOSE_FILE) run --rm backend psql-h database
+	@ echo "${GREEN}====> Database is up${WHITE}"
+	@ echo "${YELLOW}====> Upgrading the database${WHITE}"
+	@ docker-compose -p soc -f $(DOCKER_DEV_COMPOSE_FILE) run --rm backend python manage.py db upgrade -d prod-stag-migrations
+	@ echo "${GREEN}====> Database upgraded${WHITE}"
+	@ echo "${YELLOW}====> Starting the application${WHITE}"
+	@ docker-compose -p soc -f $(DOCKER_DEV_COMPOSE_FILE) up --force-recreate -d backend
+	@ echo "${YELLOW}====> Application is running at \"http://api-soc-sandbox.andela.com:4022/\"${WHITE}"
+	@ open http://api-soc-sandbox.andela.com:4022/
+
+
+## Manage the backend host and checking the frontend application
+status:
+	@ chmod +x scripts/sandbox.sh && scripts/sandbox.sh checkDocker
+	@ echo "${YELLOW}====> Checking the frontend containers${WHITE}"
+	@ chmod +x scripts/sandbox.sh && scripts/sandbox.sh checkFrontend
+	@ echo "${YELLOW}====> End of frontend check${WHITE}"
+	@ echo "${YELLOW}====> Managing host for the backend${WHITE}"
+	@ chmod +x scripts/sandbox.sh && scripts/sandbox.sh configureHosts
+
+## Stop the backend application
+stop:
+	@ echo "${YELLOW}====> Stopping backend and database containers if they are running${WHITE}"
+	@ docker-compose -p soc -f $(DOCKER_DEV_COMPOSE_FILE) stop
+	@ echo "${YELLOW}====> Removing running containers for the backend if stopped containers exist${WHITE}"
+	@ docker-compose -p soc -f $(DOCKER_DEV_COMPOSE_FILE) rm -f
+	@ echo "${YELLOW}====> Removing image for the backend application${WHITE}"
+	@ docker images -q --filter "reference=soc-backend:sandbox" | xargs -I ARGS docker image rm ARGS
+	@ echo "${GREEN}====> Container and image removed.${WHITE}"
+
+## Destroy the application together with the network and postgres database image
+tear:stop
+	@ echo "${YELLOW}====> Removing postgres image${WHITE}"
+	@ docker images -q --filter "reference=postgres:latest" | xargs -I ARGS docker image rm ARGS
+	@ echo "${GREEN}====> Postgres image removed.${WHITE}"
+	@ echo "${YELLOW}====> Delete shared network for the frontend and the backend.${WHITE}"
+	@ docker network ls -q --filter "name=soc_soc-network" | xargs -I ARGS docker network rm ARGS
+	@ echo "${GREEN}====> Resources destroyed.${WHITE}"
+
+
+seed:
+	@ docker exec -it soc_backend_1 python manage.py seed
+	@ docker exec -it soc_backend_1 ./manage.py link_society_cohort_csv_data
+
 
 ## Upgrade the application database
 upgrade:
