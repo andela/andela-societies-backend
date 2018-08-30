@@ -4,6 +4,7 @@ from flask import Flask, jsonify
 from flask_cors import CORS
 from flask_restful import Api
 
+from api.endpoints.logged_activities import logged_activities_bp
 from api.endpoints.activity_types import ActivityTypesAPI
 from api.endpoints.activities import ActivitiesAPI
 from api.endpoints.societies import SocietyResource, AddCohort
@@ -11,13 +12,6 @@ from api.endpoints.redemption_requests import PointRedemptionAPI
 from api.endpoints.redemption_requests import RedemptionRequestNumeration
 from api.endpoints.redemption_requests import RedemptionRequestFunds
 from api.endpoints.users import UserAPI
-from api.endpoints.logged_activities import (UserLoggedActivitiesAPI,
-                                             SecretaryReviewLoggedActivityAPI)
-from api.endpoints.logged_activities import LoggedActivitiesAPI
-from api.endpoints.logged_activities import LoggedActivityAPI
-from api.endpoints.logged_activities import (LoggedActivityApprovalAPI,
-                                             LoggedActivityRejectionAPI,
-                                             LoggedActivityInfoAPI)
 from api.endpoints.roles import RoleAPI, SocietyRoleAPI
 from api.models import db
 
@@ -65,57 +59,8 @@ def create_app(environment="Production"):
         endpoint='activity_types_detail'
     )
 
-    # user logged activities
-    api.add_resource(
-        LoggedActivitiesAPI,
-        '/api/v1/logged-activities', '/api/v1/logged-activities/',
-        endpoint='logged_activities'
-    )
-    api.add_resource(
-        LoggedActivityAPI,
-        '/api/v1/logged-activities/<string:logged_activity_id>',
-        '/api/v1/logged-activities/<string:logged_activity_id>/',
-        endpoint='logged_activity'
-    )
-
-    api.add_resource(
-        UserLoggedActivitiesAPI,
-        '/api/v1/users/<string:user_id>/logged-activities',
-        '/api/v1/users/<string:user_id>/logged-activities/',
-        endpoint='user_logged_activities'
-    )
-
-    # society secretary logged Activity endpoint
-    api.add_resource(
-        SecretaryReviewLoggedActivityAPI,
-        '/api/v1/logged-activities/review/<string:logged_activity_id>',
-        '/api/v1/logged-activities/review/<string:logged_activity_id>/',
-        endpoint='secretary_logged_activity'
-    )
-
-    # Success Ops Requesting more informaton on a logged activity
-    api.add_resource(
-        LoggedActivityInfoAPI,
-        '/api/v1/logged-activities/info/<string:logged_activity_id>',
-        '/api/v1/logged-activities/info/<string:logged_activity_id>/',
-        endpoint='info_on_logged_activity'
-    )
-
-    # Success-Ops Approval of LoggedActivities
-    api.add_resource(
-        LoggedActivityApprovalAPI,
-        "/api/v1/logged-activities/approve",
-        "/api/v1/logged-activities/approve/",
-        endpoint="approve_logged_activities"
-    )
-
-    # Success-Ops Rejection of LoggedActivities
-    api.add_resource(
-        LoggedActivityRejectionAPI,
-        "/api/v1/logged-activity/reject/<string:logged_activity_id>",
-        "/api/v1/logged-activity/reject/<string:logged_activity_id>/",
-        endpoint="reject_logged_activity"
-    )
+    # register logged activities blueprint
+    app.register_blueprint(logged_activities_bp, url_prefix='/api/v1')
 
     # user endpoints
     api.add_resource(

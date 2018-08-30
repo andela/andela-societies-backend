@@ -10,9 +10,8 @@ from jose import jwt
 try:
     from app import create_app
     from api.models import (Activity, ActivityType, Cohort, Center,
-                            LoggedActivity, Society, User, Role,
-                            RedemptionRequest,
-                            db)
+                            Society, User, Role, RedemptionRequest, db)
+    from api.endpoints.logged_activities.models import LoggedActivity
 except ModuleNotFoundError:
     # this will enable us to run individual test files
     # pytest <path to file>
@@ -26,9 +25,8 @@ except ModuleNotFoundError:
 
     from app import create_app
     from api.models import (Activity, ActivityType, Cohort, Center,
-                            LoggedActivity, Society, User, Role,
-                            RedemptionRequest,
-                            db)
+                            Society, User, Role, RedemptionRequest, db)
+    from api.endpoints.logged_activities.models import LoggedActivity
 
 
 class BaseTestCase(TestCase):
