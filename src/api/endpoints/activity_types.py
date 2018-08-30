@@ -102,7 +102,7 @@ class ActivityTypesAPI(Resource):
             target_activity_type.description = payload.get("description")
         if payload.get("value"):
             target_activity_type.value = payload.get("value")
-        if payload.get("supports_multiple_participant"):
+        if payload.get("supports_multiple_participants"):
             target_activity_type.supports_multiple_participants =\
                 payload.get("supports_multiple_participants")
         return response_builder(dict(

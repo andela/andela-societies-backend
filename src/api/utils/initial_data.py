@@ -9,16 +9,17 @@ import requests
 from jose import ExpiredSignatureError, JWTError
 
 from api.utils.auth import verify_token
-from api.models import (ActivityType, Activity, Center, LoggedActivity,
+from api.models import (ActivityType, Activity, Center,
                         Society, User, Cohort, Role)
+from api.endpoints.logged_activities.models import LoggedActivity
 
 
-def centre_societies_roles_data_dev():
+def centre_societies_roles_data_dev(production=False):
     """Generate center societies and role data"""
     # test centers
-    nairobi = Center(name='Nairobi')
-    kampala = Center(name='Kampala')
-    lagos = Center(name='Lagos')
+    nairobi = Center(name='nairobi')
+    kampala = Center(name='kampala')
+    lagos = Center(name='lagos')
 
     # societies
     phoenix = Society(name="phoenix")
@@ -38,7 +39,11 @@ def centre_societies_roles_data_dev():
         Role(name="society secretary")
     )
 
-    return (roles, nairobi, kampala, lagos, phoenix, istelle, sparks, invictus)
+    return (
+        roles, nairobi, kampala, lagos, phoenix, istelle, sparks, invictus
+    ) if not production else (
+        roles, phoenix, istelle, sparks, invictus
+    )
 
 
 # setup dev user info to access Andela API
@@ -255,16 +260,9 @@ def generete_initial_data_run_time_env():
     """Sequential generate data when called.
     Closure: provides the required objects for other functions.
     """
-
-    # generete dev data cohort, societies, roles
-    (roles, nairobi, kampala, lagos, phoenix,
-     istelle, sparks, invictus) = centre_societies_roles_data_dev()
-    centers = (nairobi, kampala, lagos)
-    societies = (phoenix, istelle, sparks, invictus)
-
     api_cohorts = api_centers = ()
-    enviroment = os.getenv("APP_SETTINGS")
-    if enviroment and not enviroment.lower() == 'testing':
+    environment = os.getenv("APP_SETTINGS")
+    if environment and not environment.lower() == 'testing':
         # generate andela api data: cohorts, centers
         api_cohorts, api_centers = get_andela_api_cohort_location_data()
 
@@ -276,30 +274,39 @@ def generete_initial_data_run_time_env():
                       hackathon, blog, app, mentor, marketing, press,
                       outside_mentoring)
 
-    # generate user data
-    args = (
-        nairobi,
-        phoenix,
-        roles
-    )
-    (member, president, success_ops) = test_dev_user_seed_data(args)
-    users = (member, president, success_ops)
+    roles = centers = users = logged_activities = ()
+    if environment and environment.lower() == 'production':
+        (roles, phoenix, istelle,
+         sparks, invictus) = centre_societies_roles_data_dev(True)
+    else:
+        # generete dev data cohort, societies, roles
+        (roles, nairobi, kampala, lagos, phoenix,
+         istelle, sparks, invictus) = centre_societies_roles_data_dev()
+        centers = (nairobi, kampala, lagos)
 
-    # dev logged activities
-    args = (
-        president, member, success_ops,
-        hackathon, interview, open_saturdays,
-        phoenix, sparks, invictus
-    )
+        # generate user data
+        args = (
+            nairobi,
+            phoenix,
+            roles
+        )
+        (member, president, success_ops) = test_dev_user_seed_data(args)
+        users = (member, president, success_ops)
 
-    (hackathon_points, interview_points,
-     open_saturday_points) = test_dev_activities_seed_data(args)
-    logged_activities = (hackathon_points, interview_points,
-                         open_saturday_points)
+        # dev logged activities
+        args = (
+            president, member, success_ops,
+            hackathon, interview, open_saturdays,
+            phoenix, sparks, invictus
+        )
 
-    production_data = api_centers + api_cohorts + roles + societies
-    dev_data = production_data + centers + activity_types + users + \
-        logged_activities
+        logged_activities = test_dev_activities_seed_data(args)
+
+    societies = (phoenix, istelle, sparks, invictus)
+
+    production_data = api_centers + api_cohorts + roles + societies + \
+        activity_types
+    dev_data = production_data + centers + users + logged_activities
 
     return dict(
         production_data=production_data,
