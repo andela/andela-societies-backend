@@ -4,7 +4,7 @@ import re
 from flask import Flask, render_template_string
 
 from config import configuration
-from api.models import Role, LoggedActivity, db
+from api.models import Role, db
 
 
 SUCCESS_OPS_MESSAGE = '''
@@ -52,6 +52,7 @@ def generate_success_ops_pending_activities_emails(app):
     Get pending logged activities and genrate email for each success ops
     member
     '''
+    from api.endpoints.logged_activities.models import LoggedActivity
     with app.app_context():
         success_ops_role = Role.query.filter_by(
             name='success ops'

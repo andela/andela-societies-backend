@@ -9,66 +9,14 @@ from flask import (
     Response, current_app, jsonify, request, url_for, g
 )
 from api.models import (Activity, ActivityType, Cohort, Center, Role, Society,
-                        RedemptionRequest, LoggedActivity, db)
+                        RedemptionRequest, db)
 from api.utils.marshmallow_schemas import basic_info_schema, redemption_schema
 
-
-ParsedResult = namedtuple(
-    'ParsedResult',
-    ['activity', 'activity_type', 'activity_date', 'activity_value']
-)
 
 PaginatedResult = namedtuple(
     'PaginatedResult',
     ['data', 'count', 'page', 'pages', 'previous_url', 'next_url']
 )
-
-
-def parse_log_activity_fields(result):
-    """Parse the fields of the Log Activity Fields."""
-    if result.get('activity_id'):
-        activity = Activity.query.get(result['activity_id'])
-        if not activity:
-            return response_builder(dict(message='Invalid activity id'), 422)
-
-        activity_type = activity.activity_type
-        if activity_type.supports_multiple_participants and \
-                not (result.get('no_of_participants') and
-                     result.get('description')):
-            return response_builder(dict(
-                message='Please send the number of interviewees and'
-                ' their names in the description'
-            ), 400)
-
-        activity_date = activity.activity_date
-        time_difference = datetime.date.today() - activity_date
-    else:
-        activity_date = result['date']
-        if activity_date > datetime.date.today():
-            return response_builder(dict(message='Invalid activity date'), 422)
-
-        activity_type = ActivityType.query.get(
-            result['activity_type_id']
-        )
-        if not activity_type:
-            return response_builder(dict(message='Invalid activity type id'),
-                                    422)
-        activity = None
-        time_difference = datetime.date.today() - activity_date
-
-    if time_difference.days > 30:
-        return response_builder(dict(
-            message='You\'re late. That activity'
-            ' happened more than 30 days ago'
-        ), 422)
-
-    activity_value = activity_type.value if not \
-        activity_type.supports_multiple_participants else \
-        activity_type.value * result['no_of_participants']
-
-    return ParsedResult(
-        activity, activity_type, activity_date, activity_value
-    )
 
 
 def paginate_items(fetched_data, serialize=True):

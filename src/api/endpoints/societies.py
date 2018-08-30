@@ -6,10 +6,11 @@ from flask_restful import Resource
 from api.utils.auth import roles_required, token_required
 from api.utils.helpers import paginate_items, response_builder
 from api.utils.marshmallow_schemas import (base_schema, cohort_schema,
-                                           society_schema,
-                                           user_logged_activities_schema)
-
-from ..models import Cohort, LoggedActivity, Society
+                                           society_schema)
+from api.endpoints.logged_activities.marshmallow_schemas import \
+    user_logged_activities_schema
+from ..models import Cohort, Society
+from api.endpoints.logged_activities.models import LoggedActivity
 
 
 class SocietyResource(Resource):
@@ -32,7 +33,7 @@ class SocietyResource(Resource):
                     status="fail",
                     message="Name, color scheme and logo are required"
                             " to create a society."
-                    ), 400)
+                ), 400)
 
             # if no errors occur in assigning above
             society = Society(
@@ -121,8 +122,8 @@ class SocietyResource(Resource):
                         errors=e), 500)
 
             return response_builder(dict(
-                                status="fail",
-                                message="Society does not exist."), 404)
+                status="fail",
+                message="Society does not exist."), 404)
 
         # if payload does not exist
         return response_builder(dict(
@@ -147,8 +148,8 @@ class SocietyResource(Resource):
 
         society.delete()
         return response_builder(dict(
-                status="success",
-                message="Society deleted successfully."), 200)
+            status="success",
+            message="Society deleted successfully."), 200)
 
 
 class AddCohort(Resource):
@@ -196,9 +197,9 @@ class AddCohort(Resource):
 
         cohort_data = cohort_schema.dump(cohort).data
         cohort_meta_data = {
-                'society': base_schema.dump(society).data,
-                'center': base_schema.dump(cohort.center).data
-                }
+            'society': base_schema.dump(society).data,
+            'center': base_schema.dump(cohort.center).data
+        }
         cohort_data['meta'] = cohort_meta_data
 
         return response_builder(dict(

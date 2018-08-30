@@ -1,7 +1,7 @@
 """RedemptionRequest Module."""
 
 from flask import request, g, current_app
-from flask_restplus import Resource
+from flask_restful import Resource
 
 from api.utils.notifications.email_notices import send_email
 from api.utils.auth import token_required, roles_required
@@ -133,7 +133,7 @@ class PointRedemptionAPI(Resource):
     @classmethod
     @token_required
     @roles_required(["finance", "cio", "society president", "vice president",
-                     "secretary, success ops"])
+                     "secretary", "success ops"])
     def get(cls, redeem_id=None):
         """Get Redemption Requests."""
         if redeem_id:
