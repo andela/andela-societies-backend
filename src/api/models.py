@@ -142,7 +142,7 @@ class User(Base):
     cohort_id = db.Column(db.String, db.ForeignKey('cohorts.uuid'))
 
     logged_activities = db.relationship(
-        'LoggedActivity', backref='user', lazy='dynamic',
+        'LoggedActivity', back_populates='user', lazy='dynamic',
         order_by='desc(LoggedActivity.created_at)'
     )
     created_activities = db.relationship('Activity',
@@ -177,8 +177,9 @@ class Society(Base):
     _used_points = db.Column(db.Integer, default=0)
 
     members = db.relationship('User', backref='society', lazy='dynamic')
-    logged_activities = db.relationship('LoggedActivity', backref='society',
-                                        lazy='dynamic')
+    logged_activities = db.relationship(
+        'LoggedActivity', back_populates='society', lazy='dynamic'
+    )
     cohorts = db.relationship('Cohort', backref='society', lazy='dynamic')
     redemptions = db.relationship('RedemptionRequest', backref='society',
                                   lazy='dynamic')
@@ -215,6 +216,10 @@ class ActivityType(Base):
     supports_multiple_participants = db.Column(db.Boolean, default=False)
 
     activities = db.relationship('Activity', backref='activity_type')
+    logged_activities = db.relationship(
+        'LoggedActivity', back_populates='activity_type', lazy='dynamic',
+        order_by='desc(LoggedActivity.created_at)'
+    )
 
 
 class Activity(Base):
@@ -228,31 +233,10 @@ class Activity(Base):
     added_by_id = db.Column(db.String,
                             db.ForeignKey('users.uuid'), nullable=False)
 
-
-class LoggedActivity(Base):
-    """Models Activities logged by fellows."""
-
-    __tablename__ = 'logged_activities'
-    value = db.Column(db.Integer, nullable=False)
-    status = db.Column(db.String, default='in review')
-    approved_at = db.Column(db.DateTime)
-    activity_date = db.Column(db.Date)
-    redeemed = db.Column(db.Boolean, nullable=False, default=False)
-    no_of_participants = db.Column(db.Integer)
-
-    approver_id = db.Column(db.String)
-    reviewer_id = db.Column(db.String)
-    activity_type_id = db.Column(
-        db.String, db.ForeignKey('activity_types.uuid'), nullable=False
+    logged_activities = db.relationship(
+        'LoggedActivity', back_populates='activity', lazy='dynamic',
+        order_by='desc(LoggedActivity.created_at)'
     )
-    user_id = db.Column(db.String, db.ForeignKey('users.uuid'), nullable=False)
-    society_id = db.Column(
-        db.String, db.ForeignKey('societies.uuid'), nullable=False,
-    )
-    activity_id = db.Column(db.String, db.ForeignKey('activities.uuid'))
-
-    activity = db.relationship('Activity', uselist=False)
-    activity_type = db.relationship('ActivityType', uselist=False)
 
 
 class RedemptionRequest(Base):
