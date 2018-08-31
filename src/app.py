@@ -5,9 +5,10 @@ from flask_cors import CORS
 from flask_restful import Api
 
 from api.endpoints.logged_activities import logged_activities_bp
+from api.endpoints.cohorts import cohorts_bp
+from api.endpoints.societies import societies_bp
 from api.endpoints.activity_types import ActivityTypesAPI
 from api.endpoints.activities import ActivitiesAPI
-from api.endpoints.societies import SocietyResource, AddCohort
 from api.endpoints.redemption_requests import PointRedemptionAPI
 from api.endpoints.redemption_requests import RedemptionRequestNumeration
 from api.endpoints.redemption_requests import RedemptionRequestFunds
@@ -62,23 +63,18 @@ def create_app(environment="Production"):
     # register logged activities blueprint
     app.register_blueprint(logged_activities_bp, url_prefix='/api/v1')
 
+    # register cohorts blueprint
+    app.register_blueprint(cohorts_bp, url_prefix='/api/v1')
+
+    # register societies blueprint
+    app.register_blueprint(societies_bp, url_prefix='/api/v1')
+
     # user endpoints
     api.add_resource(
         UserAPI,
         '/api/v1/users/<string:user_id>',
         '/api/v1/users/<string:user_id>/',
         endpoint='user_info'
-    )
-
-    # society endpoints
-    api.add_resource(
-        SocietyResource,
-        "/api/v1/societies",
-        "/api/v1/societies/",
-        "/api/v1/societies/<string:society_id>",
-        "/api/v1/societies/<string:society_id>/",
-
-        endpoint="society"
     )
 
     # redemption endpoints
@@ -106,11 +102,6 @@ def create_app(environment="Production"):
         "/api/v1/societies/redeem/funds/<string:redeem_id>",
         "/api/v1/societies/redeem/funds/<string:redeem_id>/",
         endpoint="redemption_request_funds"
-    )
-
-    # Add Cohort to society
-    api.add_resource(
-        AddCohort, "/api/v1/societies/cohorts"
     )
 
     # role endpoints

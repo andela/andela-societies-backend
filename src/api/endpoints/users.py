@@ -2,7 +2,8 @@
 from flask import g
 from flask_restful import Resource
 
-from api.models import User, Cohort, Center
+from api.models import User, Center
+from api.endpoints.cohorts.models import Cohort
 from api.utils.auth import token_required
 from api.utils.helpers import add_extra_user_info
 from api.utils.marshmallow_schemas import user_schema, basic_info_schema
@@ -22,7 +23,7 @@ class UserAPI(Resource):
         if user:
             user_information, _ = user_schema.dump(user)
             user_information['roles'], _ = basic_info_schema.dump(
-                                            user.roles, many=True)
+                user.roles, many=True)
             status_code = 200
         else:
             _, _, user_info = add_extra_user_info(
@@ -64,7 +65,7 @@ class UserAPI(Resource):
             cohort_serialized, _ = basic_info_schema.dump(cohort)
             user_information['cohort'] = cohort_serialized
             user_information['society'], _ = basic_info_schema.dump(
-                   cohort.society)
+                cohort.society)
 
         user_information['roles'] = {role['name']: role['id']
                                      for role in user_information['roles']}
