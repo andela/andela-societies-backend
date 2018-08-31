@@ -3,34 +3,15 @@
 import base64
 import datetime
 import os
-import sys
-from unittest import TestCase, mock
 from jose import jwt
+from unittest import TestCase, mock
 
-try:
-    from app import create_app
-    from api.models import (Activity, ActivityType, Center,
-                            User, Role, RedemptionRequest, db)
-    from api.endpoints.cohorts.models import Cohort
-    from api.endpoints.societies.models import Society
-    from api.endpoints.logged_activities.models import LoggedActivity
-except ModuleNotFoundError:
-    # this will enable us to run individual test files
-    # pytest <path to file>
-    # e.g pytest tests/test_logged_activities.py
-    # Run individual test within class
-    # e.g pytest <path to file>.py::ClassName::test_method_name
-
-    sys.path.insert(0,
-                    os.path.abspath(
-                        os.path.join(os.path.dirname(__file__), '..')))
-
-    from app import create_app
-    from api.models import (Activity, ActivityType, Center,
-                            User, Role, RedemptionRequest, db)
-    from api.endpoints.cohorts.models import Cohort
-    from api.endpoints.societies.models import Society
-    from api.endpoints.logged_activities.models import LoggedActivity
+from app import create_app
+from api.models import Activity, ActivityType, Center, User, Role, db
+from api.endpoints.cohorts.models import Cohort
+from api.endpoints.societies.models import Society
+from api.endpoints.logged_activities.models import LoggedActivity
+from api.endpoints.redemption_requests.models import RedemptionRequest
 
 
 class BaseTestCase(TestCase):

@@ -60,7 +60,8 @@ class Testing(Config):
     MAIL_GUN_TEST = os.environ.get('MAIL_GUN_TEST')
     NOTIFICATIONS_SENDER = os.getenv(
         'TESTS_NOTIFICATIONS_SENDER',
-        'Andela Societies Notifications<societies-notifications-tests@andela.com>'
+        'Andela Societies Notifications<societies-notifications-tests'
+        '@andela.com>'
     )
 
 

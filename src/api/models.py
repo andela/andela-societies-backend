@@ -40,6 +40,8 @@ user_role = db.Table('user_role',
 class Base(db.Model):
     """Base model, contain utility methods and properties."""
 
+    db = db
+
     __abstract__ = True
     uuid = db.Column(db.String, primary_key=True, default=generate_uuid)
     name = db.Column(db.String)
@@ -114,7 +116,9 @@ class Center(Base):
                               lazy='dynamic',
                               cascade="all, delete, delete-orphan")
     redemption_requests = db.relationship(
-        'RedemptionRequest', backref='center', lazy='dynamic',
+        'RedemptionRequest',
+        back_populates='center',
+        lazy='dynamic',
         order_by='desc(RedemptionRequest.created_at)'
     )
 
@@ -144,7 +148,9 @@ class User(Base):
                                  lazy='dynamic',
                                  backref='participants')
     redemption_requests = db.relationship(
-        'RedemptionRequest', backref='user', lazy='dynamic',
+        'RedemptionRequest',
+        back_populates='user',
+        lazy='dynamic',
         order_by='desc(RedemptionRequest.created_at)'
     )
 
@@ -164,7 +170,9 @@ class ActivityType(Base):
     value = db.Column(db.Integer, nullable=False)
     supports_multiple_participants = db.Column(db.Boolean, default=False)
 
-    activities = db.relationship('Activity', backref='activity_type')
+    activities = db.relationship(
+        'Activity', backref='activity_type', lazy='dynamic'
+    )
     logged_activities = db.relationship(
         'LoggedActivity', back_populates='activity_type', lazy='dynamic',
         order_by='desc(LoggedActivity.created_at)'
@@ -186,20 +194,6 @@ class Activity(Base):
         'LoggedActivity', back_populates='activity', lazy='dynamic',
         order_by='desc(LoggedActivity.created_at)'
     )
+    activity_id = db.Column(db.String, db.ForeignKey('activities.uuid'))
 
-
-class RedemptionRequest(Base):
-    """Model all redemption requests by Society Presidents."""
-
-    __tablename__ = 'redemptions'
-    user_id = db.Column(db.String, db.ForeignKey('users.uuid'), nullable=False)
-    society_id = db.Column(db.String, db.ForeignKey('societies.uuid'),
-                           nullable=False)
-    value = db.Column(db.Integer, nullable=False)
-    status = db.Column(db.String, default="pending", nullable=False)
-    center_id = db.Column(db.String, db.ForeignKey('centers.uuid'),
-                          nullable=False)
-    comment = db.Column(db.String)
-    rejection = db.Column(db.String)
-
-    society = db.relationship('Society', back_populates='redemptions')
+    activity = db.relationship('Activity', uselist=False)

@@ -1,4 +1,6 @@
-from api.models import db, Base
+from api.models import Base
+
+db = Base.db
 
 
 class Society(Base):

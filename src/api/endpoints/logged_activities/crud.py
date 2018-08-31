@@ -4,6 +4,7 @@ from flask import g, request
 from api.models import Activity, ActivityType
 from api.utils.auth import token_required
 from api.utils.helpers import response_builder, paginate_items
+
 from .models import LoggedActivity
 from .helpers import ParsedResult, parse_log_activity_fields
 from .marshmallow_schemas import (

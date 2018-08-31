@@ -9,9 +9,7 @@ from api.endpoints.cohorts import cohorts_bp
 from api.endpoints.societies import societies_bp
 from api.endpoints.activity_types import ActivityTypesAPI
 from api.endpoints.activities import ActivitiesAPI
-from api.endpoints.redemption_requests import PointRedemptionAPI
-from api.endpoints.redemption_requests import RedemptionRequestNumeration
-from api.endpoints.redemption_requests import RedemptionRequestFunds
+from api.endpoints.redemption_requests import redemption_bp
 from api.endpoints.users import UserAPI
 from api.endpoints.roles import RoleAPI, SocietyRoleAPI
 from api.models import db
@@ -24,7 +22,7 @@ except ImportError:
 
 
 def create_app(environment="Production"):
-    """Factory Method that creates an instance of the app with the given env.
+    """Create an instance of the app with the given env.
 
     Args:
         environment (str): Specify the configuration to initilize app with.
@@ -77,33 +75,6 @@ def create_app(environment="Production"):
         endpoint='user_info'
     )
 
-    # redemption endpoints
-    api.add_resource(
-        PointRedemptionAPI, "/api/v1/societies/redeem",
-        "/api/v1/societies/redeem/",
-        endpoint="point_redemption"
-    )
-
-    api.add_resource(
-        PointRedemptionAPI, "/api/v1/societies/redeem/<string:redeem_id>",
-        "/api/v1/societies/redeem/<string:redeem_id>/",
-        endpoint="point_redemption_detail"
-    )
-
-    api.add_resource(
-        RedemptionRequestNumeration,
-        "/api/v1/societies/redeem/verify/<string:redeem_id>",
-        "/api/v1/societies/redeem/verify/<string:redeem_id>/",
-        endpoint="redemption_numeration"
-    )
-
-    api.add_resource(
-        RedemptionRequestFunds,
-        "/api/v1/societies/redeem/funds/<string:redeem_id>",
-        "/api/v1/societies/redeem/funds/<string:redeem_id>/",
-        endpoint="redemption_request_funds"
-    )
-
     # role endpoints
     api.add_resource(
         RoleAPI, "/api/v1/roles", "/api/v1/roles/",
@@ -121,6 +92,9 @@ def create_app(environment="Production"):
         "/api/v1/roles/society-execs/",
         endpoint="society_execs_roles"
     )
+
+    # register blueprints here
+    app.register_blueprint(redemption_bp)
 
     # enable health check ping to API
     @app.route('/')
