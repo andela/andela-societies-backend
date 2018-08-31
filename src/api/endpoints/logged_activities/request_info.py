@@ -1,10 +1,11 @@
 from flask_restful import Resource
 from flask import request, current_app
 
-from .models import LoggedActivity
 from api.utils.auth import token_required, roles_required
 from api.utils.helpers import response_builder
 from api.utils.notifications.email_notices import send_email
+
+from .models import LoggedActivity
 
 
 class LoggedActivityInfoAPI(Resource):

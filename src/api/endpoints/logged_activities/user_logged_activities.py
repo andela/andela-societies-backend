@@ -3,6 +3,7 @@ from flask_restful import Resource
 from api.models import User
 from api.utils.auth import token_required
 from api.utils.helpers import response_builder
+
 from .models import db, LoggedActivity
 from .marshmallow_schemas import user_logged_activities_schema
 
