@@ -1,15 +1,10 @@
 """Contain utility functions and constants."""
-import datetime
 import os
-from collections import namedtuple
-
-
 import requests
-from flask import (
-    Response, current_app, jsonify, request, url_for, g
-)
-from api.models import (Activity, ActivityType, Center, Role,
-                        RedemptionRequest, db)
+from collections import namedtuple
+from flask import Response, current_app, jsonify, request, url_for
+
+from api.models import Center, Role
 from api.utils.marshmallow_schemas import basic_info_schema, redemption_schema
 
 
@@ -21,8 +16,11 @@ PaginatedResult = namedtuple(
 
 def paginate_items(fetched_data, serialize=True):
     """Paginate all roles for display."""
-    _page = request.args.get('page', type=int) or current_app.config['DEFAULT_PAGE']
-    _limit = request.args.get('limit', type=int) or current_app.config['PAGE_LIMIT']
+    from api.endpoints.redemption_requests import RedemptionRequest
+    _page = request.args.get('page', type=int) or \
+        current_app.config['DEFAULT_PAGE']
+    _limit = request.args.get('limit', type=int) or \
+        current_app.config['PAGE_LIMIT']
     page = current_app.config['DEFAULT_PAGE'] if _page < 0 else _page
     limit = current_app.config['PAGE_LIMIT'] if _limit < 0 else _limit
 
@@ -117,6 +115,7 @@ def edit_role(payload, search_term):
 
 def find_item(data):
     """Build the response with found/404 item in DB."""
+    from api.endpoints.redemption_requests import RedemptionRequest
     if data:
 
         # Serialization of RedemptionRequest
@@ -148,7 +147,9 @@ def response_builder(data, status_code=200):
 
 
 def add_extra_user_info(
-    token, user_id, url=os.environ.get('ANDELA_API_URL')
+    token,
+    user_id,
+    url=os.environ.get('ANDELA_API_URL')
 ):  # pragma: no cover
     """Retrive user information from ANDELA API.
 
@@ -156,9 +157,8 @@ def add_extra_user_info(
         token(str): valid jwt token
         user_id(str): id for user to retive information about
 
-    Returns:
+    Return:
         tuple(location, cohort, api_response)
-
     """
     cohort = location = None
     Bearer = 'Bearer '
@@ -202,23 +202,3 @@ def serialize_redmp(redemption):
     serial_data["society"] = serilaized_society
     serial_data["center"], _ = basic_info_schema.dump(redemption.center)
     return serial_data
-
-
-def get_redemption_request(redeem_id):
-    if "society president" in [role.name for role in g.current_user.roles]:
-        redemp_request = g.current_user.society.redemptions.filter_by(
-            uuid=redeem_id).one_or_none()
-    else:
-        redemp_request = RedemptionRequest.query.get(redeem_id)
-    if not redemp_request:
-        return response_builder(dict(
-            status="fail",
-            message="RedemptionRequest does not exist."),
-            404)
-
-    if redemp_request.status != "pending":
-        return response_builder(dict(
-            status="fail",
-            message="RedemptionRequest already approved or rejected"), 403)
-
-    return redemp_request

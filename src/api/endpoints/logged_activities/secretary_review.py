@@ -3,6 +3,7 @@ from flask import request
 
 from api.utils.auth import token_required, roles_required
 from api.utils.helpers import response_builder
+
 from .models import LoggedActivity
 from .marshmallow_schemas import single_logged_activity_schema
 
