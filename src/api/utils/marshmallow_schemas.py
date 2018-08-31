@@ -132,28 +132,6 @@ class ActivitySchema(BaseSchema):
             return value
 
 
-class CohortSchema(BaseSchema):
-    """Validation Schema for Cohort."""
-
-    center_id = fields.String(dump_only=True, dump_to='centerId',
-                              validate=[validate.Length(max=36)])
-
-    society_id = fields.String(dump_only=True, dump_to='societyId',
-                               validate=[validate.Length(max=36)])
-
-
-class SocietySchema(BaseSchema):
-    """Validation/Serialize Schema for Society."""
-
-    _total_points = fields.Integer(dump_only=True, dump_to='totalPoints')
-
-    _used_points = fields.Integer(dump_only=True, dump_to='usedPoints')
-
-    remaining_points = fields.Integer(dump_only=True, dump_to='remainingPoints')
-
-    color_scheme = fields.String(dump_only=True, dump_to='colorScheme')
-
-
 class UserSchema(BaseSchema):
     """User serializer/validator."""
 
@@ -208,11 +186,9 @@ new_activity_type_schema = ActivityTypesSchema()
 activity_schema = ActivitySchema()
 
 role_schema = RoleSchema()
-cohort_schema = CohortSchema()
 base_schema = BaseSchema()
 user_schema = UserSchema()
 basic_info_schema = BaseSchema()
-society_schema = SocietySchema()
 redemption_request_schema = RedemptionRequestSchema()
 edit_redemption_request_schema = EditRedemptionRequestSchema()
 redemption_schema = RedemptionSchema()

@@ -8,7 +8,7 @@ import requests
 from flask import (
     Response, current_app, jsonify, request, url_for, g
 )
-from api.models import (Activity, ActivityType, Cohort, Center, Role, Society,
+from api.models import (Activity, ActivityType, Center, Role,
                         RedemptionRequest, db)
 from api.utils.marshmallow_schemas import basic_info_schema, redemption_schema
 
@@ -178,6 +178,7 @@ def add_extra_user_info(
         return cohort, location, response
 
     if api_response.status_code == 200 and api_response.json().get('cohort'):
+        from api.endpoints.cohorts.models import Cohort
         cohort = Cohort.query.filter_by(
             uuid=api_response.json().get('cohort').get('id')).first()
         if not cohort:
@@ -196,8 +197,7 @@ def serialize_redmp(redemption):
     """To serialize and package redeptions."""
     serial_data, _ = redemption_schema.dump(redemption)
     seriallized_user, _ = basic_info_schema.dump(redemption.user)
-    serilaized_society, _ = basic_info_schema.dump(
-        Society.query.get(redemption.user.society_id))
+    serilaized_society, _ = basic_info_schema.dump(redemption.user.society)
     serial_data["user"] = seriallized_user
     serial_data["society"] = serilaized_society
     serial_data["center"], _ = basic_info_schema.dump(redemption.center)

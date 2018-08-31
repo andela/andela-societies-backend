@@ -119,17 +119,6 @@ class Center(Base):
     )
 
 
-class Cohort(Base):
-    """Models cohorts available in Andela."""
-
-    __tablename__ = 'cohorts'
-    center_id = db.Column(db.String, db.ForeignKey('centers.uuid'),
-                          nullable=False)
-    society_id = db.Column(db.String, db.ForeignKey('societies.uuid'))
-
-    members = db.relationship('User', backref='cohort')
-
-
 class User(Base):
     """Models Users."""
 
@@ -141,6 +130,8 @@ class User(Base):
     center_id = db.Column(db.String, db.ForeignKey('centers.uuid'))
     cohort_id = db.Column(db.String, db.ForeignKey('cohorts.uuid'))
 
+    society = db.relationship('Society', back_populates='members')
+    cohort = db.relationship('Cohort', back_populates='members')
     logged_activities = db.relationship(
         'LoggedActivity', back_populates='user', lazy='dynamic',
         order_by='desc(LoggedActivity.created_at)'
@@ -164,48 +155,6 @@ class Role(Base):
     __tablename__ = 'roles'
     users = db.relationship('User', secondary='user_role', lazy='dynamic',
                             backref=db.backref('roles', lazy='dynamic'))
-
-
-class Society(Base):
-    """Model Societies in Andela."""
-
-    __tablename__ = 'societies'
-    name = db.Column(db.String, nullable=False, unique=True)
-    color_scheme = db.Column(db.String)
-    logo = db.Column(db.String)
-    _total_points = db.Column(db.Integer, default=0)
-    _used_points = db.Column(db.Integer, default=0)
-
-    members = db.relationship('User', backref='society', lazy='dynamic')
-    logged_activities = db.relationship(
-        'LoggedActivity', back_populates='society', lazy='dynamic'
-    )
-    cohorts = db.relationship('Cohort', backref='society', lazy='dynamic')
-    redemptions = db.relationship('RedemptionRequest', backref='society',
-                                  lazy='dynamic')
-
-    @property
-    def total_points(self):
-        """Keep track of all society points."""
-        return self._total_points
-
-    @total_points.setter
-    def total_points(self, point):
-        self._total_points += point.value
-
-    @property
-    def used_points(self):
-        """Keep track of redeemed points."""
-        return self._used_points
-
-    @used_points.setter
-    def used_points(self, redemption_request):
-        self._used_points += redemption_request.value
-
-    @property
-    def remaining_points(self):
-        """Keep track of points available for redeemption."""
-        return self.total_points - self.used_points
 
 
 class ActivityType(Base):
@@ -252,3 +201,5 @@ class RedemptionRequest(Base):
                           nullable=False)
     comment = db.Column(db.String)
     rejection = db.Column(db.String)
+
+    society = db.relationship('Society', back_populates='redemptions')

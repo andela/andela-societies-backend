@@ -2,9 +2,8 @@ from flask import Blueprint
 from flask_restful import Api
 
 
-from .all_logged_activities import LoggedActivitiesAPI
+from .crud import LoggedActivitiesAPI
 from .user_logged_activities import UserLoggedActivitiesAPI
-from .single_logged_activity import LoggedActivityAPI
 from .approve import LoggedActivityApprovalAPI
 from .reject import LoggedActivityRejectionAPI
 from .request_info import LoggedActivityInfoAPI
@@ -15,19 +14,13 @@ logged_activities_bp = Blueprint('api', __name__)
 logged_activities_api = Api(logged_activities_bp)
 
 
-# add or fetch logged activities endpoint
+# CRUD logged activities endpoint
 logged_activities_api.add_resource(
     LoggedActivitiesAPI,
     '/logged-activities', '/logged-activities/',
-    endpoint='logged_activities'
-)
-
-# single logged activity endpoint
-logged_activities_api.add_resource(
-    LoggedActivityAPI,
     '/logged-activities/<string:logged_activity_id>',
     '/logged-activities/<string:logged_activity_id>/',
-    endpoint='logged_activity'
+    endpoint='logged_activities'
 )
 
 # user logged activities endpoint

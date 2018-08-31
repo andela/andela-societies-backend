@@ -203,6 +203,6 @@ class AddCohort(Resource):
         cohort_data['meta'] = cohort_meta_data
 
         return response_builder(dict(
-            message="Cohort added to society succesfully",
+            message="Cohort added to society successfully",
             data=cohort_data
         ), 200)

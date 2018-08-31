@@ -7,8 +7,8 @@ from api.utils.auth import roles_required, token_required
 from api.utils.helpers import (edit_role, find_item, paginate_items,
                                response_builder)
 from api.utils.marshmallow_schemas import role_schema
-
-from ..models import Role, Society, User, user_role
+from api.endpoints.societies.models import Society
+from ..models import Role, User, user_role
 
 
 class RoleAPI(Resource):
