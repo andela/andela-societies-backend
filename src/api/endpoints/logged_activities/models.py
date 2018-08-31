@@ -1,8 +1,10 @@
-from api.models import db, Base
+from api.models import Base
+
+db = Base.db
 
 
 class LoggedActivity(Base):
-    '''Models Activities logged by fellows.'''
+    """Models Activities logged by fellows."""
 
     __tablename__ = 'logged_activities'
     value = db.Column(db.Integer, nullable=False)
