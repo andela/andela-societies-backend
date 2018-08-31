@@ -9,8 +9,10 @@ from jose import jwt
 
 try:
     from app import create_app
-    from api.models import (Activity, ActivityType, Cohort, Center,
-                            Society, User, Role, RedemptionRequest, db)
+    from api.models import (Activity, ActivityType, Center,
+                            User, Role, RedemptionRequest, db)
+    from api.endpoints.cohorts.models import Cohort
+    from api.endpoints.societies.models import Society
     from api.endpoints.logged_activities.models import LoggedActivity
 except ModuleNotFoundError:
     # this will enable us to run individual test files
@@ -24,8 +26,10 @@ except ModuleNotFoundError:
                         os.path.join(os.path.dirname(__file__), '..')))
 
     from app import create_app
-    from api.models import (Activity, ActivityType, Cohort, Center,
-                            Society, User, Role, RedemptionRequest, db)
+    from api.models import (Activity, ActivityType, Center,
+                            User, Role, RedemptionRequest, db)
+    from api.endpoints.cohorts.models import Cohort
+    from api.endpoints.societies.models import Society
     from api.endpoints.logged_activities.models import LoggedActivity
 
 

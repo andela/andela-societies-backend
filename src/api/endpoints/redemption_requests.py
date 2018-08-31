@@ -13,7 +13,8 @@ from api.utils.marshmallow_schemas import (
     redemption_request_schema, edit_redemption_request_schema
 )
 from api.utils.marshmallow_schemas import basic_info_schema, redemption_schema
-from ..models import Society, RedemptionRequest, Center
+from api.endpoints.societies.models import Society
+from ..models import RedemptionRequest, Center
 
 
 class PointRedemptionAPI(Resource):

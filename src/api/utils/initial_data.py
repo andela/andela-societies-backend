@@ -10,7 +10,9 @@ from jose import ExpiredSignatureError, JWTError
 
 from api.utils.auth import verify_token
 from api.models import (ActivityType, Activity, Center,
-                        Society, User, Cohort, Role)
+                        User, Role)
+from api.endpoints.cohorts.models import Cohort
+from api.endpoints.societies.models import Society
 from api.endpoints.logged_activities.models import LoggedActivity
 
 
