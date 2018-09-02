@@ -3,7 +3,7 @@ from flask import g, request
 from flask_restful import Resource
 
 from api.models import Activity
-from api.utils.auth import roles_required, token_required
+from api.services.auth import roles_required, token_required
 from api.utils.helpers import response_builder
 from api.utils.marshmallow_schemas import activity_schema
 

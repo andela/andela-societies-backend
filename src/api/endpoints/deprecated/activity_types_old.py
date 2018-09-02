@@ -4,7 +4,7 @@ from flask import request
 from flask_restful import Resource
 
 from api.models import ActivityType
-from api.utils.auth import roles_required, token_required
+from api.services.auth import roles_required, token_required
 from api.utils.helpers import find_item, response_builder
 from api.utils.marshmallow_schemas import (activity_types_schema,
                                            new_activity_type_schema)

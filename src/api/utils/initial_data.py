@@ -8,16 +8,19 @@ import base64
 import requests
 from jose import ExpiredSignatureError, JWTError
 
-from api.utils.auth import verify_token
-from api.models import (ActivityType, Activity, Center,
-                        User, Role)
+from api.models import Center
 from api.endpoints.cohorts.models import Cohort
 from api.endpoints.societies.models import Society
 from api.endpoints.logged_activities.models import LoggedActivity
+from api.endpoints.activities.models import Activity
+from api.endpoints.roles.models import Role
+from api.endpoints.activity_type.models import ActivityType
+from api.endpoints.users.models import User
+from api.services.auth import verify_token
 
 
 def centre_societies_roles_data_dev(production=False):
-    """Generate center societies and role data"""
+    """Generate center societies and role data."""
     # test centers
     nairobi = Center(name='nairobi')
     kampala = Center(name='kampala')

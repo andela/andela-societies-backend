@@ -1,10 +1,9 @@
 from flask_restful import Resource
 from flask import request
 
-from api.utils.auth import token_required, roles_required
+from api.services.auth import token_required, roles_required
 from api.utils.helpers import response_builder
 
-from .models import LoggedActivity
 from .marshmallow_schemas import single_logged_activity_schema
 
 
@@ -13,9 +12,12 @@ class SecretaryReviewLoggedActivityAPI(Resource):
 
     decorators = [token_required]
 
-    @classmethod
+    def __init__(self, **kwargs):
+        """Inject dependacy for resource."""
+        self.LoggedActivity = kwargs['LoggedActivity']
+
     @roles_required(['society secretary'])
-    def put(cls, logged_activity_id):
+    def put(self, logged_activity_id):
         """Put method on logged Activity resource."""
         payload = request.get_json(silent=True)
 
@@ -23,7 +25,7 @@ class SecretaryReviewLoggedActivityAPI(Resource):
             return response_builder(dict(message='status is required.'),
                                     400)
 
-        logged_activity = LoggedActivity.query.filter_by(
+        logged_activity = self.LoggedActivity.query.filter_by(
             uuid=logged_activity_id).first()
         if not logged_activity:
             return response_builder(dict(message='Logged activity not found'),
