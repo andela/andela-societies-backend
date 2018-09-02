@@ -1,21 +1,23 @@
 from flask_restful import Resource
 from flask import request
 
-from api.utils.auth import token_required, roles_required
+from api.services.auth import token_required, roles_required
 from api.endpoints.logged_activities.marshmallow_schemas import \
     user_logged_activities_schema
 from api.utils.helpers import response_builder, paginate_items
-from .models import Society
 from .marshmallow_schemas import society_schema
 
 
 class SocietyResource(Resource):
     """To contain CRUD endpoints for Society."""
 
-    @classmethod
+    def __init__(self, **kwargs):
+        """Inject dependacy for resource."""
+        self.Society = kwargs['Society']
+
     @token_required
     @roles_required(["success ops"])
-    def post(cls):
+    def post(self):
         """Create a society."""
         payload = request.get_json(silent=True)
         if payload:
@@ -32,7 +34,7 @@ class SocietyResource(Resource):
                 ), 400)
 
             # if no errors occur in assigning above
-            society = Society(
+            society = self.Society(
                 name=name, color_scheme=color_scheme, logo=logo, photo=photo
             )
             society.save()
@@ -46,18 +48,17 @@ class SocietyResource(Resource):
             status="fail",
             message="Data for creation must be provided"), 400)
 
-    @classmethod
     @token_required
-    def get(cls, society_id=None):
+    def get(self, society_id=None):
         """Get Society(ies) details."""
         if society_id:
-            society = Society.query.get(society_id)
+            society = self.Society.query.get(society_id)
         elif request.args.get('name'):
-            society = Society.query.filter_by(
+            society = self.Society.query.filter_by(
                 name=request.args.get('name')).first()
         else:
             # if no search term has been passed, return all societies in DB
-            societies = Society.query
+            societies = self.Society.query
             return paginate_items(societies)
 
         if society:
@@ -77,10 +78,9 @@ class SocietyResource(Resource):
                 message="Resource does not exist."
             ), 404)
 
-    @classmethod
     @token_required
     @roles_required(["success ops"])
-    def put(cls, society_id=None):
+    def put(self, society_id=None):
         """Edit Society details."""
         payload = request.get_json(silent=True)
         if payload:
@@ -89,7 +89,7 @@ class SocietyResource(Resource):
                     status="fail",
                     message="Society to be edited must be provided"), 400)
 
-            society = Society.query.get(society_id)
+            society = self.Society.query.get(society_id)
             if society:
                 try:
                     name = payload["name"] or None
@@ -125,17 +125,16 @@ class SocietyResource(Resource):
             status="fail",
             message="Data for editing must be provided"), 400)
 
-    @classmethod
     @token_required
     @roles_required(["success ops"])
-    def delete(cls, society_id=None):
+    def delete(self, society_id=None):
         """Delete Society."""
         if not society_id:
             return response_builder(dict(
                 status="fail",
                 message="Society id must be provided."), 400)
 
-        society = Society.query.get(society_id)
+        society = self.Society.query.get(society_id)
         if not society:
             return response_builder(dict(
                 status="fail",

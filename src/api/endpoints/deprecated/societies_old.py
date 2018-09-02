@@ -3,7 +3,7 @@
 from flask import request
 from flask_restful import Resource
 
-from api.utils.auth import roles_required, token_required
+from api.services.auth import roles_required, token_required
 from api.utils.helpers import paginate_items, response_builder
 from api.utils.marshmallow_schemas import (base_schema, cohort_schema,
                                            society_schema)

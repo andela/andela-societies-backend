@@ -1,11 +1,11 @@
 from flask_restful import Resource
 
-from api.models import User
-from api.utils.auth import token_required
+from api.endpoints.users.models import User
+from api.services.auth import token_required
 from api.utils.helpers import response_builder
 
-from .models import db, LoggedActivity
 from .marshmallow_schemas import user_logged_activities_schema
+from .models import db
 
 
 class UserLoggedActivitiesAPI(Resource):
@@ -13,8 +13,11 @@ class UserLoggedActivitiesAPI(Resource):
 
     decorators = [token_required]
 
-    @classmethod
-    def get(cls, user_id):
+    def __init__(self, **kwargs):
+        """Inject dependacy for resource."""
+        self.LoggedActivity = kwargs['LoggedActivity']
+
+    def get(self, user_id):
         """Get a user's logged activities by user_id URL parameter."""
         user = User.query.get(user_id)
         if not user:
@@ -27,10 +30,10 @@ class UserLoggedActivitiesAPI(Resource):
             message = "There are no logged activities for that user."
 
         points_earned = db.session.query(
-            db.func.sum(LoggedActivity.value)
+            db.func.sum(self.LoggedActivity.value)
         ).filter(
-            LoggedActivity.user_id == user_id,
-            LoggedActivity.status == 'approved'
+            self.LoggedActivity.user_id == user_id,
+            self.LoggedActivity.status == 'approved'
         ).scalar()
 
         return response_builder(dict(

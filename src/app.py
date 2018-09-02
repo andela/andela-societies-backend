@@ -1,17 +1,19 @@
 """Main app module."""
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, Blueprint
 from flask_cors import CORS
 from flask_restful import Api
 
 from api.endpoints.logged_activities import logged_activities_bp
 from api.endpoints.cohorts import cohorts_bp
 from api.endpoints.societies import societies_bp
-from api.endpoints.activity_types import ActivityTypesAPI
-from api.endpoints.activities import ActivitiesAPI
+from api.endpoints.activities import activities_bp
 from api.endpoints.redemption_requests import redemption_bp
-from api.endpoints.users import UserAPI
-from api.endpoints.roles import RoleAPI, SocietyRoleAPI
+from api.endpoints.roles import roles_bp
+from api.endpoints.activity_type import activitiy_type_bp
+from api.endpoints.users import users_bp
+
+
 from api.models import db
 
 
@@ -34,67 +36,48 @@ def create_app(environment="Production"):
     app.config.from_object(configuration[environment])
     db.init_app(app)
 
-    api = Api(app=app)
-
     # enable cross origin resource sharing
     CORS(app)
 
-    # activities endpoints
-    api.add_resource(
-        ActivitiesAPI, '/api/v1/activities', '/api/v1/activities/',
-        endpoint='activities'
-    )
-
-    # activity types endpoints
-    api.add_resource(
-        ActivityTypesAPI, '/api/v1/activity-types',
-        '/api/v1/activity-types/', endpoint='activity_types'
-    )
-
-    api.add_resource(
-        ActivityTypesAPI,
-        '/api/v1/activity-types/<string:act_types_id>',
-        '/api/v1/activity-types/<string:act_types_id>/',
-        endpoint='activity_types_detail'
-    )
-
     # register logged activities blueprint
-    app.register_blueprint(logged_activities_bp, url_prefix='/api/v1')
+    app.register_blueprint(
+        logged_activities_bp(Api, Blueprint), url_prefix='/api/v1'
+    )
 
     # register cohorts blueprint
-    app.register_blueprint(cohorts_bp, url_prefix='/api/v1')
+    app.register_blueprint(
+        cohorts_bp(Api, Blueprint), url_prefix='/api/v1'
+    )
 
     # register societies blueprint
-    app.register_blueprint(societies_bp, url_prefix='/api/v1')
-
-    # user endpoints
-    api.add_resource(
-        UserAPI,
-        '/api/v1/users/<string:user_id>',
-        '/api/v1/users/<string:user_id>/',
-        endpoint='user_info'
+    app.register_blueprint(
+        societies_bp(Api, Blueprint), url_prefix='/api/v1'
     )
 
-    # role endpoints
-    api.add_resource(
-        RoleAPI, "/api/v1/roles", "/api/v1/roles/",
-        endpoint="role"
+    # register redemption blueprint
+    app.register_blueprint(
+        redemption_bp(Api, Blueprint)
     )
 
-    api.add_resource(
-        RoleAPI, "/api/v1/roles/<string:role_query>",
-        "/api/v1/roles/<string:role_query>/",
-        endpoint="role_detail"
+    # register activities blueprint
+    app.register_blueprint(
+        activities_bp(Api, Blueprint)
     )
 
-    api.add_resource(
-        SocietyRoleAPI, "/api/v1/roles/society-execs",
-        "/api/v1/roles/society-execs/",
-        endpoint="society_execs_roles"
+    # register roles blueprint
+    app.register_blueprint(
+        roles_bp(Api, Blueprint)
     )
 
-    # register blueprints here
-    app.register_blueprint(redemption_bp)
+    # register activity_types blueprint
+    app.register_blueprint(
+        activitiy_type_bp(Api, Blueprint)
+    )
+
+    # register users blueprint
+    app.register_blueprint(
+        users_bp(Api, Blueprint)
+    )
 
     # enable health check ping to API
     @app.route('/')

@@ -1,10 +1,9 @@
 from flask_restful import Resource
 from flask import request
 
-from api.utils.auth import token_required, roles_required
+from api.services.auth import token_required, roles_required
 from api.utils.helpers import response_builder
 
-from .models import LoggedActivity
 from .marshmallow_schemas import logged_activities_schema
 
 
@@ -13,9 +12,12 @@ class LoggedActivityApprovalAPI(Resource):
 
     decorators = [token_required]
 
-    @classmethod
+    def __init__(self, **kwargs):
+        """Inject dependacy for resource."""
+        self.LoggedActivity = kwargs['LoggedActivity']
+
     @roles_required(["success ops"])
-    def put(cls, logged_activity_id=None):
+    def put(self, logged_activity_id=None):
         """Put method for approving logged Activity resource."""
         payload = request.get_json(silent=True)
 
@@ -39,7 +41,7 @@ class LoggedActivityApprovalAPI(Resource):
 
             unique_activities_ids = set([])
             for logged_activities_id in logged_activities_ids:
-                logged_activities = LoggedActivity.query.get(
+                logged_activities = self.LoggedActivity.query.get(
                     logged_activities_id
                 )
                 if logged_activities is None or logged_activities.redeemed \

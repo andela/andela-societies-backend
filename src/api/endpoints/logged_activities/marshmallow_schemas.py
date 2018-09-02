@@ -1,6 +1,7 @@
 from marshmallow import fields, validates_schema, validate, ValidationError
 
-from api.models import User, ActivityType
+from api.endpoints.users.models import User
+from api.endpoints.activity_type.models import ActivityType
 from api.utils.marshmallow_schemas import BaseSchema
 
 

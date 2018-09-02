@@ -4,7 +4,8 @@ import re
 from flask import Flask, render_template_string
 
 from config import configuration
-from api.models import Role, db
+from api.models import db
+from api.endpoints.roles.models import Role
 
 
 SUCCESS_OPS_MESSAGE = '''

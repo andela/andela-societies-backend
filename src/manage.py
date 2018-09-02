@@ -10,9 +10,13 @@ from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager, Shell, prompt_bool
 
 from api.utils.initial_data import generete_initial_data_run_time_env
-from api.models import Activity, User, db, Center, Role
+from api.models import db, Center
 from api.endpoints.cohorts.models import Cohort
 from api.endpoints.societies.models import Society
+from api.endpoints.activities.models import Activity
+from api.endpoints.roles.models import Role
+from api.endpoints.users.models import User
+
 from app import create_app
 from run_tests import test
 
