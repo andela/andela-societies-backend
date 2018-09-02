@@ -7,11 +7,15 @@ from jose import jwt
 from unittest import TestCase, mock
 
 from app import create_app
-from api.models import Activity, ActivityType, Center, User, Role, db
+from api.models import Center, db
 from api.endpoints.cohorts.models import Cohort
 from api.endpoints.societies.models import Society
 from api.endpoints.logged_activities.models import LoggedActivity
 from api.endpoints.redemption_requests.models import RedemptionRequest
+from api.endpoints.activities.models import Activity
+from api.endpoints.roles.models import Role
+from api.endpoints.activity_type.models import ActivityType
+from api.endpoints.users.models import User
 
 
 class BaseTestCase(TestCase):
@@ -197,7 +201,7 @@ class BaseTestCase(TestCase):
         os.environ['APP_SETTINGS'] = 'Testing'
         os.environ['MAIL_GUN_TEST'] = 'True'
 
-        self.patcher = mock.patch('api.utils.auth.add_extra_user_info',
+        self.patcher = mock.patch('api.services.auth.add_extra_user_info',
                                   return_value=(None, None, None))
         self.patcher.start()
 

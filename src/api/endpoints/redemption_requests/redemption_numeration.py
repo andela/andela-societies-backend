@@ -4,7 +4,7 @@ from flask_restful import Resource
 
 # imports from other packages
 from api.utils.notifications.email_notices import send_email
-from api.utils.auth import token_required, roles_required
+from api.services.auth import token_required, roles_required
 from api.utils.helpers import response_builder
 from api.utils.marshmallow_schemas import basic_info_schema
 

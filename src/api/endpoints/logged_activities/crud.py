@@ -1,11 +1,9 @@
 from flask_restful import Resource
 from flask import g, request
 
-from api.models import Activity, ActivityType
-from api.utils.auth import token_required
+from api.services.auth import token_required
 from api.utils.helpers import response_builder, paginate_items
 
-from .models import LoggedActivity
 from .helpers import ParsedResult, parse_log_activity_fields
 from .marshmallow_schemas import (
     LogEditActivitySchema, single_logged_activity_schema,
@@ -18,8 +16,13 @@ class LoggedActivitiesAPI(Resource):
 
     decorators = [token_required]
 
-    @classmethod
-    def post(cls):
+    def __init__(self, **kwargs):
+        """Inject dependacy for resource."""
+        self.Activity = kwargs['Activity']
+        self.ActivityType = kwargs['ActivityType']
+        self.LoggedActivity = kwargs['LoggedActivity']
+
+    def post(self):
         """Log a new activity."""
         payload = request.get_json(silent=True)
 
@@ -36,13 +39,15 @@ class LoggedActivitiesAPI(Resource):
                 ), 422)
 
             parsed_result = parse_log_activity_fields(
-                result, Activity, ActivityType
+                result,
+                self.Activity,
+                self.ActivityType
             )
             if not isinstance(parsed_result, ParsedResult):
                 return parsed_result
 
             # log activity
-            logged_activity = LoggedActivity(
+            logged_activity = self.LoggedActivity(
                 name=result.get('name'),
                 description=result.get('description'),
                 society=society,
@@ -77,18 +82,17 @@ class LoggedActivitiesAPI(Resource):
                                 message="Data for creation must be provided."),
                                 400)
 
-    @classmethod
-    def get(cls):
+    def get(self):
         """Get all logged activities."""
         paginate = request.args.get("paginate", "true")
         message = "all Logged activities fetched successfully"
 
         if paginate.lower() == "false":
-            logged_activities = LoggedActivity.query.all()
-            count = LoggedActivity.query.count()
+            logged_activities = self.LoggedActivity.query.all()
+            count = self.LoggedActivity.query.count()
             data = {"count": count}
         else:
-            logged_activities = LoggedActivity.query
+            logged_activities = self.LoggedActivity.query
             pagination_result = paginate_items(logged_activities,
                                                serialize=False)
             logged_activities = pagination_result.data
@@ -108,8 +112,7 @@ class LoggedActivitiesAPI(Resource):
         return response_builder(dict(data=data, message=message,
                                      status="success"), 200)
 
-    @classmethod
-    def put(cls, logged_activity_id=None):
+    def put(self, logged_activity_id=None):
         """Edit an activity."""
         payload = request.get_json(silent=True)
 
@@ -121,7 +124,7 @@ class LoggedActivitiesAPI(Resource):
             if errors:
                 return response_builder(dict(validationErrors=errors), 400)
 
-            logged_activity = LoggedActivity.query.filter_by(
+            logged_activity = self.LoggedActivity.query.filter_by(
                 uuid=logged_activity_id,
                 user_id=g.current_user.uuid).one_or_none()
             if not logged_activity:
@@ -138,7 +141,9 @@ class LoggedActivitiesAPI(Resource):
             if not result.get('date'):
                 result['date'] = logged_activity.activity_date
             parsed_result = parse_log_activity_fields(
-                result, Activity, ActivityType
+                result,
+                self.Activity,
+                self.ActivityType
             )
             if not isinstance(parsed_result, ParsedResult):
                 return parsed_result
@@ -163,10 +168,9 @@ class LoggedActivitiesAPI(Resource):
                                 message="Data for creation must be provided."),
                                 400)
 
-    @classmethod
-    def delete(cls, logged_activity_id=None):
+    def delete(self, logged_activity_id=None):
         """Delete a logged activity."""
-        logged_activity = LoggedActivity.query.filter_by(
+        logged_activity = self.LoggedActivity.query.filter_by(
             uuid=logged_activity_id,
             user_id=g.current_user.uuid).one_or_none()
 

@@ -4,7 +4,7 @@ from flask_restful import Resource
 
 from api.models import User, Center
 from api.endpoints.cohorts.models import Cohort
-from api.utils.auth import token_required
+from api.services.auth import token_required
 from api.utils.helpers import add_extra_user_info
 from api.utils.marshmallow_schemas import user_schema, basic_info_schema
 

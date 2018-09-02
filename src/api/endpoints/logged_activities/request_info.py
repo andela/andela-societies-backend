@@ -1,11 +1,9 @@
 from flask_restful import Resource
 from flask import request, current_app
 
-from api.utils.auth import token_required, roles_required
+from api.services.auth import token_required, roles_required
 from api.utils.helpers import response_builder
 from api.utils.notifications.email_notices import send_email
-
-from .models import LoggedActivity
 
 
 class LoggedActivityInfoAPI(Resource):
@@ -13,9 +11,12 @@ class LoggedActivityInfoAPI(Resource):
 
     decorators = [token_required]
 
-    @classmethod
+    def __init__(self, **kwargs):
+        """Inject dependacy for resource."""
+        self.LoggedActivity = kwargs['LoggedActivity']
+
     @roles_required(["success ops"])
-    def put(cls, logged_activity_id=None):
+    def put(self, logged_activity_id=None):
         """Put method for requesting more info on a logged activity."""
         payload = request.get_json(silent=True)
 
@@ -30,7 +31,7 @@ class LoggedActivityInfoAPI(Resource):
                 status="fail",
                 message="LoggedActivity id must be provided."), 400)
 
-        logged_activity = LoggedActivity.query.get(logged_activity_id)
+        logged_activity = self.LoggedActivity.query.get(logged_activity_id)
 
         if not logged_activity:
             return response_builder(dict(message='Logged activity not found'),

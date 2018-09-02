@@ -5,7 +5,7 @@ from flask_restful import Resource
 from sqlalchemy import func
 
 from api.models import LoggedActivity, User, db
-from api.utils.auth import token_required, roles_required
+from api.services.auth import token_required, roles_required
 from api.utils.helpers import (ParsedResult, parse_log_activity_fields,
                                response_builder, paginate_items)
 from api.utils.marshmallow_schemas import (
