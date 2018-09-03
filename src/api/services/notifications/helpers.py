@@ -29,6 +29,13 @@ def create_celery_flask(environment=os.getenv('APP_SETTINGS', 'Production')):
     """
     app = Flask(__name__)
     app.config.from_object(configuration[environment])
+    app.config.update(  # EMAIL SETTINGS
+                      MAIL_SERVER=os.environ.get("MAIL_SERVER"),
+                      MAIL_PORT=os.environ.get("MAIL_PORT"),
+                      MAIL_USE_TLS=os.environ.get("MAIL_USE_TLS"),
+                      MAIL_USERNAME=os.environ.get("MAIL_USERNAME"),
+                      MAIL_PASSWORD=os.environ.get("MAIL_PASSWORD")
+                      )
     db.init_app(app)
     return app
 
@@ -41,7 +48,7 @@ def validate_email(recipients=None):
     email addresses before send() is invoked
     :return bool:
     """
-    regex = "^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$"
+    regex = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
     for email in recipients:
         if not re.match(regex, email):
             raise ValueError("invalid email address: {}".format(email))
