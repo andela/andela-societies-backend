@@ -5,6 +5,7 @@ from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import SQLAlchemyError
 
+
 db = SQLAlchemy()
 
 
@@ -101,23 +102,3 @@ class Base(db.Model):
             for attribute in self.__table__.columns
         }
         return dictionary_mapping
-
-
-class Center(Base):
-    """Models different centres in Andela."""
-
-    __tablename__ = 'centers'
-    members = db.relationship('User',
-                              backref='center',
-                              lazy='dynamic',
-                              cascade="all, delete, delete-orphan")
-    cohorts = db.relationship('Cohort',
-                              backref='center',
-                              lazy='dynamic',
-                              cascade="all, delete, delete-orphan")
-    redemption_requests = db.relationship(
-        'RedemptionRequest',
-        back_populates='center',
-        lazy='dynamic',
-        order_by='desc(RedemptionRequest.created_at)'
-    )

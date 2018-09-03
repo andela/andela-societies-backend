@@ -3,7 +3,7 @@ from flask import request
 
 from api.services.auth import token_required, roles_required
 from api.utils.helpers import response_builder
-from api.utils.marshmallow_schemas import base_schema
+from api.utils.marshmallow_schemas import basic_info_schema
 
 from .marshmallow_schemas import cohort_schema
 
@@ -57,8 +57,8 @@ class Cohorts(Resource):
 
         cohort_data = cohort_schema.dump(cohort).data
         cohort_meta_data = {
-            'society': base_schema.dump(society).data,
-            'center': base_schema.dump(cohort.center).data
+            'society': basic_info_schema.dump(society).data,
+            'center': basic_info_schema.dump(cohort.center).data
         }
         cohort_data['meta'] = cohort_meta_data
 

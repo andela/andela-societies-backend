@@ -8,14 +8,9 @@ import base64
 import requests
 from jose import ExpiredSignatureError, JWTError
 
-from api.models import Center
-from api.endpoints.cohorts.models import Cohort
-from api.endpoints.societies.models import Society
-from api.endpoints.logged_activities.models import LoggedActivity
-from api.endpoints.activities.models import Activity
-from api.endpoints.roles.models import Role
-from api.endpoints.activity_type.models import ActivityType
-from api.endpoints.users.models import User
+from api.models import (
+    Center, Cohort, Society, LoggedActivity, Activity, Role, ActivityType, User
+)
 from api.services.auth import verify_token
 
 

@@ -2,7 +2,7 @@
 
 
 def cohorts_bp(Api, Blueprint):
-    from api.endpoints.societies.models import Society
+    from api.models import Society
     from .models import Cohort
     from .crud import Cohorts
 

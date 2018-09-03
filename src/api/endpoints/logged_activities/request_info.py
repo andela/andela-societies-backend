@@ -3,7 +3,7 @@ from flask import request, current_app
 
 from api.services.auth import token_required, roles_required
 from api.utils.helpers import response_builder
-from api.utils.notifications.email_notices import send_email
+from api.services.notifications.tasks import send_email
 
 
 class LoggedActivityInfoAPI(Resource):
@@ -12,7 +12,7 @@ class LoggedActivityInfoAPI(Resource):
     decorators = [token_required]
 
     def __init__(self, **kwargs):
-        """Inject dependacy for resource."""
+        """Inject dependency for resource."""
         self.LoggedActivity = kwargs['LoggedActivity']
 
     @roles_required(["success ops"])

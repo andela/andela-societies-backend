@@ -2,10 +2,8 @@
 
 
 def logged_activities_bp(Api, Blueprint):
-    from api.endpoints.activity_type.models import ActivityType
-    from api.endpoints.activities.models import Activity
+    from api.models import ActivityType, Activity
     from .models import LoggedActivity
-
     from .crud import LoggedActivitiesAPI
     from .user_logged_activities import UserLoggedActivitiesAPI
     from .approve import LoggedActivityApprovalAPI
