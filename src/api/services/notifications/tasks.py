@@ -5,7 +5,7 @@ import requests
 from celery import Celery
 from celery.schedules import crontab
 
-from api.utils.notifications.task_helpers import (
+from api.services.notifications.helpers import (
     generate_success_ops_pending_activities_emails,
     create_celery_flask, validate_email
 )
@@ -20,7 +20,7 @@ celery = Celery(
 
 celery.conf.beat_schedule = {
     'mail-success-ops': {
-        'task': 'api.utils.notifications.email_notices.mail_success_ops',
+        'task': 'api.services.notifications.tasks.mail_success_ops',
         'schedule': crontab(
             hour=9, minute=0,  # timezone is UTC by default
             day_of_week=flask_app.config['SUCCESS_OPS_NEWSLETTER_DAY']

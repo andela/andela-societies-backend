@@ -3,7 +3,7 @@ from flask import request, g, current_app
 from flask_restful import Resource
 
 # from other packages
-from api.utils.notifications.email_notices import send_email
+from api.services.notifications.tasks import send_email
 from api.utils.helpers import find_item, paginate_items, response_builder
 from api.services.auth import token_required, roles_required
 from api.utils.marshmallow_schemas import basic_info_schema
@@ -23,7 +23,7 @@ class PointRedemptionAPI(Resource):
     """
 
     def __init__(self, **kwargs):
-        """Inject dependacy for resource."""
+        """Inject dependencies for resource."""
         self.RedemptionRequest = kwargs['RedemptionRequest']
         self.Center = kwargs['Center']
         self.Society = kwargs['Society']

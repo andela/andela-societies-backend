@@ -1,4 +1,1 @@
-from .auth import (verify_token,
-                   token_required,
-                   roles_required,
-                   add_extra_user_info)
+from .auth import verify_token, token_required, roles_required

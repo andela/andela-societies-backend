@@ -14,7 +14,7 @@ class RoleAPI(Resource):
     """Contain CRUD endpoints for Role."""
 
     def __init__(self, **kwargs):
-        """Inject dependacy for resource."""
+        """Inject dependency for resource."""
         self.Role = kwargs['Role']
 
     @token_required

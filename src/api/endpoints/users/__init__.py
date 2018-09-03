@@ -2,9 +2,7 @@
 
 
 def users_bp(Api, Blueprint):
-    from api.models import Center
-    from api.endpoints.cohorts.models import Cohort
-
+    from api.models import Center, Cohort
     from .models import User
     from .users import UserAPI
 

@@ -17,7 +17,7 @@ class LoggedActivitiesAPI(Resource):
     decorators = [token_required]
 
     def __init__(self, **kwargs):
-        """Inject dependacy for resource."""
+        """Inject dependencies for resource."""
         self.Activity = kwargs['Activity']
         self.ActivityType = kwargs['ActivityType']
         self.LoggedActivity = kwargs['LoggedActivity']
