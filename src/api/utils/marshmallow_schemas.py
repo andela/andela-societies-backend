@@ -23,5 +23,4 @@ class BaseSchema(Schema):
     description = fields.String()
 
 
-base_schema = BaseSchema()
 basic_info_schema = BaseSchema()

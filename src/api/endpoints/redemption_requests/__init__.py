@@ -2,8 +2,7 @@
 
 
 def redemption_bp(Api, Blueprint):
-    from api.endpoints.societies.models import Society
-    from api.models import Center
+    from api.models import Center, Society
     from .models import RedemptionRequest
     from .redemption_points import PointRedemptionAPI
     from .redemption_numeration import RedemptionRequestNumeration
@@ -23,7 +22,7 @@ def redemption_bp(Api, Blueprint):
             'RedemptionRequest': RedemptionRequest,
             'Center': Center,
             'Society': Society
-            }
+        }
     )
 
     redemption_api.add_resource(
@@ -34,7 +33,7 @@ def redemption_bp(Api, Blueprint):
         resource_class_kwargs={
             'RedemptionRequest': RedemptionRequest,
             'Society': Society
-            }
+        }
     )
 
     redemption_api.add_resource(

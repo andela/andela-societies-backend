@@ -1,7 +1,6 @@
 from marshmallow import fields, validates_schema, validate, ValidationError
 
-from api.endpoints.users.models import User
-from api.endpoints.activity_type.models import ActivityType
+from api.models import User, ActivityType
 from api.utils.marshmallow_schemas import BaseSchema
 
 
@@ -13,7 +12,7 @@ class LoggedActivitySchema(BaseSchema):
     date = fields.Date(attribute='activity_date',
                        dump_to='activityDate', load_from='activityDate')
     owner = fields.String(attribute='user.name')
-    owner_photo = fields.Url(attribute='user.photo')
+    owner_photo = fields.Url(attribute='user.photo', dump_to='ownerPhoto')
     activity_id = fields.String(dump_to='activityId', load_from='activityId')
     activity = fields.String(attribute='activity.name')
     category = fields.String(attribute='activity_type.name')

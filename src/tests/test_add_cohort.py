@@ -79,7 +79,7 @@ class CohortsTestCase(BaseTestCase):
             )
         )
 
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 404)
 
         data = json.loads(response.data)
         self.assertDictEqual(data, dict(
@@ -96,7 +96,7 @@ class CohortsTestCase(BaseTestCase):
             )
         )
 
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 404)
 
         data = json.loads(response.data)
         self.assertDictEqual(data, dict(

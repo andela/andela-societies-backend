@@ -48,7 +48,7 @@ Then issue the following commands
 
 ```sh
     $ brew services start rabbitmq
-    $ celery -A api.utils.notifications.email_notices worker -l info --beat
+    $ celery -A api.services.notifications.tasks worker -l info --beat
 ```
 
 You need to set the following environment variables:
@@ -65,7 +65,7 @@ Then in your module/controller do the following:
 
 ```python
 # import the notifications
-from api.utils.notifications.email_notices import send_email
+from api.services.notifications.tasks import send_email
 
 ...
 

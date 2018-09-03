@@ -1,4 +1,5 @@
-from api.models import Base
+from api.models.base import Base
+
 
 db = Base.db
 
@@ -11,5 +12,6 @@ class Cohort(Base):
                           nullable=False)
     society_id = db.Column(db.String, db.ForeignKey('societies.uuid'))
 
+    center = db.relationship('Center', back_populates='cohorts')
     society = db.relationship('Society', back_populates='cohorts')
     members = db.relationship('User', back_populates='cohort', lazy='dynamic')

@@ -1,6 +1,5 @@
 from flask import g
 
-from api.endpoints.societies.models import Society
 from api.utils.helpers import response_builder
 from api.utils.marshmallow_schemas import basic_info_schema
 
@@ -33,8 +32,7 @@ def serialize_redmp(redemption):
     """To serialize and package redeptions."""
     serial_data, _ = redemption_schema.dump(redemption)
     seriallized_user, _ = basic_info_schema.dump(redemption.user)
-    serilaized_society, _ = basic_info_schema.dump(
-        Society.query.get(redemption.user.society_id))
+    serilaized_society, _ = basic_info_schema.dump(redemption.user.society)
     serial_data["user"] = seriallized_user
     serial_data["society"] = serilaized_society
     serial_data["center"], _ = basic_info_schema.dump(redemption.center)

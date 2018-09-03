@@ -12,7 +12,7 @@ class SocietyResource(Resource):
     """To contain CRUD endpoints for Society."""
 
     def __init__(self, **kwargs):
-        """Inject dependacy for resource."""
+        """Inject dependency for resource."""
         self.Society = kwargs['Society']
 
     @token_required

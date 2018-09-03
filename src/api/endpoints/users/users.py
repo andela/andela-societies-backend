@@ -2,7 +2,8 @@
 from flask import g
 from flask_restful import Resource
 
-from api.services.auth import token_required, add_extra_user_info
+from api.services.auth import token_required
+from api.services.auth.helpers import add_extra_user_info
 from api.utils.marshmallow_schemas import basic_info_schema
 
 from .marshmallow_schema import user_schema
@@ -12,7 +13,7 @@ class UserAPI(Resource):
     """User Resource."""
 
     def __init__(self, **kwargs):
-        """Inject dependacy for resource."""
+        """Inject dependencies for resource."""
         self.User = kwargs['User']
         self.Center = kwargs['Center']
         self.Cohort = kwargs['Cohort']
