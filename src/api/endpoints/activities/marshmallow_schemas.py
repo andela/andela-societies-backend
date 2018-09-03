@@ -3,7 +3,7 @@ from marshmallow import (ValidationError, fields, post_load, validate,
                          validates)
 
 from api.utils.marshmallow_schemas import BaseSchema
-from api.endpoints.activity_type.models import ActivityType
+from api.models import ActivityType
 
 from .models import Activity
 

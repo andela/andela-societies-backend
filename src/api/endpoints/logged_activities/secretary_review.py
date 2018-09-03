@@ -13,7 +13,7 @@ class SecretaryReviewLoggedActivityAPI(Resource):
     decorators = [token_required]
 
     def __init__(self, **kwargs):
-        """Inject dependacy for resource."""
+        """Inject dependency for resource."""
         self.LoggedActivity = kwargs['LoggedActivity']
 
     @roles_required(['society secretary'])

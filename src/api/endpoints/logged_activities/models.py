@@ -1,4 +1,5 @@
-from api.models import Base
+from api.models.base import Base
+
 
 db = Base.db
 

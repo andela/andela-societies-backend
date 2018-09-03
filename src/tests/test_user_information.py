@@ -30,7 +30,7 @@ class UserInformationTestCase(BaseTestCase):
         self.society.save()
 
         cohort = self.cohort_12_Ke
-        self.patcher = mock.patch('api.services.auth.add_extra_user_info',
+        self.patcher = mock.patch('api.services.auth.helpers.add_extra_user_info',
                                   return_value=info_mock(200,
                                                          location=self.nairobi,
                                                          cohort=cohort,
@@ -81,8 +81,8 @@ class UserInformationTestCase(BaseTestCase):
             'location': {'id': mock_location.uuid},
             'cohort': {'id': mock_cohort.uuid},
             'roles': {
-                    "Andelan": "-Ktest_andelan_id",
-                    "Fellow": "-KXGy1EB1oimjQgFim6C"
+                "Andelan": "-Ktest_andelan_id",
+                "Fellow": "-KXGy1EB1oimjQgFim6C"
             }
         }
 

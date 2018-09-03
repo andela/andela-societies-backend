@@ -2,9 +2,7 @@
 
 
 def roles_bp(Api, Blueprint):
-    from api.endpoints.societies.models import Society
-    from api.endpoints.users.models import User
-
+    from api.models import Society, User
     from .models import Role
     from .roles import RoleAPI
     from .society_roles import SocietyRoleAPI

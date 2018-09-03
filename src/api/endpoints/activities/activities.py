@@ -12,7 +12,7 @@ class ActivitiesAPI(Resource):
     """Contains CRUD endpoints for activities."""
 
     def __init__(self, **kwargs):
-        """Inject dependacy for resource."""
+        """Inject dependency for resource."""
         self.Activity = kwargs['Activity']
 
     @token_required

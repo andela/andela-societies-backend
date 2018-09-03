@@ -4,8 +4,7 @@ import re
 from flask import Flask, render_template_string
 
 from config import configuration
-from api.models import db
-from api.endpoints.roles.models import Role
+from api.models import Base, Role, LoggedActivity
 
 
 SUCCESS_OPS_MESSAGE = '''
@@ -15,6 +14,8 @@ Have a great week ahead.\n
 Regards,
 The Andela Societies Team.
 '''
+
+db = Base.db
 
 
 def create_celery_flask(environment=os.getenv('APP_SETTINGS', 'Production')):
@@ -29,7 +30,6 @@ def create_celery_flask(environment=os.getenv('APP_SETTINGS', 'Production')):
     app = Flask(__name__)
     app.config.from_object(configuration[environment])
     db.init_app(app)
-
     return app
 
 
@@ -53,7 +53,6 @@ def generate_success_ops_pending_activities_emails(app):
     Get pending logged activities and genrate email for each success ops
     member
     '''
-    from api.endpoints.logged_activities.models import LoggedActivity
     with app.app_context():
         success_ops_role = Role.query.filter_by(
             name='success ops'

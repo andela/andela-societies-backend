@@ -1,6 +1,5 @@
 from flask_restful import Resource
 
-from api.endpoints.users.models import User
 from api.services.auth import token_required
 from api.utils.helpers import response_builder
 
@@ -14,12 +13,13 @@ class UserLoggedActivitiesAPI(Resource):
     decorators = [token_required]
 
     def __init__(self, **kwargs):
-        """Inject dependacy for resource."""
+        """Inject dependencies for resource."""
         self.LoggedActivity = kwargs['LoggedActivity']
+        self.User = kwargs['User']
 
     def get(self, user_id):
         """Get a user's logged activities by user_id URL parameter."""
-        user = User.query.get(user_id)
+        user = self.User.query.get(user_id)
         if not user:
             return response_builder(dict(message="User not found"), 404)
 

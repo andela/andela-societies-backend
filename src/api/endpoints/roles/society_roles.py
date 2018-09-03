@@ -9,7 +9,7 @@ class SocietyRoleAPI(Resource):
     """Contains functionality to change Society Executives."""
 
     def __init__(self, **kwargs):
-        """Inject dependacy for resource."""
+        """Inject dependencies for resource."""
         self.Role = kwargs['Role']
         self.Society = kwargs['Society']
         self.User = kwargs['User']

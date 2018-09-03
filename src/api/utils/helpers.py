@@ -1,6 +1,9 @@
 """Contain utility functions and constants."""
 from collections import namedtuple
+
 from flask import current_app, jsonify, request, url_for
+
+from api.models import RedemptionRequest, Cohort
 
 
 PaginatedResult = namedtuple(
@@ -11,7 +14,6 @@ PaginatedResult = namedtuple(
 
 def paginate_items(fetched_data, serialize=True):
     """Paginate all roles for display."""
-    from api.endpoints.redemption_requests.models import RedemptionRequest
     from api.endpoints.redemption_requests.helpers import serialize_redmp
 
     _page = request.args.get('page', type=int) or \
@@ -82,7 +84,6 @@ def find_item(data):
     """Build the response with found/404 item in DB."""
     # bad design
     # # TODO: Remove local imports from this function, pass model as param
-    from api.endpoints.redemption_requests.models import RedemptionRequest
     from api.endpoints.redemption_requests.helpers import serialize_redmp
     if data:
 

@@ -10,17 +10,18 @@ from api.endpoints.societies import societies_bp
 from api.endpoints.activities import activities_bp
 from api.endpoints.redemption_requests import redemption_bp
 from api.endpoints.roles import roles_bp
-from api.endpoints.activity_type import activitiy_type_bp
+from api.endpoints.activity_types import activitiy_type_bp
 from api.endpoints.users import users_bp
-
-
-from api.models import db
+from api.models import Base
 
 
 try:
     from .config import configuration
 except ImportError:
     from config import configuration
+
+
+db = Base.db
 
 
 def create_app(environment="Production"):

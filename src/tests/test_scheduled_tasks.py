@@ -1,6 +1,6 @@
 '''Scheduled tasks tests module'''
 from .base_test import BaseTestCase
-from ..api.utils.notifications.email_notices import mail_success_ops
+from ..api.services.notifications.tasks import mail_success_ops
 
 
 class SuccessOpsWeeklyTaskTestCase(BaseTestCase):

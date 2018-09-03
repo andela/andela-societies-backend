@@ -1,4 +1,5 @@
-from api.models import Base
+from api.models.base import Base
+
 
 db = Base.db
 
@@ -17,6 +18,7 @@ class User(Base):
 
     society = db.relationship('Society', back_populates='members')
     cohort = db.relationship('Cohort', back_populates='members')
+    center = db.relationship('Center', back_populates='members')
     logged_activities = db.relationship(
         'LoggedActivity',
         back_populates='user',

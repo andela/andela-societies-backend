@@ -16,7 +16,7 @@ class ActivityTypesAPI(Resource):
     decorators = [token_required]
 
     def __init__(self, **kwargs):
-        """Inject dependacy for resource."""
+        """Inject dependency for resource."""
         self.ActivityType = kwargs['ActivityType']
 
     @roles_required(["success ops"])
