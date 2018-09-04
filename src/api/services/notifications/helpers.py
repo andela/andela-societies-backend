@@ -4,7 +4,7 @@ import re
 from flask import Flask, render_template_string
 
 from config import configuration
-from api.models import Role, LoggedActivity, db
+from api.models import Base, Role, LoggedActivity
 
 
 SUCCESS_OPS_MESSAGE = '''
@@ -14,6 +14,8 @@ Have a great week ahead.\n
 Regards,
 The Andela Societies Team.
 '''
+
+db = Base.db
 
 
 def create_celery_flask(environment=os.getenv('APP_SETTINGS', 'Production')):
@@ -28,7 +30,6 @@ def create_celery_flask(environment=os.getenv('APP_SETTINGS', 'Production')):
     app = Flask(__name__)
     app.config.from_object(configuration[environment])
     db.init_app(app)
-
     return app
 
 

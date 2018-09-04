@@ -7,20 +7,12 @@ communicate with the API.
 import base64
 from functools import wraps
 
-from flask import current_app, g, jsonify, request
+from flask import current_app, g, request
 from jose import ExpiredSignatureError, JWTError, jwt
 
+from .helpers import store_user_details
 from api.models import Role, User
-from api.utils.helpers import add_extra_user_info, response_builder
-
-
-def auth_response(status_code, message):
-    """Build authentication responses."""
-    response = jsonify({
-        "message": message
-    })
-    response.status_code = status_code
-    return response
+from api.utils.helpers import response_builder
 
 
 def verify_token(authorization_token, public_key, audience=None, issuer=None):
@@ -110,42 +102,6 @@ def token_required(f):
                 user.save()
         return f(*args, **kwargs)
     return decorated
-
-
-def store_user_details(payload, token):
-    """Store user details in our database."""
-    user_id = payload["UserInfo"]["id"]
-    name = payload["UserInfo"]["name"]
-    email = payload["UserInfo"]["email"]
-    photo = payload["UserInfo"]["picture"]
-    roles = payload["UserInfo"]["roles"]
-
-    user = User.query.get(user_id)
-
-    # save user to db if they haven't been saved yet
-    if not user:
-        user = User(
-            uuid=user_id, name=name, email=email, photo=photo
-        )
-
-    cohort, location, _ = add_extra_user_info(token, user_id)
-
-    if cohort:
-        cohort.members.append(user)
-        cohort.save()
-        user.society_id = cohort.society.uuid if cohort.society else None
-
-    if location:
-        location.members.append(user)
-        location.save()
-
-    # set current user in flask global variable, g
-    user.roles = [
-        Role.query.filter_by(name=role.lower()).first() for role in roles
-        if role and role != "Andelan" and Role.query.filter_by(
-            name=role.lower()).first() is not None]
-    user.save()
-    return user
 
 
 def roles_required(roles):

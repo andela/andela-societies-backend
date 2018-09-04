@@ -2,19 +2,22 @@
 from flask import g, request
 from flask_restful import Resource
 
-from api.models import Activity
-from api.utils.auth import roles_required, token_required
+from api.services.auth import roles_required, token_required
 from api.utils.helpers import response_builder
-from api.utils.marshmallow_schemas import activity_schema
+
+from .marshmallow_schemas import activity_schema
 
 
 class ActivitiesAPI(Resource):
     """Contains CRUD endpoints for activities."""
 
-    @classmethod
+    def __init__(self, **kwargs):
+        """Inject dependency for resource."""
+        self.Activity = kwargs['Activity']
+
     @token_required
     @roles_required(["success ops", "society president"])
-    def post(cls):
+    def post(self):
         """Create an activity."""
         payload = request.get_json(silent=True)
 
@@ -27,7 +30,7 @@ class ActivitiesAPI(Resource):
                 validation_status_code = status_code or 400
                 return response_builder(errors, validation_status_code)
             else:
-                activity = Activity(
+                activity = self.Activity(
                             name=result['name'],
                             description=result['description'],
                             activity_type_id=result['activity_type_id'],

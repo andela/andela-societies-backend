@@ -2,7 +2,7 @@
 from flask import current_app
 
 from .base_test import BaseTestCase
-from ..api.utils.notifications.email_notices import send_email
+from ..api.services.notifications.tasks import send_email
 
 
 class TestMailGunNotification(BaseTestCase):

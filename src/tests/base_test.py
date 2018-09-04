@@ -3,32 +3,14 @@
 import base64
 import datetime
 import os
-import sys
-from unittest import TestCase, mock
 from jose import jwt
+from unittest import TestCase, mock
 
-try:
-    from app import create_app
-    from api.models import (Activity, ActivityType, Cohort, Center,
-                            LoggedActivity, Society, User, Role,
-                            RedemptionRequest,
-                            db)
-except ModuleNotFoundError:
-    # this will enable us to run individual test files
-    # pytest <path to file>
-    # e.g pytest tests/test_logged_activities.py
-    # Run individual test within class
-    # e.g pytest <path to file>.py::ClassName::test_method_name
-
-    sys.path.insert(0,
-                    os.path.abspath(
-                        os.path.join(os.path.dirname(__file__), '..')))
-
-    from app import create_app
-    from api.models import (Activity, ActivityType, Cohort, Center,
-                            LoggedActivity, Society, User, Role,
-                            RedemptionRequest,
-                            db)
+from app import create_app, db
+from api.models import (
+    Center, Cohort, Society, LoggedActivity, RedemptionRequest, Activity,
+    Role, ActivityType, User
+)
 
 
 class BaseTestCase(TestCase):
@@ -214,7 +196,7 @@ class BaseTestCase(TestCase):
         os.environ['APP_SETTINGS'] = 'Testing'
         os.environ['MAIL_GUN_TEST'] = 'True'
 
-        self.patcher = mock.patch('api.utils.auth.add_extra_user_info',
+        self.patcher = mock.patch('api.services.auth.helpers.add_extra_user_info',
                                   return_value=(None, None, None))
         self.patcher.start()
 

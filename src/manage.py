@@ -10,9 +10,10 @@ from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager, Shell, prompt_bool
 
 from api.utils.initial_data import generete_initial_data_run_time_env
-from api.models import Activity, Society, User, db, Center, Role, Cohort
-from app import create_app
+from app import create_app, db
+from api.models import Center, Cohort, Society, Activity, Role, User
 from run_tests import test
+
 
 app = create_app(environment=os.environ.get('APP_SETTINGS', "Production"))
 manager = Manager(app)

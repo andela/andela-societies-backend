@@ -2,27 +2,33 @@
 from flask import g
 from flask_restful import Resource
 
-from api.models import User, Cohort, Center
-from api.utils.auth import token_required
-from api.utils.helpers import add_extra_user_info
-from api.utils.marshmallow_schemas import user_schema, basic_info_schema
+from api.services.auth import token_required
+from api.services.auth.helpers import add_extra_user_info
+from api.utils.marshmallow_schemas import basic_info_schema
+
+from .marshmallow_schema import user_schema
 
 
 class UserAPI(Resource):
     """User Resource."""
 
-    @classmethod
+    def __init__(self, **kwargs):
+        """Inject dependencies for resource."""
+        self.User = kwargs['User']
+        self.Center = kwargs['Center']
+        self.Cohort = kwargs['Cohort']
+
     @token_required
-    def get(cls, user_id=None):
+    def get(self, user_id=None):
         """Get user information."""
         user_information = {}
         status_code = None
-        user = User.query.filter_by(uuid=user_id).first()
+        user = self.User.query.filter_by(uuid=user_id).first()
 
         if user:
             user_information, _ = user_schema.dump(user)
             user_information['roles'], _ = basic_info_schema.dump(
-                                            user.roles, many=True)
+                user.roles, many=True)
             status_code = 200
         else:
             _, _, user_info = add_extra_user_info(
@@ -54,17 +60,17 @@ class UserAPI(Resource):
             status_code = user_info.status_code
 
         location, _ = basic_info_schema.dump(
-            Center.query.filter_by(
+            self.Center.query.filter_by(
                 uuid=user_information.pop('centerId')).first())
         user_information['location'] = location
 
-        cohort = Cohort.query.filter_by(
+        cohort = self.Cohort.query.filter_by(
             uuid=user_information.pop('cohortId')).first()
         if cohort:
             cohort_serialized, _ = basic_info_schema.dump(cohort)
             user_information['cohort'] = cohort_serialized
             user_information['society'], _ = basic_info_schema.dump(
-                   cohort.society)
+                cohort.society)
 
         user_information['roles'] = {role['name']: role['id']
                                      for role in user_information['roles']}
