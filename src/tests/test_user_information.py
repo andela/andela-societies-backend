@@ -30,7 +30,7 @@ class UserInformationTestCase(BaseTestCase):
         self.society.save()
 
         cohort = self.cohort_12_Ke
-        self.patcher = mock.patch('api.utils.auth.add_extra_user_info',
+        self.patcher = mock.patch('api.services.auth.helpers.add_extra_user_info',
                                   return_value=info_mock(200,
                                                          location=self.nairobi,
                                                          cohort=cohort,
@@ -81,12 +81,12 @@ class UserInformationTestCase(BaseTestCase):
             'location': {'id': mock_location.uuid},
             'cohort': {'id': mock_cohort.uuid},
             'roles': {
-                    "Andelan": "-Ktest_andelan_id",
-                    "Fellow": "-KXGy1EB1oimjQgFim6C"
+                "Andelan": "-Ktest_andelan_id",
+                "Fellow": "-KXGy1EB1oimjQgFim6C"
             }
         }
 
-        patcher = mock.patch('api.endpoints.users.add_extra_user_info',
+        patcher = mock.patch('api.endpoints.users.users.add_extra_user_info',
                              return_value=info_mock(200,
                                                     society=mock_society,
                                                     location=mock_location,
@@ -114,7 +114,7 @@ class UserInformationTestCase(BaseTestCase):
 
         patcher.stop()
 
-    @mock.patch('api.endpoints.users.add_extra_user_info',
+    @mock.patch('api.endpoints.users.users.add_extra_user_info',
                 return_value=info_mock(404, data={"error": "user not found"}))
     def test_get_user_info_404(self, mocked_func):
         """Test handles user not found."""
@@ -125,7 +125,7 @@ class UserInformationTestCase(BaseTestCase):
         response_data = json.loads(response.data)
         self.assertDictEqual(response_data, {"error": "user not found"})
 
-    @mock.patch('api.endpoints.users.add_extra_user_info',
+    @mock.patch('api.endpoints.users.users.add_extra_user_info',
                 return_value=info_mock(503, data={"Error": "Network Error"}))
     def test_get_user_info_503(self, mocked_func):
         """Test handles failed network connection correctly."""
@@ -136,7 +136,7 @@ class UserInformationTestCase(BaseTestCase):
         response_data = json.loads(response.data)
         self.assertDictEqual(response_data, {"Error": "Network Error"})
 
-    @mock.patch('api.endpoints.users.add_extra_user_info',
+    @mock.patch('api.endpoints.users.users.add_extra_user_info',
                 return_value=info_mock(500,
                                        data={"Error": "Something went wrong"}))
     def test_get_user_info_500(self, mocked_func):

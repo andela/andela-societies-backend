@@ -5,7 +5,7 @@ import json
 from .base_test import BaseTestCase, Role
 
 
-class AddCohortTestCase(BaseTestCase):
+class CohortsTestCase(BaseTestCase):
 
     def setUp(self):
         super().setUp()
@@ -18,7 +18,7 @@ class AddCohortTestCase(BaseTestCase):
         self.cohort_12_Ke.save()
 
         response = self.client.put(
-            '/api/v1/societies/cohorts',
+            '/api/v1/cohorts',
             headers=self.success_ops, data=json.dumps(
                 {'cohortId': self.cohort_12_Ke.uuid,
                  'societyId': self.istelle.uuid}
@@ -29,7 +29,7 @@ class AddCohortTestCase(BaseTestCase):
 
         data = json.loads(response.data)
 
-        self.assertEqual("Cohort added to society succesfully", data['message'])
+        self.assertEqual("Cohort added to society successfully", data['message'])
         self.assertEqual(
             data.get('data').get('meta').get('society')['id'],
             self.istelle.uuid
@@ -39,7 +39,7 @@ class AddCohortTestCase(BaseTestCase):
         self.istelle.save()
 
         response = self.client.put(
-            '/api/v1/societies/cohorts',
+            '/api/v1/cohorts',
             headers=self.success_ops, data=json.dumps(
                 {'societyId': self.istelle.uuid}
             )
@@ -55,7 +55,7 @@ class AddCohortTestCase(BaseTestCase):
         self.cohort_12_Ke.save()
 
         response = self.client.put(
-            '/api/v1/societies/cohorts',
+            '/api/v1/cohorts',
             headers=self.success_ops, data=json.dumps(
                 {'cohortId': self.cohort_12_Ke.uuid}
             )
@@ -72,14 +72,14 @@ class AddCohortTestCase(BaseTestCase):
         self.istelle.save()
 
         response = self.client.put(
-            '/api/v1/societies/cohorts',
+            '/api/v1/cohorts',
             headers=self.success_ops, data=json.dumps(
                 {'cohortId': "-K-3refaaaer:Invalid",
                  'societyId': self.istelle.uuid}
             )
         )
 
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 404)
 
         data = json.loads(response.data)
         self.assertDictEqual(data, dict(
@@ -89,14 +89,14 @@ class AddCohortTestCase(BaseTestCase):
         self.cohort_12_Ke.save()
 
         response = self.client.put(
-            '/api/v1/societies/cohorts',
+            '/api/v1/cohorts',
             headers=self.success_ops, data=json.dumps(
                 {'cohortId': self.cohort_12_Ke.uuid,
                  'societyId': "-K-3refaaaer:Invalid"}
             )
         )
 
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 404)
 
         data = json.loads(response.data)
         self.assertDictEqual(data, dict(
@@ -110,7 +110,7 @@ class AddCohortTestCase(BaseTestCase):
         self.istelle.save()
 
         response = self.client.put(
-            '/api/v1/societies/cohorts',
+            '/api/v1/cohorts',
             headers=self.success_ops, data=json.dumps(
                 {'cohortId': self.cohort_12_Ke.uuid,
                  'societyId': self.istelle.uuid}
@@ -122,4 +122,4 @@ class AddCohortTestCase(BaseTestCase):
         data = json.loads(response.data)
         self.assertDictEqual(data, dict(
             message="Cohort already in society."
-            ))
+        ))

@@ -55,3 +55,5 @@ werkzeug = "==0.12.2"
 
 [dev-packages]
 yapf = "*"
+"pep8" = "*"
+"autopep8" = "*"

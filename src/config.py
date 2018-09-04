@@ -26,7 +26,7 @@ class Config(object):
     MAIL_GUN_URL = os.environ.get('MAIL_GUN_URL')
     MAIL_GUN_API_KEY = os.environ.get('MAIL_GUN_API_KEY')
     SENDER_CREDS = os.environ.get("SENDER_CREDS")
-    NOTIFICATIONS_SENDER = os.getenv('NOTIFICATIONS_SENDER')
+    NOTIFICATIONS_SENDER = os.getenv('NOTIFICATIONS_SENDER', SENDER_CREDS)
     CELERY_BACKEND = os.environ.get("CELERY_BACKEND")
     CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL")
     CIO = os.environ.get("CIO")
@@ -58,8 +58,11 @@ class Testing(Config):
     ISSUER = "tests"
     API_IDENTIFIER = "tests"
     MAIL_GUN_TEST = os.environ.get('MAIL_GUN_TEST')
-    NOTIFICATIONS_SENDER = os.getenv('TESTS_NOTIFICATIONS_SENDER',
-                                     'notifications@tests.com')
+    NOTIFICATIONS_SENDER = os.getenv(
+        'TESTS_NOTIFICATIONS_SENDER',
+        'Andela Societies Notifications<societies-notifications-tests'
+        '@andela.com>'
+    )
 
 
 class Staging(Development):

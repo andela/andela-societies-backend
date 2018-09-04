@@ -1,6 +1,6 @@
 '''Module containing tasks helpers tests'''
 from .base_test import BaseTestCase
-from ..api.utils.notifications.task_helpers import \
+from ..api.services.notifications.helpers import \
     generate_success_ops_pending_activities_emails
 
 

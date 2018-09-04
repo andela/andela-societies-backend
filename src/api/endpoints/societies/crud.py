@@ -1,24 +1,23 @@
-"""Society Module."""
-
-from flask import request
 from flask_restful import Resource
+from flask import request
 
-from api.utils.auth import roles_required, token_required
-from api.utils.helpers import paginate_items, response_builder
-from api.utils.marshmallow_schemas import (base_schema, cohort_schema,
-                                           society_schema,
-                                           user_logged_activities_schema)
-
-from ..models import Cohort, LoggedActivity, Society
+from api.services.auth import token_required, roles_required
+from api.endpoints.logged_activities.marshmallow_schemas import \
+    user_logged_activities_schema
+from api.utils.helpers import response_builder, paginate_items
+from .marshmallow_schemas import society_schema
 
 
 class SocietyResource(Resource):
     """To contain CRUD endpoints for Society."""
 
-    @classmethod
+    def __init__(self, **kwargs):
+        """Inject dependency for resource."""
+        self.Society = kwargs['Society']
+
     @token_required
     @roles_required(["success ops"])
-    def post(cls):
+    def post(self):
         """Create a society."""
         payload = request.get_json(silent=True)
         if payload:
@@ -32,10 +31,10 @@ class SocietyResource(Resource):
                     status="fail",
                     message="Name, color scheme and logo are required"
                             " to create a society."
-                    ), 400)
+                ), 400)
 
             # if no errors occur in assigning above
-            society = Society(
+            society = self.Society(
                 name=name, color_scheme=color_scheme, logo=logo, photo=photo
             )
             society.save()
@@ -49,23 +48,21 @@ class SocietyResource(Resource):
             status="fail",
             message="Data for creation must be provided"), 400)
 
-    @classmethod
     @token_required
-    def get(cls, society_id=None):
+    def get(self, society_id=None):
         """Get Society(ies) details."""
         if society_id:
-            society = Society.query.get(society_id)
+            society = self.Society.query.get(society_id)
         elif request.args.get('name'):
-            society = Society.query.filter_by(
+            society = self.Society.query.filter_by(
                 name=request.args.get('name')).first()
         else:
             # if no search term has been passed, return all societies in DB
-            societies = Society.query
+            societies = self.Society.query
             return paginate_items(societies)
 
         if society:
-            society_logged_activities = LoggedActivity.query.filter_by(
-                society_id=society.uuid).all()
+            society_logged_activities = society.logged_activities.all()
 
             data, _ = society_schema.dump(society)
             data['loggedActivities'], _ = user_logged_activities_schema.dump(
@@ -81,10 +78,9 @@ class SocietyResource(Resource):
                 message="Resource does not exist."
             ), 404)
 
-    @classmethod
     @token_required
     @roles_required(["success ops"])
-    def put(cls, society_id=None):
+    def put(self, society_id=None):
         """Edit Society details."""
         payload = request.get_json(silent=True)
         if payload:
@@ -93,7 +89,7 @@ class SocietyResource(Resource):
                     status="fail",
                     message="Society to be edited must be provided"), 400)
 
-            society = Society.query.get(society_id)
+            society = self.Society.query.get(society_id)
             if society:
                 try:
                     name = payload["name"] or None
@@ -121,25 +117,24 @@ class SocietyResource(Resource):
                         errors=e), 500)
 
             return response_builder(dict(
-                                status="fail",
-                                message="Society does not exist."), 404)
+                status="fail",
+                message="Society does not exist."), 404)
 
         # if payload does not exist
         return response_builder(dict(
             status="fail",
             message="Data for editing must be provided"), 400)
 
-    @classmethod
     @token_required
     @roles_required(["success ops"])
-    def delete(cls, society_id=None):
+    def delete(self, society_id=None):
         """Delete Society."""
         if not society_id:
             return response_builder(dict(
                 status="fail",
                 message="Society id must be provided."), 400)
 
-        society = Society.query.get(society_id)
+        society = self.Society.query.get(society_id)
         if not society:
             return response_builder(dict(
                 status="fail",
@@ -147,61 +142,5 @@ class SocietyResource(Resource):
 
         society.delete()
         return response_builder(dict(
-                status="success",
-                message="Society deleted successfully."), 200)
-
-
-class AddCohort(Resource):
-    """Resource for adding cohorts to societies."""
-
-    @classmethod
-    @token_required
-    @roles_required(["success ops"])
-    def put(cls):
-        """Assign a cohort to a society.
-
-        Return
-            response (dict): key:status
-
-        """
-        payload = request.get_json(silent=True)
-
-        if not payload or not ('societyId' in payload and
-                               'cohortId' in payload):
-            return response_builder(dict(
-                message="Error societyId and cohortId are required."
-            ), 400)
-
-        society = Society.query.filter_by(
-            uuid=payload.get('societyId')).first()
-        if not society:
-            return response_builder(dict(
-                message="Error Invalid societyId."
-            ), 400)
-
-        cohort = Cohort.query.filter_by(uuid=payload.get('cohortId')).first()
-        if not cohort:
-            return response_builder(dict(
-                message="Error Invalid cohortId."
-            ), 400)
-
-        if cohort.society_id == society.uuid:
-            return response_builder(dict(
-                message="Cohort already in society."
-            ), 409)
-
-        society.cohorts.append(cohort)
-        society.save()
-        cohort.save()
-
-        cohort_data = cohort_schema.dump(cohort).data
-        cohort_meta_data = {
-                'society': base_schema.dump(society).data,
-                'center': base_schema.dump(cohort.center).data
-                }
-        cohort_data['meta'] = cohort_meta_data
-
-        return response_builder(dict(
-            message="Cohort added to society succesfully",
-            data=cohort_data
-        ), 200)
+            status="success",
+            message="Society deleted successfully."), 200)
