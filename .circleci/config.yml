@@ -65,14 +65,14 @@ workflows:
           filters:
             branches:
               only:
-                - staging
+                - develop
       - deploy-staging:
           requires:
             - upgrade-database
           filters:
             branches:
               only:
-                - staging
+                - develop
       - deploy-master:
           requires:
             - test
