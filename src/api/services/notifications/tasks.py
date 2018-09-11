@@ -1,7 +1,9 @@
 """Notifications module."""
 import os
-import requests
 
+from flask import current_app
+from flask_mail import Mail
+from flask_mail import Message
 from celery import Celery
 from celery.schedules import crontab
 
@@ -17,6 +19,9 @@ celery = Celery(
     broker=os.environ.get("CELERY_BROKER_URL", None),
     backend=os.environ.get("CELERY_BACKEND", None)
 )
+mail_sender = Mail()
+mail_sender.init_app(flask_app)
+
 
 celery.conf.beat_schedule = {
     'mail-success-ops': {
@@ -30,14 +35,17 @@ celery.conf.beat_schedule = {
 
 
 @celery.task
-def send_email(**kwargs):
+def send_email(app=flask_app, mail=mail_sender, **kwargs):
     """
     Send the Emails.
 
-    This method sends email using Mail Gun. Ensure to have the following
+    This method sends email using Flask_Mail. Ensure to have the following
     environment variable set;
-    1. MAIL_GUN_URL
-    2. MAIL_GUN_API_KEY
+    1. MAIL_SERVER = Your Server
+    2. MAIL_PORT = Your server's port
+    3. MAIL_USE_TLS = True
+    4. MAIL_USERNAME
+    5. MAIL_PASSWORD
 
     :kwarg app:
     :kwarg strategy:
@@ -47,37 +55,30 @@ def send_email(**kwargs):
     :kwarg recipients:
     :return bool:
     """
-    if not kwargs["sender"] or not kwargs["sender"].strip():
-        raise ValueError("sender address missing")
+    with app.app_context():
+        if not kwargs.get("sender") or not kwargs.get("sender").strip():
+            raise ValueError("sender address missing")
 
-    validate_email(kwargs["recipients"])
+        validate_email(kwargs["recipients"])
 
-    if os.getenv("MAIL_GUN_TEST"):
-        return True
+        if current_app.config.get("MAIL_GUN_TEST"):
+                return True
 
-    mail_gun_url = flask_app.config["MAIL_GUN_URL"]
-    mail_gun_api_key = flask_app.config["MAIL_GUN_API_KEY"]
+        msg = Message(subject=kwargs["subject"],
+                      recipients=kwargs["recipients"], sender=kwargs["sender"])
+        msg.body = kwargs["message"]
 
-    data = {
-        "from": kwargs["sender"],
-        "to": kwargs["recipients"],
-        "subject": kwargs["subject"],
-        "text": kwargs["message"],
-    }
-    if kwargs.get("html"):
-        data.update(dict(html=kwargs.get("html")))
-    response = requests.post(
-        mail_gun_url, auth=("api", mail_gun_api_key), data=data
-    )
-    if response.status_code == 200:
-        return True
-    else:
-        return False
+        if kwargs.get("html"):
+            msg.html = kwargs.get("html")
+
+        mail_sender.send(msg)
 
 
 @celery.task
 def mail_success_ops(app=flask_app):
     """
+    Mail Cron Job.
+
     Mail success ops every monday morning when there are pending
     activities
     """

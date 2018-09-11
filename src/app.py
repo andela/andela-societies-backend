@@ -12,6 +12,7 @@ from api.endpoints.redemption_requests import redemption_bp
 from api.endpoints.roles import roles_bp
 from api.endpoints.activity_types import activitiy_type_bp
 from api.endpoints.users import users_bp
+from api.endpoints.healthcheck_email import email_healthcheck_bp
 from api.models import Base
 
 
@@ -78,6 +79,11 @@ def create_app(environment="Production"):
     # register users blueprint
     app.register_blueprint(
         users_bp(Api, Blueprint)
+    )
+
+    # register Email Healthcheck blueprint
+    app.register_blueprint(
+        email_healthcheck_bp(Api, Blueprint)
     )
 
     # enable health check ping to API

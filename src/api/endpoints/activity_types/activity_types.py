@@ -97,18 +97,26 @@ class ActivityTypesAPI(Resource):
                 message="Resource not found."
             ), 404)
 
-        if payload.get("name"):
-            target_activity_type.name = payload.get("name")
-        if payload.get("description"):
-            target_activity_type.description = payload.get("description")
-        if payload.get("value"):
-            target_activity_type.value = payload.get("value")
-        if payload.get("supports_multiple_participants"):
+        result, errors = new_activity_type_schema.load(payload, partial=True)
+
+        if errors:
+            status_code = new_activity_type_schema.context.get(
+                'status_code')
+            validation_status_code = status_code or 400
+            return response_builder(errors, validation_status_code)
+
+        if "name" in result:
+            target_activity_type.name = result["name"]
+        if "description" in result:
+            target_activity_type.description = result["description"]
+        if "value" in result:
+            target_activity_type.value = result["value"]
+        if "supports_multiple_participant" in result:
             target_activity_type.supports_multiple_participants =\
-                payload.get("supports_multiple_participants")
+                result["supports_multiple_participants"]
         return response_builder(dict(
             message="Edit successful",
-            path=target_activity_type.serialize(),
+            data=target_activity_type.serialize(),
             status="success",
         ), 200)
 
