@@ -608,7 +608,7 @@ class LoggedActivityApprovalTestCase(BaseTestCase):
 
         """
         Test a scenario where approval for logged activities fails when
-        logged_activities_ids request payload is of type string.
+        logged_activities_ids request payload is of type List.
         """
 
         self.successops_role.save()
@@ -673,7 +673,32 @@ class LoggedActivityApprovalTestCase(BaseTestCase):
            headers=self.success_ops
         )
 
-        message = 'Invalid logged activities or no pending logged activities in request'
+        message = 'invalid logged_activities_ids or no pending logged activities'
+        response_details = json.loads(response.get_data(as_text=True))
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response_details['message'], message)
+
+    def test_fails_when_logged_activities_key_not_in_payload(self):
+
+        """
+        Test a scenario where loggedActivitiesIds key not in payload request assuming
+        and invalid key is provided
+        """
+
+        self.successops_role.save()
+
+        self.payload = dict(
+            loggedActivitiesId=['13567788', '235555666']
+        )
+
+        response = self.client.put(
+           f'/api/v1/logged-activities/approve/',
+           data=json.dumps(self.payload),
+           headers=self.success_ops
+        )
+
+        message = 'loggedActivitiesIds is required'
         response_details = json.loads(response.get_data(as_text=True))
 
         self.assertEqual(response.status_code, 400)
