@@ -2,7 +2,7 @@
 
 
 def logged_activities_bp(Api, Blueprint):
-    from api.models import ActivityType, Activity, User
+    from api.models import ActivityType, Activity, User, base
     from .models import LoggedActivity
     from .crud import LoggedActivitiesAPI
     from .user_logged_activities import UserLoggedActivitiesAPI
@@ -10,6 +10,7 @@ def logged_activities_bp(Api, Blueprint):
     from .reject import LoggedActivityRejectionAPI
     from .request_info import LoggedActivityInfoAPI
     from .secretary_review import SecretaryReviewLoggedActivityAPI
+
 
     logged_activities_bp_service = Blueprint('logged_activities_api', __name__)
     logged_activities_api = Api(logged_activities_bp_service)
@@ -69,7 +70,8 @@ def logged_activities_bp(Api, Blueprint):
         "/logged-activities/approve/",
         endpoint="approve_logged_activities",
         resource_class_kwargs={
-            'LoggedActivity': LoggedActivity
+            'LoggedActivity': LoggedActivity,
+            'db': base.db
         }
     )
 
