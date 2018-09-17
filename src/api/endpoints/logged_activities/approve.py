@@ -45,10 +45,12 @@ class LoggedActivityApprovalAPI(Resource):
 
             request_approval_data = bulk_approval_query.all()
 
-            request_approval =bulk_approval_query.update({'status': 'approved'},
+            request_approval = bulk_approval_query.update({'status': 'approved'},
             synchronize_session=False)
 
             if request_approval:
+                for approval in request_approval_data:
+                    approval.society.total_points = approval
                 self.db.session.commit()
                 return response_builder(dict(
                     data=logged_activities_schema.dump(request_approval_data).data,
