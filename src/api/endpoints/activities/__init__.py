@@ -11,8 +11,8 @@ def activities_bp(Api, Blueprint):
     # activities endpoints
     activities_api .add_resource(
         ActivitiesAPI,
-        '/api/v1/activities',
-        '/api/v1/activities/',
+        '/activities',
+        '/activities/',
         endpoint='activities',
         resource_class_kwargs={
             'Activity': Activity

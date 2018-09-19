@@ -1,7 +1,9 @@
 """Main app module."""
 
+from blinker import Namespace
 from flask import Flask, jsonify, Blueprint
 from flask_cors import CORS
+from flask_mail import Mail
 from flask_restful import Api
 
 from api.endpoints.logged_activities import logged_activities_bp
@@ -18,8 +20,10 @@ from api.models import Base
 
 try:
     from .config import configuration
+    from .email_handeler import send_email_async
 except ImportError:
     from config import configuration
+    from email_handeler import send_email_async
 
 
 db = Base.db
@@ -38,52 +42,72 @@ def create_app(environment="Production"):
     app.config.from_object(configuration[environment])
     db.init_app(app)
 
+    mail = Mail(app)
+    mail.init_app(app)
+
     # enable cross origin resource sharing
     CORS(app)
 
+    # url prefixes
+    url_version_1 = '/api/v1'
+
+    # create events
+    app_signals = Namespace()
+    send_email_signal = app_signals.signal('send_email')
+    send_email_signal.connect(send_email_async)
+
     # register logged activities blueprint
     app.register_blueprint(
-        logged_activities_bp(Api, Blueprint), url_prefix='/api/v1'
+        logged_activities_bp(Api, Blueprint, send_email_signal, mail),
+        url_prefix=url_version_1
     )
 
     # register cohorts blueprint
     app.register_blueprint(
-        cohorts_bp(Api, Blueprint), url_prefix='/api/v1'
+        cohorts_bp(Api, Blueprint),
+        url_prefix=url_version_1
     )
 
     # register societies blueprint
     app.register_blueprint(
-        societies_bp(Api, Blueprint), url_prefix='/api/v1'
+        societies_bp(Api, Blueprint),
+        url_prefix=url_version_1
     )
 
     # register redemption blueprint
     app.register_blueprint(
-        redemption_bp(Api, Blueprint)
+        redemption_bp(Api, Blueprint, send_email_signal, mail),
+        url_prefix=url_version_1
     )
 
     # register activities blueprint
     app.register_blueprint(
-        activities_bp(Api, Blueprint)
+        activities_bp(Api, Blueprint),
+        url_prefix=url_version_1
     )
 
     # register roles blueprint
     app.register_blueprint(
-        roles_bp(Api, Blueprint)
+        roles_bp(Api, Blueprint),
+        url_prefix=url_version_1
     )
 
     # register activity_types blueprint
     app.register_blueprint(
-        activitiy_type_bp(Api, Blueprint)
+        activitiy_type_bp(Api, Blueprint),
+        url_prefix=url_version_1
     )
 
     # register users blueprint
     app.register_blueprint(
-        users_bp(Api, Blueprint)
+        users_bp(Api, Blueprint),
+        url_prefix=url_version_1
     )
 
     # register Email Healthcheck blueprint
     app.register_blueprint(
-        email_healthcheck_bp(Api, Blueprint)
+        email_healthcheck_bp(Api, Blueprint),
+        url_prefix=url_version_1
     )
 
     # enable health check ping to API

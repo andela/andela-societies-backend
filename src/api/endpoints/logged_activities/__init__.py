@@ -1,7 +1,7 @@
 """setup logged_activities request resource blueprint."""
 
 
-def logged_activities_bp(Api, Blueprint):
+def logged_activities_bp(Api, Blueprint, emit_email_event, mail):
     from api.models import ActivityType, Activity, User, base
     from .models import LoggedActivity
     from .crud import LoggedActivitiesAPI
@@ -18,7 +18,8 @@ def logged_activities_bp(Api, Blueprint):
     # CRUD logged activities endpoint
     logged_activities_api.add_resource(
         LoggedActivitiesAPI,
-        '/logged-activities', '/logged-activities/',
+        '/logged-activities',
+        '/logged-activities/',
         '/logged-activities/<string:logged_activity_id>',
         '/logged-activities/<string:logged_activity_id>/',
         endpoint='logged_activities',
@@ -59,7 +60,9 @@ def logged_activities_bp(Api, Blueprint):
         '/logged-activities/info/<string:logged_activity_id>/',
         endpoint='info_on_logged_activity',
         resource_class_kwargs={
-            'LoggedActivity': LoggedActivity
+            'LoggedActivity': LoggedActivity,
+            'email': emit_email_event,
+            'mail': mail
         }
     )
 
@@ -78,8 +81,8 @@ def logged_activities_bp(Api, Blueprint):
     # success ops reject logged_activity
     logged_activities_api.add_resource(
         LoggedActivityRejectionAPI,
-        "/logged-activity/reject/<string:logged_activity_id>",
-        "/logged-activity/reject/<string:logged_activity_id>/",
+        "/logged-activities/reject/<string:logged_activity_id>",
+        "/logged-activities/reject/<string:logged_activity_id>/",
         endpoint="reject_logged_activity",
         resource_class_kwargs={
             'LoggedActivity': LoggedActivity

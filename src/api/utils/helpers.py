@@ -1,6 +1,6 @@
 """Contain utility functions and constants."""
-from collections import namedtuple
 
+from collections import namedtuple
 from flask import current_app, jsonify, request, url_for
 
 from api.models import RedemptionRequest, Cohort

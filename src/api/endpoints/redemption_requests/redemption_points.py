@@ -3,7 +3,6 @@ from flask import request, g, current_app
 from flask_restful import Resource
 
 # from other packages
-from api.services.notifications.tasks import send_email
 from api.utils.helpers import find_item, paginate_items, response_builder
 from api.services.auth import token_required, roles_required
 from api.utils.marshmallow_schemas import basic_info_schema
@@ -27,6 +26,8 @@ class PointRedemptionAPI(Resource):
         self.RedemptionRequest = kwargs['RedemptionRequest']
         self.Center = kwargs['Center']
         self.Society = kwargs['Society']
+        self.email = kwargs['email']
+        self.mail = kwargs['mail']
 
     @token_required
     @roles_required(["society president"])
@@ -66,14 +67,20 @@ class PointRedemptionAPI(Resource):
             data, _ = redemption_schema.dump(redemp_request)
             data["center"], _ = basic_info_schema.dump(center)
 
-            send_email.delay(
-                sender=current_app.config["SENDER_CREDS"],
+            email_payload = dict(
+                sender=g.current_user.email,
                 subject="RedemptionRequest for {}".format(
                     g.current_user.society.name),
                 message="Redemption Request reason:{}."
                         "Redemption Request value: {} points".format(
                     redemp_request.name, redemp_request.value),
                 recipients=[current_app.config["CIO"]]
+            )
+
+            self.email.send(
+                current_app._get_current_object(),
+                payload=email_payload,
+                mail=self.mail
             )
 
             return response_builder(dict(

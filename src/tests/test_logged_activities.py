@@ -720,7 +720,7 @@ class LoggedActivityRejectTestCase(BaseTestCase):
         self.log_alibaba_challenge.save()
 
         response = self.client.put(
-           f'/api/v1/logged-activity/reject/{self.log_alibaba_challenge.uuid}',
+           f'/api/v1/logged-activities/reject/{self.log_alibaba_challenge.uuid}',
            headers=self.success_ops
         )
 
@@ -741,7 +741,7 @@ class LoggedActivityRejectTestCase(BaseTestCase):
         self.successops_role.save()
 
         response = self.client.put(
-           '/api/v1/logged-activity/reject/43kaa',
+           '/api/v1/logged-activities/reject/43kaa',
            headers=self.success_ops
         )
 
@@ -763,7 +763,7 @@ class LoggedActivityRejectTestCase(BaseTestCase):
         self.log_alibaba_challenge.save()
 
         response = self.client.put(
-           f'/api/v1/logged-activity/reject/{self.log_alibaba_challenge.uuid}',
+           f'/api/v1/logged-activities/reject/{self.log_alibaba_challenge.uuid}',
            headers=self.success_ops
         )
 

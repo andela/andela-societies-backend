@@ -13,10 +13,10 @@ def roles_bp(Api, Blueprint):
     # role endpoints
     roles_api.add_resource(
         RoleAPI,
-        "/api/v1/roles",
-        "/api/v1/roles/",
-        "/api/v1/roles/<string:role_query>",
-        "/api/v1/roles/<string:role_query>/",
+        "/roles",
+        "/roles/",
+        "/roles/<string:role_query>",
+        "/roles/<string:role_query>/",
         endpoint="role",
         resource_class_kwargs={
             'Role': Role
@@ -25,8 +25,8 @@ def roles_bp(Api, Blueprint):
 
     roles_api.add_resource(
         SocietyRoleAPI,
-        "/api/v1/roles/society-execs",
-        "/api/v1/roles/society-execs/",
+        "/roles/society-execs",
+        "/roles/society-execs/",
         endpoint="society_execs_roles",
         resource_class_kwargs={
             'Role': Role,
