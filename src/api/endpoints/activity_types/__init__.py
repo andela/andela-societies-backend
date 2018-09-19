@@ -11,10 +11,10 @@ def activitiy_type_bp(Api, Blueprint):
     # activity types endpoints
     activitiy_type_api.add_resource(
         ActivityTypesAPI,
-        '/api/v1/activity-types',
-        '/api/v1/activity-types/',
-        '/api/v1/activity-types/<string:act_types_id>',
-        '/api/v1/activity-types/<string:act_types_id>/',
+        '/activity-types',
+        '/activity-types/',
+        '/activity-types/<string:act_types_id>',
+        '/activity-types/<string:act_types_id>/',
         endpoint='activity_types',
         resource_class_kwargs={
             'ActivityType': ActivityType

@@ -25,6 +25,8 @@ class RedemptionRequestFunds(Resource):
     def __init__(self, **kwargs):
         """Inject dependency for resource."""
         self.RedemptionRequest = kwargs['RedemptionRequest']
+        self.email = kwargs['email']
+        self.mail = kwargs['mail']
 
     @roles_required(["finance"])
     def put(self, redeem_id=None):
@@ -55,7 +57,7 @@ class RedemptionRequestFunds(Resource):
         if status == "completed":
             redemp_request.status = status
 
-            send_email.delay(
+            email_payload = dict(
                 sender=current_app.config["SENDER_CREDS"],
                 subject="RedemptionRequest for {}".format(
                     redemp_request.user.society.name),
@@ -64,6 +66,12 @@ class RedemptionRequestFunds(Resource):
                     redemp_request.name),
                 recipients=[redemp_request.user.email,
                             current_app.config["CIO"]]
+            )
+
+            self.email.send(
+                current_app._get_current_object(),
+                payload=email_payload,
+                mail=self.mail
             )
         else:
             return response_builder(dict(

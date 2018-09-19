@@ -1,7 +1,7 @@
 """setup redemption request resource blueprint."""
 
 
-def redemption_bp(Api, Blueprint):
+def redemption_bp(Api, Blueprint, emit_email_event, mail):
     from api.models import Center, Society
     from .models import RedemptionRequest
     from .redemption_points import PointRedemptionAPI
@@ -13,36 +13,42 @@ def redemption_bp(Api, Blueprint):
 
     redemption_api.add_resource(
         PointRedemptionAPI,
-        "/api/v1/societies/redeem/<string:redeem_id>",
-        "/api/v1/societies/redeem/<string:redeem_id>/",
-        "/api/v1/societies/redeem",
-        "/api/v1/societies/redeem/",
+        "/societies/redeem/<string:redeem_id>",
+        "/societies/redeem/<string:redeem_id>/",
+        "/societies/redeem",
+        "/societies/redeem/",
         endpoint="point_redemption_detail",
         resource_class_kwargs={
             'RedemptionRequest': RedemptionRequest,
             'Center': Center,
-            'Society': Society
+            'Society': Society,
+            'email': emit_email_event,
+            'mail': mail
         }
     )
 
     redemption_api.add_resource(
         RedemptionRequestNumeration,
-        "/api/v1/societies/redeem/verify/<string:redeem_id>",
-        "/api/v1/societies/redeem/verify/<string:redeem_id>/",
+        "/societies/redeem/verify/<string:redeem_id>",
+        "/societies/redeem/verify/<string:redeem_id>/",
         endpoint="redemption_numeration",
         resource_class_kwargs={
             'RedemptionRequest': RedemptionRequest,
-            'Society': Society
+            'Society': Society,
+            'email': emit_email_event,
+            'mail': mail
         }
     )
 
     redemption_api.add_resource(
         RedemptionRequestFunds,
-        "/api/v1/societies/redeem/funds/<string:redeem_id>",
-        "/api/v1/societies/redeem/funds/<string:redeem_id>/",
+        "/societies/redeem/funds/<string:redeem_id>",
+        "/societies/redeem/funds/<string:redeem_id>/",
         endpoint="redemption_request_funds",
         resource_class_kwargs={
-            'RedemptionRequest': RedemptionRequest
+            'RedemptionRequest': RedemptionRequest,
+            'email': emit_email_event,
+            'mail': mail
         }
     )
     return redemption_bp_service

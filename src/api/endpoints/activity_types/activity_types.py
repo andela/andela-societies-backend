@@ -114,6 +114,10 @@ class ActivityTypesAPI(Resource):
         if "supports_multiple_participant" in result:
             target_activity_type.supports_multiple_participants =\
                 result["supports_multiple_participants"]
+
+        # save the model here
+        target_activity_type.save()
+
         return response_builder(dict(
             message="Edit successful",
             data=target_activity_type.serialize(),

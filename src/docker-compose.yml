@@ -1,0 +1,37 @@
+version: '3.3'
+
+services:
+
+  python-web-api-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+    command: python manage.py runserver -p 5000 -h 0.0.0.0
+    ports:
+      - "5000:5000"
+    environment:
+      APP_SETTINGS: Development
+      DEV_DATABASE: postgresql://soc_dev:password_dev@postgres-db-soc-dev:5432/devDB
+    env_file:
+      - .env
+    networks:
+      - andela-soc-dev-network
+    depends_on:
+      - postgres-db-soc-dev
+
+  postgres-db-soc-dev:
+    image: postgres
+    environment:
+      POSTGRES_USER: soc_dev
+      POSTGRES_PASSWORD: password_dev
+      POSTGRES_DB: devDB
+    ports:
+      - "5001:5432"
+    networks:
+      - andela-soc-dev-network
+
+networks:
+  andela-soc-dev-network:
+    driver: bridge

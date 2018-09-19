@@ -12,8 +12,8 @@ def users_bp(Api, Blueprint):
     # user endpoints
     users_api.add_resource(
         UserAPI,
-        '/api/v1/users/<string:user_id>',
-        '/api/v1/users/<string:user_id>/',
+        '/users/<string:user_id>',
+        '/users/<string:user_id>/',
         endpoint='user_info',
         resource_class_kwargs={
             'User': User,

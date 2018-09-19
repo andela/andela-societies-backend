@@ -52,6 +52,7 @@ pycryptodome = "==3.5.1"
 six = "==1.10.0"
 sqlalchemy = "==1.1.14"
 werkzeug = "==0.12.2"
+flask-mail = "*"
 
 [dev-packages]
 yapf = "*"
