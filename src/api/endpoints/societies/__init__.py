@@ -11,7 +11,8 @@ def societies_bp(Api, Blueprint):
     # society CRUD endpoints
     societies_api.add_resource(
         SocietyResource,
-        "/societies", "/societies/",
+        "/societies",
+        "/societies/",
         "/societies/<string:society_id>",
         "/societies/<string:society_id>/",
         endpoint="societies",

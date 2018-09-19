@@ -3,7 +3,6 @@ from flask import request, current_app
 
 from api.services.auth import token_required, roles_required
 from api.utils.helpers import response_builder
-from api.services.notifications.tasks import send_email
 
 
 class LoggedActivityInfoAPI(Resource):
@@ -14,6 +13,8 @@ class LoggedActivityInfoAPI(Resource):
     def __init__(self, **kwargs):
         """Inject dependency for resource."""
         self.LoggedActivity = kwargs['LoggedActivity']
+        self.email = kwargs['email']
+        self.mail = kwargs['mail']
 
     @roles_required(["success ops"])
     def put(self, logged_activity_id=None):
@@ -39,8 +40,9 @@ class LoggedActivityInfoAPI(Resource):
 
         comment = payload.get("comment")
         if comment:
-            send_email.delay(
+            email_payload = dict(
                 sender=current_app.config["SENDER_CREDS"],
+                recipients=[logged_activity.user.email],
                 subject="More Info on Logged Activity for {}".format(
                     logged_activity.user.society.name),
                 message="Success Ops needs more information on this"
@@ -51,8 +53,12 @@ class LoggedActivityInfoAPI(Resource):
                             logged_activity.name, comment, request.host_url +
                             '/api/v1/logged-activities/' +
                             logged_activity.uuid
-                ),
-                recipients=[logged_activity.user.email]
+                            ),
+            )
+            self.email.send(
+                current_app._get_current_object(),
+                payload=email_payload,
+                mail=self.mail
             )
         else:
             return response_builder(dict(
@@ -61,5 +67,4 @@ class LoggedActivityInfoAPI(Resource):
 
         return response_builder(dict(
             status='success',
-            message='Extra information has been successfully requested'),
-            200)
+            message='Extra information has been successfully requested'), 200)

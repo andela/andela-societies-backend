@@ -3,7 +3,6 @@ from flask import request, g, current_app
 from flask_restful import Resource
 
 # imports from other packages
-from api.services.notifications.tasks import send_email
 from api.services.auth import token_required, roles_required
 from api.utils.helpers import response_builder
 from api.utils.marshmallow_schemas import basic_info_schema
@@ -27,6 +26,8 @@ class RedemptionRequestNumeration(Resource):
         """Inject dependencies for resource."""
         self.RedemptionRequest = kwargs['RedemptionRequest']
         self.Society = kwargs['Society']
+        self.email = kwargs['email']
+        self.mail = kwargs['mail']
 
     @token_required
     @roles_required(["success ops", "cio"])
@@ -75,7 +76,7 @@ class RedemptionRequestNumeration(Resource):
                 finance_email = redemp_request.center.name.lower() + \
                     "-finance@andela.com"
 
-            send_email.delay(
+            email_payload = dict(
                 sender=current_app.config["SENDER_CREDS"],
                 subject="RedemptionRequest for {}".format(
                     redemp_request.user.society.name),
@@ -89,7 +90,13 @@ class RedemptionRequestNumeration(Resource):
                 recipients=[finance_email]
             )
 
-            send_email.delay(
+            self.email.send(
+                current_app._get_current_object(),
+                payload=email_payload,
+                mail=self.mail
+            )
+
+            email_payload = dict(
                 sender=current_app.config["SENDER_CREDS"],
                 subject="RedemptionRequest for {}".format(
                     redemp_request.user.society.name),
@@ -98,10 +105,16 @@ class RedemptionRequestNumeration(Resource):
                 recipients=[redemp_request.user.email]
             )
 
+            self.email.send(
+                current_app._get_current_object(),
+                payload=email_payload,
+                mail=self.mail
+            )
+
         elif status == "rejected":
             redemp_request.status = status
             redemp_request.rejection = rejection_reason
-            send_email.delay(
+            email_payload = dict(
                 sender=current_app.config["SENDER_CREDS"],
                 subject="RedemptionRequest for {}".format(
                     redemp_request.user.society.name),
@@ -110,14 +123,25 @@ class RedemptionRequestNumeration(Resource):
                 recipients=[redemp_request.user.email]
             )
 
+            self.email.send(
+                current_app._get_current_object(),
+                payload=email_payload,
+                mail=self.mail
+            )
         elif comment:
-            send_email.delay(
+            email_payload = dict(
                 sender=current_app.config["SENDER_CREDS"],
                 subject="More Info on RedemptionRequest for {}".format(
                     redemp_request.user.society.name),
                 message=comment,
                 recipients=[redemp_request.user.email]
             )  # cover for requesting more information
+
+            self.email.send(
+                current_app._get_current_object(),
+                payload=email_payload,
+                mail=self.mail
+            )
 
         else:
             return response_builder(dict(

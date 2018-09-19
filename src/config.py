@@ -30,11 +30,18 @@ class Config(object):
     CELERY_BACKEND = os.environ.get("CELERY_BACKEND")
     CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL")
     CIO = os.environ.get("CIO")
+    EMAIL_HOST_SERVICE = os.environ.get("EMAIL_HOST_SERVICE")
 
     SUCCESS_OPS_NEWSLETTER_DAY = os.getenv(
         'SUCCESS_OPS_NEWSLETTER_DAY', 'mon'
         # can be int or valid cron day string
     )
+
+    MAIL_SERVER = os.environ.get('MAIL_SERVER')
+    MAIL_PORT = int(os.environ.get('MAIL_PORT', 25))
+    MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS') is not None
+    MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
+    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
 
 
 class Development(Config):
