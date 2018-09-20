@@ -19,6 +19,7 @@ class PointRedemptionBaseTestCase(BaseTestCase):
         self.sparks.save()
         self.phoenix.save()
         self.redemp_req.save()
+        self.test_cio.save()
 
         self.sparks_president = User(
             uuid="-KdQsMtixG4U0y_-yJEHsparks",
@@ -450,6 +451,7 @@ class PointRedemptionApprovalTestCase(BaseTestCase):
         self.sparks.save()
         self.phoenix.save()
         self.redemp_req.save()
+        self.test_cio.save()
 
     def test_point_redemption_approval_successful(self):
         """Test approval of redemption request.

@@ -25,7 +25,8 @@ class ActivityTypesSchema(BaseSchema):
             'message': 'Please send value if activity supports multiple '
             'participants'
         },
-        dump_to='supportsMultipleParticipants'
+        dump_to='supportsMultipleParticipants',
+        load_from='supports_multiple'
     )
 
     @post_load
@@ -40,5 +41,14 @@ class ActivityTypesSchema(BaseSchema):
                                    'Activity Type (name) already exists!'})
 
 
+class EditActivityTypesSchema(ActivityTypesSchema):
+    """Edit ActivityType validation schema."""
+
+    @post_load
+    def verify_activity_type(self, data):
+        pass
+
+
 activity_types_schema = ActivityTypesSchema(many=True)
 new_activity_type_schema = ActivityTypesSchema()
+edit_activity_type_schema = EditActivityTypesSchema()

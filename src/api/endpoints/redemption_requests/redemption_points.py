@@ -28,6 +28,7 @@ class PointRedemptionAPI(Resource):
         self.Society = kwargs['Society']
         self.email = kwargs['email']
         self.mail = kwargs['mail']
+        self.Role = kwargs['Role']
 
     @token_required
     @roles_required(["society president"])
@@ -52,6 +53,10 @@ class PointRedemptionAPI(Resource):
                 status="fail"
             ), 403)
 
+        # bug fix this nigeria -> lagos
+        if result.get('center') == 'nigeria':
+            result['center'] = 'lagos'
+
         center = self.Center.query.filter_by(name=result.get('center')).first()
 
         if center:
@@ -67,21 +72,24 @@ class PointRedemptionAPI(Resource):
             data, _ = redemption_schema.dump(redemp_request)
             data["center"], _ = basic_info_schema.dump(center)
 
-            email_payload = dict(
-                sender=g.current_user.email,
-                subject="RedemptionRequest for {}".format(
-                    g.current_user.society.name),
-                message="Redemption Request reason:{}."
-                        "Redemption Request value: {} points".format(
-                    redemp_request.name, redemp_request.value),
-                recipients=[current_app.config["CIO"]]
-            )
+            CIO = self.Role.query.filter_by(name='cio').first()
 
-            self.email.send(
-                current_app._get_current_object(),
-                payload=email_payload,
-                mail=self.mail
-            )
+            if CIO and CIO.users.all():  # TODO Add logging here
+                email_payload = dict(
+                    sender=g.current_user.email,
+                    subject="RedemptionRequest for {}".format(
+                        g.current_user.society.name),
+                    message="Redemption Request reason:{}."
+                            "Redemption Request value: {} points".format(
+                        redemp_request.name, redemp_request.value),
+                    recipients=[user.email for user in CIO.users]
+                )
+
+                self.email.send(
+                    current_app._get_current_object(),
+                    payload=email_payload,
+                    mail=self.mail
+                )
 
             return response_builder(dict(
                 message="Redemption request created. Success Ops will be in"

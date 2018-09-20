@@ -2,7 +2,7 @@
 
 
 def redemption_bp(Api, Blueprint, emit_email_event, mail):
-    from api.models import Center, Society
+    from api.models import Center, Society, Role
     from .models import RedemptionRequest
     from .redemption_points import PointRedemptionAPI
     from .redemption_numeration import RedemptionRequestNumeration
@@ -10,7 +10,6 @@ def redemption_bp(Api, Blueprint, emit_email_event, mail):
 
     redemption_bp_service = Blueprint('redemption_api', __name__)
     redemption_api = Api(redemption_bp_service)
-
     redemption_api.add_resource(
         PointRedemptionAPI,
         "/societies/redeem/<string:redeem_id>",
@@ -23,7 +22,8 @@ def redemption_bp(Api, Blueprint, emit_email_event, mail):
             'Center': Center,
             'Society': Society,
             'email': emit_email_event,
-            'mail': mail
+            'mail': mail,
+            'Role': Role
         }
     )
 
@@ -48,7 +48,8 @@ def redemption_bp(Api, Blueprint, emit_email_event, mail):
         resource_class_kwargs={
             'RedemptionRequest': RedemptionRequest,
             'email': emit_email_event,
-            'mail': mail
+            'mail': mail,
+            'Role': Role
         }
     )
     return redemption_bp_service
