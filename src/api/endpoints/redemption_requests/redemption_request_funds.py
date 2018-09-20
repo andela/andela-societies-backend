@@ -27,6 +27,7 @@ class RedemptionRequestFunds(Resource):
         self.RedemptionRequest = kwargs['RedemptionRequest']
         self.email = kwargs['email']
         self.mail = kwargs['mail']
+        self.Role = kwargs['Role']
 
     @roles_required(["finance"])
     def put(self, redeem_id=None):
@@ -57,22 +58,24 @@ class RedemptionRequestFunds(Resource):
         if status == "completed":
             redemp_request.status = status
 
-            email_payload = dict(
-                sender=current_app.config["SENDER_CREDS"],
-                subject="RedemptionRequest for {}".format(
-                    redemp_request.user.society.name),
-                message="Redemption Request on {} has been completed. Finance"
-                " has wired the money to the reciepient.".format(
-                    redemp_request.name),
-                recipients=[redemp_request.user.email,
-                            current_app.config["CIO"]]
-            )
+            CIO = self.Role.query.filter_by(name='cio').first()
+            if CIO and CIO.users.all():  # TODO Add logging here
+                email_payload = dict(
+                    sender=current_app.config["SENDER_CREDS"],
+                    subject="RedemptionRequest for {}".format(
+                        redemp_request.user.society.name),
+                    message="Redemption Request on {} has been completed. Finance"
+                    " has wired the money to the reciepient.".format(
+                        redemp_request.name),
+                    recipients=([user.email for user in CIO.users]
+                                + [redemp_request.user.email])
+                )
 
-            self.email.send(
-                current_app._get_current_object(),
-                payload=email_payload,
-                mail=self.mail
-            )
+                self.email.send(
+                    current_app._get_current_object(),
+                    payload=email_payload,
+                    mail=self.mail
+                )
         else:
             return response_builder(dict(
                 status="Failed",

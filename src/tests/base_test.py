@@ -340,6 +340,16 @@ class BaseTestCase(TestCase):
             society=self.invictus
         )
 
+        self.test_cio = User(
+            uuid="-KdQdsdadqwdqomb2dunkdnw",
+            name="Test CIO",
+            photo="https://www.link.com",
+            email="test.cio.societies@andela.com",
+            center=self.nairobi,
+        )
+
+        self.test_cio.roles.append(self.cio_role)
+
         self.president = User(
             uuid="-KdQsMtixG4U0y_-yJEH",
             name="Test President",

@@ -7,7 +7,8 @@ from api.services.auth import roles_required, token_required
 from api.utils.helpers import find_item, response_builder
 
 from .marshmallow_schemas import (activity_types_schema,
-                                  new_activity_type_schema)
+                                  new_activity_type_schema,
+                                  edit_activity_type_schema)
 
 
 class ActivityTypesAPI(Resource):
@@ -97,23 +98,20 @@ class ActivityTypesAPI(Resource):
                 message="Resource not found."
             ), 404)
 
-        result, errors = new_activity_type_schema.load(payload, partial=True)
+        result, errors = edit_activity_type_schema.load(payload, partial=True)
+
+        new_data = [
+            (key, result[key]) for key in result
+            if getattr(target_activity_type, key) != result[key]
+        ]
 
         if errors:
-            status_code = new_activity_type_schema.context.get(
+            status_code = edit_activity_type_schema.context.get(
                 'status_code')
             validation_status_code = status_code or 400
             return response_builder(errors, validation_status_code)
 
-        if "name" in result:
-            target_activity_type.name = result["name"]
-        if "description" in result:
-            target_activity_type.description = result["description"]
-        if "value" in result:
-            target_activity_type.value = result["value"]
-        if "supports_multiple_participant" in result:
-            target_activity_type.supports_multiple_participants =\
-                result["supports_multiple_participants"]
+        for data in new_data: setattr(target_activity_type, *data)
 
         # save the model here
         target_activity_type.save()

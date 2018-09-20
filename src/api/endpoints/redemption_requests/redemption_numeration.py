@@ -60,7 +60,8 @@ class RedemptionRequestNumeration(Resource):
 
         status = result.get("status")
         comment = result.get("comment")
-        rejection_reason = result.get("rejection")
+        rejection_reason = result.get("rejection") or \
+            result.get('rejection_reason')
 
         if status == "approved":
             user = redemp_request.user
@@ -116,10 +117,10 @@ class RedemptionRequestNumeration(Resource):
             redemp_request.rejection = rejection_reason
             email_payload = dict(
                 sender=current_app.config["SENDER_CREDS"],
-                subject="RedemptionRequest for {}".format(
-                    redemp_request.user.society.name),
-                message="This redemption request has been rejected for this"
-                        " reason: {}".format(redemp_request.rejection),
+                subject=f"Redemption Request for"
+                        f" {redemp_request.user.society.name}",
+                message=f"This redemption request has been rejected for this"
+                        f" reason: {rejection_reason}",
                 recipients=[redemp_request.user.email]
             )
 
