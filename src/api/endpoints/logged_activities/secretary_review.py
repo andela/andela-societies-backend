@@ -1,5 +1,5 @@
 from flask_restful import Resource
-from flask import request
+from flask import request, g
 
 from api.services.auth import token_required, roles_required
 from api.utils.helpers import response_builder
@@ -30,6 +30,13 @@ class SecretaryReviewLoggedActivityAPI(Resource):
         if not logged_activity:
             return response_builder(dict(message='Logged activity not found'),
                                     404)
+
+        if logged_activity.society.uuid != g.current_user.society.uuid:
+            society = logged_activity.society.name
+            return response_builder(dict(
+                message=f"Permission denied, you are not a secretary of {society}"
+                ),
+                403)
 
         if not (payload.get('status') in ['pending', 'rejected']):
             return response_builder(dict(message='Invalid status value.'),
