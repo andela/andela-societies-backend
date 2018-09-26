@@ -428,7 +428,7 @@ class BaseTestCase(TestCase):
             value=2500,
             user=self.test_user,
             activity=self.alibaba_ai_challenge,
-            society=self.phoenix,
+            society=self.invictus,
             activity_type=self.hackathon
         )
 

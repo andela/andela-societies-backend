@@ -12,7 +12,10 @@ from .marshmallow_schemas import (
     redemption_schema,
     redemption_request_schema,
     edit_redemption_request_schema)
-from .helpers import serialize_redmp, get_redemption_request
+from .helpers import (
+    serialize_redmp,
+    get_redemption_request,
+    non_paginated_redemptions)
 
 
 class PointRedemptionAPI(Resource):
@@ -153,47 +156,44 @@ class PointRedemptionAPI(Resource):
                      "secretary, success ops"])
     def get(self, redeem_id=None):
         """Get Redemption Requests."""
+        paginate = request.args.get("paginate", "true")
+        paginate = False if paginate.lower().strip() == 'false' else True
+        redemp_request = self.RedemptionRequest.query
+
         if redeem_id:
-            redemp_request = self.RedemptionRequest.query.get(redeem_id)
+            redemp_request = redemp_request.get(redeem_id)
             return find_item(redemp_request)
         else:
-            search_term_name = request.args.get('society')
-            if search_term_name:
+
+            if request.args.get('society'):
+                search_term_name = request.args.get('society')
                 society = self.Society.query.filter_by(
                     name=search_term_name).first()
                 if not society:
                     mes = f"Society with name:{search_term_name} not found"
                     return {"message": mes}, 400
-                redemp_request = self.RedemptionRequest.query.filter_by(
+                redemp_request = redemp_request.filter_by(
                     society_id=society.uuid)
-                return paginate_items(redemp_request)
-
-            search_term_status = request.args.get('status')
-            if search_term_status:
-                redemp_request = self.RedemptionRequest.query.filter_by(
+            elif request.args.get('status'):
+                search_term_status = request.args.get('status')
+                redemp_request = redemp_request.filter_by(
                     status=search_term_status)
-                return paginate_items(redemp_request)
-
-            search_term_name = request.args.get('name')
-            if search_term_name:
-                redemp_request = self.RedemptionRequest.query.filter_by(
+            elif request.args.get('name'):
+                search_term_name = request.args.get('name')
+                redemp_request = redemp_request.filter_by(
                     name=search_term_name)
-                return paginate_items(redemp_request)
-
-            search_term_center = request.args.get("center")
-            if search_term_center:
+            elif request.args.get("center"):
+                search_term_center = request.args.get("center")
                 center_query = self.Center.query.filter_by(
                     name=search_term_center).first()
                 if not center_query:
                     mes = f"country with name:{search_term_center} not found"
                     return {"message": mes}, 400
-
-                redemp_request = self.RedemptionRequest.query.filter_by(
+                redemp_request = redemp_request.filter_by(
                     center=center_query)
-                return paginate_items(redemp_request)
 
-        redemption_requests = self.RedemptionRequest.query
-        return paginate_items(redemption_requests)
+        return (paginate_items(redemp_request)
+                if paginate else non_paginated_redemptions(redemp_request))
 
     @token_required
     @roles_required(["success ops", "society president"])
