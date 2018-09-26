@@ -29,7 +29,7 @@ def get_redemption_request(redeem_id):
 
 
 def serialize_redmp(redemption):
-    """To serialize and package redeptions."""
+    """To serialize and package redemptions."""
     serial_data, _ = redemption_schema.dump(redemption)
     seriallized_user, _ = basic_info_schema.dump(redemption.user)
     serilaized_society, _ = basic_info_schema.dump(redemption.user.society)
@@ -37,3 +37,23 @@ def serialize_redmp(redemption):
     serial_data["society"] = serilaized_society
     serial_data["center"], _ = basic_info_schema.dump(redemption.center)
     return serial_data
+
+
+def serialize_redemptions(redemptions):
+    """To serialize a list of redemptions."""
+    return map(serialize_redmp, redemptions)
+
+
+def non_paginated_redemptions(redemptions):
+    """To package a list of serialized redemptions."""
+    data = list(serialize_redemptions(redemptions))
+    return dict(
+        message="fetched successfully.",
+        pages=1,
+        previousUrl=None,
+        nextUrl=None,
+        status="success",
+        count=len(data),
+        currentPage=1,
+        data=data
+    )

@@ -127,7 +127,7 @@ class PointRedemptionBaseTestCase(BaseTestCase):
 
     def test_get_all_redemption_requests_by_cio(self):
         """Test retrieval of Redemption Requests."""
-        response = self.client.get("api/v1/societies/redeem",
+        response = self.client.get("api/v1/societies/redeem?paginate=false",
                                    headers=self.cio,
                                    content_type='application/json')
 

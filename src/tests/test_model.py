@@ -138,8 +138,8 @@ class SocietyTestCase(BaseTestCase):
 
     def test_delete_existing_society(self):
         """Test if society has been deleted successfully."""
-        self.invictus.save()
-        self.assertTrue(self.invictus.delete())
+        self.istelle.save()
+        self.assertTrue(self.istelle.delete())
 
     def test_delete_nonexistent_society(self):
         """Test for false return if nonexistent society is deleted."""
@@ -212,7 +212,7 @@ class LoggedActivityTestCase(BaseTestCase):
         self.log_alibaba_challenge.save()
 
         self.assertListEqual(
-            self.phoenix.logged_activities.all(), [self.log_alibaba_challenge]
+            self.invictus.logged_activities.all(), [self.log_alibaba_challenge]
         )
 
 
