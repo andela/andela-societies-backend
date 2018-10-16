@@ -14,7 +14,6 @@ from api.endpoints.redemption_requests import redemption_bp
 from api.endpoints.roles import roles_bp
 from api.endpoints.activity_types import activitiy_type_bp
 from api.endpoints.users import users_bp
-from api.endpoints.healthcheck_email import email_healthcheck_bp
 from api.models import Base
 
 
@@ -33,7 +32,7 @@ def create_app(environment="Production"):
     """Create an instance of the app with the given env.
 
     Args:
-        environment (str): Specify the configuration to initilize app with.
+        environment (str): Specify the configuration to initialize app with.
 
     Return:
         app (Flask): it returns an instance of Flask.
@@ -101,12 +100,6 @@ def create_app(environment="Production"):
     # register users blueprint
     app.register_blueprint(
         users_bp(Api, Blueprint),
-        url_prefix=url_version_1
-    )
-
-    # register Email Healthcheck blueprint
-    app.register_blueprint(
-        email_healthcheck_bp(Api, Blueprint),
         url_prefix=url_version_1
     )
 
