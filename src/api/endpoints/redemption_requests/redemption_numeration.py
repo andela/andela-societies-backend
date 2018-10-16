@@ -70,12 +70,12 @@ class RedemptionRequestNumeration(Resource):
             redemp_request.status = status
 
             # Get the relevant Finance Center to respond on RedemptionRequest
-            if str(redemp_request.center.name.lower()) == 'kampala':
-                finance_email = redemp_request.center.name.lower() + \
-                    ".finance@andela.com"
-            else:
-                finance_email = redemp_request.center.name.lower() + \
-                    "-finance@andela.com"
+            center_emails = {"kampala": ".finance@andela.com"}
+            finance_email = redemp_request.center.name.lower() + \
+                center_emails.get(
+                redemp_request.center.name.lower(),
+                "-finance@andela.com"
+                )
 
             email_payload = dict(
                 sender=current_app.config["SENDER_CREDS"],
