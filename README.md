@@ -60,6 +60,52 @@ https://www.python.org/
 For this section I will assume you have python3 and it's configured on your machine. </br>
 Navigate to the folder you cloned and run: </br>
 
+##### Get configuration .env from the team channel or ask the team TTL
+
+#### Using Docker
+
+   - Install docker on your machine
+       - [Docker](https://www.docker.com/get-started)
+
+
+   - Navigate to src folder within the project, then run
+
+      ```
+         docker-compose build
+      ```
+
+    - Run this to start the server
+
+        ```
+        docker-compose up
+        ```
+    - Useful Commands you might need
+
+        - Connect to the running web service
+            ```
+            $ docker-compose exec python-web-api-dev  bash
+            ```
+
+        - Delete containers (in case something breaks)
+
+            ```
+            docker-compose down
+            ```
+        - Commands that you can run inside the container
+            ```
+            # seed data
+
+            $ python manage.py db seed
+
+            # setup migrations
+
+            $ python manage.py db init # run once at initialization
+            $ python manage.py db migrate # run whenever you change the models
+            $ python manage.py db upgrade # apply the changes to the db
+            ```
+
+#### Manual Way
+
 - Install Requirements
 ```
 $ cd src
