@@ -1,0 +1,7 @@
+requirements.txt
+dev-requirements.txt
+migrations/
+**/__pycache__/
+**/.DS_Store
+**/.cache
+**/.pytest_cache/
