@@ -23,12 +23,8 @@ class Config(object):
     PUBLIC_KEY = os.environ.get('PUBLIC_KEY')
     API_ISSUER = "accounts.andela.com"
     API_AUDIENCE = "andela.com"
-    MAIL_GUN_URL = os.environ.get('MAIL_GUN_URL')
-    MAIL_GUN_API_KEY = os.environ.get('MAIL_GUN_API_KEY')
     SENDER_CREDS = os.environ.get("SENDER_CREDS")
     NOTIFICATIONS_SENDER = os.getenv('NOTIFICATIONS_SENDER', SENDER_CREDS)
-    CELERY_BACKEND = os.environ.get("CELERY_BACKEND")
-    CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL")
     CIO = os.environ.get("CIO")
     EMAIL_HOST_SERVICE = os.environ.get("EMAIL_HOST_SERVICE")
 
@@ -64,7 +60,6 @@ class Testing(Config):
     PUBLIC_KEY = os.environ.get('PUBLIC_KEY_TEST')
     ISSUER = "tests"
     API_IDENTIFIER = "tests"
-    MAIL_GUN_TEST = os.environ.get('MAIL_GUN_TEST')
     NOTIFICATIONS_SENDER = os.getenv(
         'TESTS_NOTIFICATIONS_SENDER',
         'Andela Societies Notifications<societies-notifications-tests'

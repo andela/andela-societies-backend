@@ -1,4 +1,4 @@
-FROM gcr.io/bench-projects/soc-backend:base-image-0.0.0
+FROM python:3.6
 
 MAINTAINER "Crispus Kamau <crispus.kamau@andela.com>"
 

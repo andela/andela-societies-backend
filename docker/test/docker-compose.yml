@@ -24,7 +24,7 @@ services:
         condition: service_healthy
   # postgres database image
   database:
-    image: postgres
+    image: postgres:9.6
     restart: always
     expose:
       - "5432"
