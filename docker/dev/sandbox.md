@@ -23,13 +23,13 @@ DATABASE_URL=<value>
 APP_SETTINGS=<value>
 ANDELA_API_URL=<value>
 DEV_TOKEN=<value>
-MAIL_GUN_URL=<value>
-MAIL_GUN_API_KEY=<value>
-MAIL_GUN_TEST=<value>
-CELERY_BROKER_URL=<value>
-CELERY_BACKEND=<value>
 SENDER_CREDS=<value>
 CIO=<value>
+MAIL_SERVER=<value>
+MAIL_PORT=<value>
+MAIL_USE_TLS=<value>
+MAIL_USERNAME=<value>
+MAIL_PASSWORD=<value>
 ```
 
 The value of these variables are obtained from the TTL, fellow developers in the team or the DevOps engineer in the team.
