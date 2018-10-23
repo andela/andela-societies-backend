@@ -55,6 +55,7 @@ def get_andela_api_cohort_location_data():
     public_key_token = os.environ.get('PUBLIC_KEY')
 
     cohorts = []
+    centers = []
     if public_key_token and authorization_token and url:
         try:
             public_key = base64.b64decode(public_key_token).decode("utf-8")
@@ -101,6 +102,8 @@ def get_andela_api_cohort_location_data():
             print("Something went wrong while validating your token.")
         except Exception:
             print("Your initial dev-data, won't work...: I DON'T KNOW WHY.")
+        finally:
+            return tuple(cohorts), tuple(centers)
 
 
 # activity types
