@@ -105,7 +105,7 @@ def token_required(f):
 
 
 def roles_required(roles):
-    """Ensure only authorised roles may access sensitive data.
+    """Ensure only authorized roles may access sensitive data.
 
     params:
         roles (list): [str]
