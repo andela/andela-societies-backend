@@ -31,6 +31,20 @@ jobs:
           name: upgrade database
           command: |
             bash scripts/upgrade.sh
+      - run:
+          name: Build Success
+          when: on_success
+          command: |
+            if [ "$CIRCLE_NODE_INDEX" == 0 ]; then
+                bash scripts/slack_notification.sh "Staging database was upgraded successfully" "good"
+            fi
+      - run:
+          name: Build Failed
+          when: on_fail
+          command: |
+            if [ "$CIRCLE_NODE_INDEX" == 0 ]; then
+                bash scripts/slack_notification.sh "Staging database upgrade failed!!!" "danger"
+            fi
 
   deploy-staging:
     <<: *defaults
@@ -42,6 +56,20 @@ jobs:
           name: deploy application
           command: |
             bash scripts/deploy.sh
+      - run:
+          name: Build Success
+          when: on_success
+          command: |
+            if [ "$CIRCLE_NODE_INDEX" == 0 ]; then
+                bash scripts/slack_notification.sh "The develop branch has been deployed to the staging environment" "good"
+            fi
+      - run:
+          name: Build Failed
+          when: on_fail
+          command: |
+            if [ "$CIRCLE_NODE_INDEX" == 0 ]; then
+                bash scripts/slack_notification.sh "Deployment to staging failed!!!" "danger"
+            fi
 
   deploy-master:
     <<: *defaults
@@ -53,6 +81,20 @@ jobs:
           name: deploy application
           command: |
             bash scripts/deploy.sh
+      - run:
+          name: Build Success
+          when: on_success
+          command: |
+            if [ "$CIRCLE_NODE_INDEX" == 0 ]; then
+                bash scripts/slack_notification.sh "The master branch has been deployed to the production environment" "good"
+            fi
+      - run:
+          name: Build Failed
+          when: on_fail
+          command: |
+            if [ "$CIRCLE_NODE_INDEX" == 0 ]; then
+                bash scripts/slack_notification.sh "Deployment to production failed!!!" "danger"
+            fi
 
 workflows:
   version: 2
