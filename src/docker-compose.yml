@@ -14,7 +14,8 @@ services:
     ports:
       - "5000:5000"
     environment:
-      APP_SETTINGS: Development
+      FLASK_APP: manage.py
+      FLASK_ENV: development
       DEV_DATABASE: postgresql://soc_dev:password_dev@postgres-db-soc-dev:5432/devDB
     env_file:
       - .env

@@ -7,19 +7,23 @@ import os
 import sys
 
 from flask_migrate import Migrate, MigrateCommand
-from flask_script import Manager, Shell, prompt_bool
+# from flask_script import Manager, Shell, prompt_bool
+from flask.cli import FlaskGroup
 
 from api.utils.initial_data import generete_initial_data_run_time_env
-from app import create_app, db
+from app import create_app   # removed db, importted it differently
+from api.models.base import db
 from api.models import Center, Cohort, Society, Activity, Role, User
 from run_tests import test
 
 
-app = create_app(environment=os.environ.get('APP_SETTINGS', "Production"))
-manager = Manager(app)
+# app = create_app(environment=os.environ.get('APP_SETTINGS', "Production"))
+app = create_app()
+cli = FlaskGroup(app)
+# manager = Manager(app)
 
 
-@manager.command
+@cli.command()
 def drop_database():
     """Drop database tables."""
     if prompt_bool("Are you sure you want to lose all your data"):
@@ -30,7 +34,7 @@ def drop_database():
             print("Failed, make sure your database server is running!")
 
 
-@manager.command
+@cli.command()
 def create_database():
     """Create database tables from sqlalchemy models."""
     try:
@@ -41,7 +45,7 @@ def create_database():
         print("Failed, make sure your database server is running!")
 
 
-@manager.command
+@cli.command()
 def seed():
     """Seed database tables with initial data."""
     environment = os.getenv("APP_SETTINGS", "Production")
@@ -113,7 +117,7 @@ def linker(cohort_name, society_name):
         print('Error something went wrong when saving to DB. :-)')
 
 
-@manager.command
+@cli.command()
 def link_society_cohort_csv_data(path='data/cohort_data.csv'):
     """CLI tool, link cohort with society."""
     with open(path) as raw_data:
@@ -129,27 +133,28 @@ def link_society_cohort_csv_data(path='data/cohort_data.csv'):
                     linker(cohort_name.lower(), society_name.lower())
 
 
-@manager.command
+@cli.command()
 def tests():
     """Run the tests."""
     test()
 
 
-def shell():
-    """Make a shell/REPL context available."""
-    return dict(app=app,
-                db=db,
-                User=User,
-                Society=Society,
-                Activity=Activity,
-                Center=Center,
-                Role=Role,
-                Cohort=Cohort)
+# @app.context_processor
+# def shell():
+#     """Make a shell/REPL context available."""
+#     return dict(app=app,
+#                 db=db,
+#                 User=User,
+#                 Society=Society,
+#                 Activity=Activity,
+#                 Center=Center,
+#                 Role=Role,
+#                 Cohort=Cohort)
 
 
-manager.add_command('shell', Shell(make_context=shell))
+# cli.add_command('shell', Shell(make_context=shell))
 migrate = Migrate(app, db)
-manager.add_command("db", MigrateCommand)
+# cli.add_command("db", MigrateCommand)
 
 if __name__ == "__main__":
-    manager.run()
+    cli()

@@ -1,5 +1,6 @@
 """Main app module."""
 
+import os
 from blinker import Namespace
 from flask import Flask, jsonify, Blueprint
 from flask_cors import CORS
@@ -16,6 +17,7 @@ from api.endpoints.activity_types import activitiy_type_bp
 from api.endpoints.users import users_bp
 from api.models import Base
 
+config_name = os.getenv('FLASK_ENV', default='production').lower()
 
 try:
     from .config import configuration
@@ -25,10 +27,7 @@ except ImportError:
     from email_handeler import send_email_async
 
 
-db = Base.db
-
-
-def create_app(environment="Production"):
+def create_app(config=configuration[config_name]):
     """Create an instance of the app with the given env.
 
     Args:
@@ -38,10 +37,13 @@ def create_app(environment="Production"):
         app (Flask): it returns an instance of Flask.
     """
     app = Flask(__name__)
-    app.config.from_object(configuration[environment])
-    db.init_app(app)
+    app.config.from_object(config)
 
+    from api.models.base import db
+    db.init_app(app)
+    db = Base.db
     mail = Mail(app)
+
     mail.init_app(app)
 
     # enable cross origin resource sharing
@@ -127,5 +129,10 @@ def create_app(environment="Production"):
             message="The server encountered an internal error."))
         response.status_code = 500
         return response
+    
+    @app.context_processor
+    def ctx():
+        """Make a shell/REPL context available."""
+        return {'app': app, 'db': db}
 
     return app
