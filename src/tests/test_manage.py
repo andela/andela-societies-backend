@@ -1,8 +1,8 @@
 import os
 
 from .base_test import BaseTestCase, ActivityType, Society, db
-from ..api.utils.initial_data import generete_initial_data_run_time_env
-from ..manage import seed
+from api.utils.initial_data import generete_initial_data_run_time_env
+from manage import seed
 
 
 class ManagementCommandsTestCase(BaseTestCase):

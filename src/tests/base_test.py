@@ -6,7 +6,9 @@ import os
 from jose import jwt
 from unittest import TestCase, mock
 
-from app import create_app, db
+from app import create_app
+from api.models.base import db
+
 from api.models import (
     Center, Cohort, Society, LoggedActivity, RedemptionRequest, Activity,
     Role, ActivityType, User

@@ -74,8 +74,8 @@ class Staging(Development):
 
 
 configuration = {
-    "Testing": Testing,
-    "Development": Development,
-    "Production": Config,
-    "Staging": Staging
+    "testing": Testing,
+    "development": Development,
+    "production": Config,
+    "staging": Staging
 }
