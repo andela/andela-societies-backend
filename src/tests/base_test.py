@@ -195,13 +195,13 @@ class BaseTestCase(TestCase):
 
     def setUp(self):
         """Configure test enviroment."""
-        os.environ['APP_SETTINGS'] = 'Testing'
+        # os.environ['APP_SETTINGS'] = 'Testing'
 
         self.patcher = mock.patch('api.services.auth.helpers.add_extra_user_info',
                                   return_value=(None, None, None))
         self.patcher.start()
 
-        self.app = create_app("Testing")
+        self.app = create_app()
         self.app_context = self.app.app_context()
         self.app_context.push()
         db.drop_all()

@@ -104,7 +104,7 @@ def get_andela_api_cohort_location_data():
             print("Your initial dev-data, won't work...: I DON'T KNOW WHY.")
         finally:
             return tuple(cohorts), tuple(centers)
-
+    return tuple(), tuple()
 
 # activity types
 def activity_types_data():
