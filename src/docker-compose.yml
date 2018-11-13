@@ -15,7 +15,8 @@ services:
       - "5000:5000"
     environment:
       FLASK_APP: manage.py
-      FLASK_ENV: development
+      FLASK_DEBUG: 1
+      APP_SETTINGS: development
       DEV_DATABASE: postgresql://soc_dev:password_dev@postgres-db-soc-dev:5432/devDB
     env_file:
       - .env

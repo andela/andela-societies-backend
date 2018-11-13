@@ -16,8 +16,10 @@ from api.endpoints.roles import roles_bp
 from api.endpoints.activity_types import activitiy_type_bp
 from api.endpoints.users import users_bp
 from api.models import Base
+from api.models import Center, Cohort, Society, Activity, Role, User
 
-config_name = os.getenv('FLASK_ENV', default='production').lower()
+
+config_name = os.getenv('APP_SETTINGS', default='production').lower()
 
 try:
     from .config import configuration
@@ -129,10 +131,17 @@ def create_app(config=configuration[config_name]):
             message="The server encountered an internal error."))
         response.status_code = 500
         return response
-    
+
     @app.context_processor
     def ctx():
         """Make a shell/REPL context available."""
-        return {'app': app, 'db': db}
+        return {'app': app, 'db': db,
+                'User': User,
+                'Society': Society,
+                'Activity': Activity,
+                'Center': Center,
+                'Role': Role,
+                'Cohort': Cohort
+                }
 
     return app
