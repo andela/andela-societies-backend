@@ -15,6 +15,7 @@ services:
     environment:
       - TEST_DATABASE=postgresql://soc:soc@database:5432/test-db
       - APP_SETTINGS=Testing
+      - FLASK_APP=manage.py
     # env_file:
       # - ../../src/.env
     volumes:
