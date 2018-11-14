@@ -6,10 +6,12 @@ import csv
 import os
 import sys
 
-from flask_migrate import Migrate, MigrateCommand
+from flask_migrate import Migrate
 from flask.cli import FlaskGroup
 
 from api.utils.initial_data import generete_initial_data_run_time_env
+from api.models import Cohort, Society
+
 from app import create_app
 from api.models.base import db
 from run_tests import test
@@ -43,7 +45,7 @@ def create_database():
 @cli.command()
 def seed():
     """Seed database tables with initial data."""
-    environment = os.getenv("FLASK_ENV", "Production")
+    environment = os.getenv("APP_SETTINGS", "Production")
     if environment.lower() in ["production", "staging"] and \
             os.getenv("PRODUCTION_SEED") != "True":
         print("\n\n\t\tYou probably don't wanna do that. Exiting...\n")

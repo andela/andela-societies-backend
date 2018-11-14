@@ -8,7 +8,6 @@ from sqlalchemy.exc import SQLAlchemyError
 
 db = SQLAlchemy()
 
-
 def generate_uuid():
     """Generate unique string."""
     return str(uuid.uuid1())
