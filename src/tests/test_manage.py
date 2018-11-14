@@ -2,7 +2,6 @@ import os
 
 from .base_test import BaseTestCase, ActivityType, Society, db
 from api.utils.initial_data import generete_initial_data_run_time_env
-from manage import seed
 
 
 class ManagementCommandsTestCase(BaseTestCase):
@@ -24,9 +23,8 @@ class ManagementCommandsTestCase(BaseTestCase):
         initial_societies_count = Society.query.count()
 
         # run seeding command
-        # seed()
         os.system("python manage.py seed")
-    
+
         new_activity_types_count = ActivityType.query.count()
         new_societies_count = Society.query.count()
 
@@ -49,8 +47,7 @@ class ManagementCommandsTestCase(BaseTestCase):
         initial_societies_count = Society.query.count()
 
         # run seeding command
-        with self.assertRaises(SystemExit):
-            seed()
+        os.system("python manage.py seed")
 
         new_activity_types_count = ActivityType.query.count()
         new_societies_count = Society.query.count()

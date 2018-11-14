@@ -41,11 +41,10 @@ def create_app(config=configuration[config_name]):
     app = Flask(__name__)
     app.config.from_object(config)
 
-    from api.models.base import db
-    db.init_app(app)
     db = Base.db
-    mail = Mail(app)
+    db.init_app(app)
 
+    mail = Mail(app)
     mail.init_app(app)
 
     # enable cross origin resource sharing

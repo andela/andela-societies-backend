@@ -202,6 +202,8 @@ class BaseTestCase(TestCase):
         self.patcher.start()
 
         self.app = create_app()
+        # import pdb;
+        # pdb.set_trace()
         self.app_context = self.app.app_context()
         self.app_context.push()
         db.drop_all()
