@@ -13,6 +13,7 @@ services:
     environment:
       APP_SETTINGS: Staging
       DATABASE_URL: postgresql://soc:soc@database:5432/db
+      FLASK_APP: manage.py
     env_file:
       - ../../src/.env
     command:
