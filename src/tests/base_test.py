@@ -195,7 +195,6 @@ class BaseTestCase(TestCase):
 
     def setUp(self):
         """Configure test enviroment."""
-        # os.environ['APP_SETTINGS'] = 'Testing'
 
         self.patcher = mock.patch('api.services.auth.helpers.add_extra_user_info',
                                   return_value=(None, None, None))
