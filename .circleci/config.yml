@@ -36,17 +36,17 @@ jobs:
           when: on_success
           command: |
             if [ "$CIRCLE_NODE_INDEX" == 0 ]; then
-                bash scripts/slack_notification.sh "Staging database was upgraded successfully" "good"
+                bash scripts/slack_notification.sh "good"
             fi
       - run:
           name: Build Failed
           when: on_fail
           command: |
             if [ "$CIRCLE_NODE_INDEX" == 0 ]; then
-                bash scripts/slack_notification.sh "Staging database upgrade failed!!!" "danger"
+                bash scripts/slack_notification.sh "danger"
             fi
 
-  deploy-staging:
+  deploy:
     <<: *defaults
     steps:
       - checkout
@@ -61,39 +61,14 @@ jobs:
           when: on_success
           command: |
             if [ "$CIRCLE_NODE_INDEX" == 0 ]; then
-                bash scripts/slack_notification.sh "The develop branch has been deployed to the staging environment" "good"
+                bash scripts/slack_notification.sh "good"
             fi
       - run:
           name: Build Failed
           when: on_fail
           command: |
             if [ "$CIRCLE_NODE_INDEX" == 0 ]; then
-                bash scripts/slack_notification.sh "Deployment to staging failed!!!" "danger"
-            fi
-
-  deploy-master:
-    <<: *defaults
-    steps:
-      - checkout
-      - setup_remote_docker:
-          version: 17.11.0-ce
-      - run:
-          name: deploy application
-          command: |
-            bash scripts/deploy.sh
-      - run:
-          name: Build Success
-          when: on_success
-          command: |
-            if [ "$CIRCLE_NODE_INDEX" == 0 ]; then
-                bash scripts/slack_notification.sh "The master branch has been deployed to the production environment" "good"
-            fi
-      - run:
-          name: Build Failed
-          when: on_fail
-          command: |
-            if [ "$CIRCLE_NODE_INDEX" == 0 ]; then
-                bash scripts/slack_notification.sh "Deployment to production failed!!!" "danger"
+                bash scripts/slack_notification.sh "danger"
             fi
 
 workflows:
@@ -108,17 +83,12 @@ workflows:
             branches:
               only:
                 - develop
-      - deploy-staging:
+                - master
+      - deploy:
           requires:
             - upgrade-database
           filters:
             branches:
               only:
                 - develop
-      - deploy-master:
-          requires:
-            - test
-          filters:
-            branches:
-              only:
                 - master

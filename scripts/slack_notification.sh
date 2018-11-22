@@ -4,6 +4,33 @@ set -o errexit
 set -o pipefail
 
 
+deploy_env_variables() {
+    MESSAGE_COLOR="$1"
+
+    if [ "$MESSAGE_COLOR" == "good" ]; then
+      MESSAGE_TEXT="The $CIRCLE_BRANCH branch has been deployed to the $ENVIRONMENT environment"
+    elif [ "$MESSAGE_COLOR" == "danger" ]; then
+      MESSAGE_TEXT="Deployment to $ENVIRONMENT failed!!!"
+    else
+      echo "Warning!: $MESSAGE_COLOR is not a color that was expected to be provided"
+    fi
+
+}
+
+
+upgrade_env_variables() {
+    MESSAGE_COLOR="$1"
+
+    if [ "$MESSAGE_COLOR" == "good" ]; then
+      MESSAGE_TEXT="$ENVIRONMENT database was upgraded successfully"
+    elif [ "$MESSAGE_COLOR" == "danger" ]; then
+      MESSAGE_TEXT="$ENVIRONMENT database upgrade failed!!!"
+    else
+      echo "Warning!: $MESSAGE_COLOR is not a color that was expected to be provided"
+    fi
+}
+
+
 declare_env_variables() {
 
   # Declaring environment variables
@@ -11,10 +38,21 @@ declare_env_variables() {
   # Some environment variables assigned externally are:
   # SLACK_CHANNEL_HOOK : This is the webhook for the Slack App where notifications will be sent from
   # DEPLOYMENT_CHANNEL : This is the channel on which the Slack notifications will be posted
-  # MESSAGE_TEXT: The text to be sent to the slack channel
   # Some template for the Slack message
-  MESSAGE_TEXT="$1"
-  MESSAGE_COLOR="$2"
+
+  if [ "$CIRCLE_BRANCH" == "master" ]; then
+      ENVIRONMENT="Production"
+  else
+      ENVIRONMENT="Staging"
+  fi
+
+  if [ "$CIRCLE_JOB" == "upgrade-database" ]; then
+    upgrade_env_variables "$@"
+  fi
+
+  if [ "$CIRCLE_JOB" == "deploy" ]; then
+    deploy_env_variables "$@"
+  fi
 
   COMMIT_LINK="https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/commit/${CIRCLE_SHA1}"
   IMG_TAG="$(git rev-parse --short HEAD)"
