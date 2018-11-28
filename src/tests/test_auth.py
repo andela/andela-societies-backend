@@ -42,8 +42,7 @@ class AuthTestCase(BaseTestCase):
 
         self.assertTrue(response.status_code == 401)
 
-        error_message = "Unauthorized. The authorization token " \
-                        "supplied is invalid"
+        error_message = "malformed token"
 
         response_message = response.data.decode('utf-8')
         self.assertIn(error_message, response_message)

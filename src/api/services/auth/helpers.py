@@ -59,7 +59,7 @@ def store_user_details(payload, token):
     roles = payload["UserInfo"]["roles"]
 
     user = User.query.get(user_id)
-
+    print("this is the new print", user)
     # save user to db if they haven't been saved yet
     if not user:
         user = User(
@@ -72,7 +72,6 @@ def store_user_details(payload, token):
         cohort.members.append(user)
         cohort.save()
         user.society_id = cohort.society.uuid if cohort.society else None
-
     if location:
         location.members.append(user)
         location.save()

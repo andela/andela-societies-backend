@@ -69,28 +69,15 @@ def token_required(f):
         except JWTError:
             return response_builder(dict(message=unauthorized_message), 401)
 
-        expected_user_info_format = {
-            "id": "user_id",
-            "email": "gmail",
-            "first_name": "test",
-            "last_name": "user",
-            "name": "test user",
-            "picture": "link",
-            "roles": {
-                "Andelan": "unique_id",
-                "Fellow": "unique_id"
-            }
-        }
-        expected_user_keys = expected_user_info_format.keys()
-        payload_user_keys = payload.get("UserInfo").keys()
-
         # confirm that payload and UserInfo has required keys
         if ("UserInfo" and "exp") not in payload.keys():
             return response_builder(dict(message=unauthorized_message), 401)
-        elif not all(item in payload_user_keys for item in expected_user_keys):
-            return response_builder(dict(message=unauthorized_message), 401)
+        elif not payload["UserInfo"].get("id"):
+            return response_builder(dict(message="malformed token"), 401)
         else:
-            user = User.query.get(payload["UserInfo"]["id"])
+            user = User.query.get(payload["UserInfo"]["id"])  #TODO check if user id exists
+            print("user id is>>>>", user)
+            # user id returns the name of the user
             if not user:
                 user = store_user_details(payload, authorization_token)
             g.current_user = user
