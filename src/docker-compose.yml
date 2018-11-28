@@ -9,7 +9,7 @@ services:
     volumes:
       - .:/app
 
-    command: python manage.py runserver -p 5000 -h 0.0.0.0
+    command: python manage.py run -p 5000 -h 0.0.0.0
 
     ports:
       - "5000:5000"

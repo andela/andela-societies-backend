@@ -69,7 +69,7 @@ def seed():
             " and create tables in your database\n" \
             " Type n to skip dropping existing data and tables."
 
-        if environment != "Testing" and prompt_bool(mes):
+        if environment != "Testing":
             try:
                 db.session.remove()
                 db.drop_all()
