@@ -15,6 +15,7 @@ cd andela-societies-backend
 ```
 Ensure you have **ALL** your environment variables set in the src/.env file. 
 ```
+FLASK_APP=manage.py
 PRIVATE_KEY_TEST=<value>
 PUBLIC_KEY_TEST=<value>
 PUBLIC_KEY=<value>
