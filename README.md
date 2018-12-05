@@ -116,6 +116,7 @@ $ pip install -r requirements.txt
 ```
 export SECRET="Thequickbrownfoxjumpedoverthelazydog"
 export APP_SETTINGS=Development
+FLASK_APP=manage.py
 export DEV_DATABASE=database_url_for_development_environment
 export TEST_DATABASE=database_url_for_testing_environment
 export ANDELA_API_URL=https://api.andela.com/api/v1/
@@ -126,7 +127,7 @@ export DEV_TOKEN=token_from_signed_in_webapps
 - Run App 🏃
 ```
 $ cd src
-$ python manage.py runserver
+$ python manage.py run
 ```
 The app should be accessible via : http://127.0.0.1:5000/
 
@@ -158,6 +159,7 @@ export PUBLIC_KEY_TEST=""
 export PUBLIC_KEY=""
 export DEV_TOKEN=""
 export APP_SETTINGS="Development"
+FLASK_APP=manage.py
 ```
 The value of this variables are obtained from the TTL, or the DevOps engineer in the team.
 
