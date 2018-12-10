@@ -5,17 +5,33 @@ set -o pipefail
 set_variables() {
     COMMIT_HASH=$(git rev-parse --short HEAD)
 
-    if [ "$CIRCLE_BRANCH" == 'master' ]; then
-        IMAGE_TAG="production-${COMMIT_HASH}"
-        ENVIRONMENT=production
-        GOOGLE_COMPUTE_ZONE=${PRODUCTION_ZONE}
-        GOOGLE_CLUSTER_NAME=${PRODUCTION_CLUSTER_NAME}
-    else
-        IMAGE_TAG="staging-${COMMIT_HASH}"
-        ENVIRONMENT=staging
-        GOOGLE_COMPUTE_ZONE=${STAGING_ZONE}
-        GOOGLE_CLUSTER_NAME=${STAGING_CLUSTER_NAME}
-    fi
+    case "$CIRCLE_BRANCH" in
+        master)
+            IMAGE_TAG="production-${COMMIT_HASH}"
+            ENVIRONMENT=production
+            GOOGLE_COMPUTE_ZONE=${PRODUCTION_ZONE}
+            GOOGLE_CLUSTER_NAME=${PRODUCTION_CLUSTER_NAME}
+            DEPLOYMENT_NAME="${ENVIRONMENT}-${PROJECT_NAME}"
+            ;;
+        develop)
+            IMAGE_TAG="staging-${COMMIT_HASH}"
+            ENVIRONMENT=staging
+            GOOGLE_COMPUTE_ZONE=${STAGING_ZONE}
+            GOOGLE_CLUSTER_NAME=${STAGING_CLUSTER_NAME}
+            DEPLOYMENT_NAME="${ENVIRONMENT}-${PROJECT_NAME}"
+            ;;
+        design)
+            IMAGE_TAG="design-${COMMIT_HASH}"
+            ENVIRONMENT=staging
+            GOOGLE_COMPUTE_ZONE=${STAGING_ZONE}
+            GOOGLE_CLUSTER_NAME=${STAGING_CLUSTER_NAME}
+            DEPLOYMENT_NAME="design-${PROJECT_NAME}"
+            ;;
+        *)
+            echo "Err: This branch should not deploy."
+            exit 1
+            ;;
+    esac
 }
 
 authorize_docker() {
@@ -55,7 +71,7 @@ deploy_to_kubernetes(){
      echo "====> Prepare image for deployement"
 
     IMAGE="${DOCKER_REGISTRY}/${GOOGLE_PROJECT_ID}/${PROJECT_NAME}:${IMAGE_TAG}"
-    DEPLOYMENT_NAME="${ENVIRONMENT}-${PROJECT_NAME}"
+
     echo "====> Deploying ${IMAGE} to ${DEPLOYMENT_NAME} in ${ENVIRONMENT} environment"
 
 
