@@ -92,3 +92,4 @@ workflows:
               only:
                 - develop
                 - master
+                - design
