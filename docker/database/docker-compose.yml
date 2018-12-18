@@ -22,6 +22,7 @@ services:
       DATABASE_URL: $DATABASE_URL
       ANDELA_API_URL: $ANDELA_API_URL
       PUBLIC_KEY: $PUBLIC_KEY
+      FLASK_APP: manage.py
     networks:
       - migration
     image: application:migration
