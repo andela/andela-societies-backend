@@ -5,6 +5,6 @@ set -o pipefail
 
 coverage run -m pytest -v
 coverage html
-coveralls
+COVERALLS_REPO_TOKEN=${COVERALLS_REPO_TOKEN} coveralls
 
-exec $@
+exec "$@"
