@@ -16,6 +16,7 @@ services:
       - TEST_DATABASE=postgresql://soc:soc@database:5432/test-db
       - APP_SETTINGS=Testing
       - FLASK_APP=manage.py
+      - COVERALLS_REPO_TOKEN=${COVERALLS_REPO_TOKEN}
     # env_file:
       # - ../../src/.env
     volumes:
