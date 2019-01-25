@@ -9,7 +9,7 @@ from .marshmallow_schemas import (
     LogEditActivitySchema, single_logged_activity_schema,
     logged_activities_schema
 )
-
+from api.models import Role, User, Society
 
 class LoggedActivitiesAPI(Resource):
     """Logged Activities Resources."""
@@ -72,6 +72,12 @@ class LoggedActivitiesAPI(Resource):
                     ]
 
             logged_activity.save()
+            
+            society_id = g.current_user.society_id
+            roles = Role.query.filter_by(Role.users.user_role.any(name="secretary")).all()
+            # society_query = Society.query.all()
+            print(roles)
+
 
             return response_builder(dict(
                 data=single_logged_activity_schema.dump(logged_activity).data,
