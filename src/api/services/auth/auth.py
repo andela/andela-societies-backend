@@ -76,7 +76,6 @@ def token_required(f):
             return response_builder(dict(message="malformed token"), 401)
         else:
             user = User.query.get(payload["UserInfo"]["id"])  #TODO check if user id exists
-            print("user id is>>>>", user)
             # user id returns the name of the user
             if not user:
                 user = store_user_details(payload, authorization_token)
