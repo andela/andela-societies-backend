@@ -70,12 +70,19 @@ class LoggedActivitiesAPI(Resource):
                     logged_activity.no_of_participants = result[
                         'no_of_participants'
                     ]
+            # query = User.db.session.query(User).join(Role, Role.name == 'society secretary')
+            # print(query.all())
 
-            logged_activity.save()
+            # logged_activity.save()
             
             society_id = g.current_user.society_id
-            roles = Role.query.filter_by(Role.users.user_role.any(name="secretary")).all()
+            # roles = Role.query.filter_by(Role.users.user_role.any(name="secretary")).all()
+            # roles = Role.query.join(User).order_by(UserRole.name)
             # society_query = Society.query.all()
+            query = User.query.join(Role)
+            roles = query.order_by(User.roles).all()
+
+            # query = User.query(User).join(User.roles).join(Role.name)
             print(roles)
 
 
