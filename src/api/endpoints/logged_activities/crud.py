@@ -3,6 +3,7 @@ from flask import g, request
 
 from api.services.auth import token_required
 from api.utils.helpers import response_builder, paginate_items
+from api.services.slack_notify import SlackNotification
 
 from .helpers import ParsedResult, parse_log_activity_fields
 from .marshmallow_schemas import (
@@ -11,7 +12,7 @@ from .marshmallow_schemas import (
 )
 from api.models import Role, User, Society
 
-class LoggedActivitiesAPI(Resource):
+class LoggedActivitiesAPI(Resource, SlackNotification):
     """Logged Activities Resources."""
 
     decorators = [token_required]
@@ -21,6 +22,7 @@ class LoggedActivitiesAPI(Resource):
         self.Activity = kwargs['Activity']
         self.ActivityType = kwargs['ActivityType']
         self.LoggedActivity = kwargs['LoggedActivity']
+        SlackNotification.__init__(self)
 
     def post(self):
         """Log a new activity."""
@@ -70,20 +72,22 @@ class LoggedActivitiesAPI(Resource):
                     logged_activity.no_of_participants = result[
                         'no_of_participants'
                     ]
-            # query = User.db.session.query(User).join(Role, Role.name == 'society secretary')
-            # print(query.all())
 
-            # logged_activity.save()
+            logged_activity.save()
             
             society_id = g.current_user.society_id
-            # roles = Role.query.filter_by(Role.users.user_role.any(name="secretary")).all()
-            # roles = Role.query.join(User).order_by(UserRole.name)
-            # society_query = Society.query.all()
-            query = User.query.join(Role)
-            roles = query.order_by(User.roles).all()
 
-            # query = User.query(User).join(User.roles).join(Role.name)
-            print(roles)
+            roles = User.query.filter(User.roles.any(Role.name=="society secretary")).all()
+            users = User.query.filter_by(society_id=society_id).all()
+            message = "New activities logged. Go to https://societies.andela.com to approve points"
+            for role in roles:
+                if role in users:
+                    user_email = role.email
+                    slack_id = SlackNotification.get_slack_id(self, user_email)
+                    SlackNotification.send_message(self, message, slack_id)
+                    print("the user is", user_email)
+                else:
+                    pass
 
 
             return response_builder(dict(

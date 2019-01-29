@@ -8,14 +8,15 @@ class SlackNotification(object):
 
     def __init__(self):
         slack_token = os.getenv('SLACK_API_TOKEN')
+        print(slack_token)
         if slack_token:
             self.sc = SlackClient(slack_token)
 
 
 
-    def get_slack_id(self, user):
-        user_email = user.email
-        results = sc.api_call("users.list")
+    def get_slack_id(self, user_email):
+        user_email = user_email
+        results = self.sc.api_call("users.list")
         users = results.get("members")
 
         if users:
@@ -33,7 +34,7 @@ class SlackNotification(object):
 
 
     def send_message(self, message, slack_id):
-        sc.api_call(
+        self.sc.api_call(
             "chat.postEphemeral",
             channel=slack_id,
             text=message,
