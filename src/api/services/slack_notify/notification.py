@@ -8,7 +8,6 @@ class SlackNotification(object):
 
     def __init__(self):
         slack_token = os.getenv('SLACK_API_TOKEN')
-        print(slack_token)
         if slack_token:
             self.sc = SlackClient(slack_token)
 

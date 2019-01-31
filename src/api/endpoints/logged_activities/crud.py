@@ -77,6 +77,8 @@ class LoggedActivitiesAPI(Resource, SlackNotification):
             
             society_id = g.current_user.society_id
 
+            #send notification to the society secretary about logged points
+
             roles = User.query.filter(User.roles.any(Role.name=="society secretary")).all()
             users = User.query.filter_by(society_id=society_id).all()
             message = "New activities logged. Go to https://societies.andela.com to approve points"
@@ -85,7 +87,6 @@ class LoggedActivitiesAPI(Resource, SlackNotification):
                     user_email = role.email
                     slack_id = SlackNotification.get_slack_id(self, user_email)
                     SlackNotification.send_message(self, message, slack_id)
-                    print("the user is", user_email)
                 else:
                     pass
 
