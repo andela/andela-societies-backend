@@ -10,7 +10,7 @@ from .marshmallow_schemas import (
     LogEditActivitySchema, single_logged_activity_schema,
     logged_activities_schema
 )
-from api.models import Role, User, Society
+from api.models import Role, User
 
 class LoggedActivitiesAPI(Resource, SlackNotification):
     """Logged Activities Resources."""
@@ -74,7 +74,6 @@ class LoggedActivitiesAPI(Resource, SlackNotification):
                     ]
 
             logged_activity.save()
-            
             society_id = g.current_user.society_id
 
             #send notification to the society secretary about logged points
