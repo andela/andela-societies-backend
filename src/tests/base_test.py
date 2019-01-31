@@ -5,6 +5,7 @@ import datetime
 import os
 from jose import jwt
 from unittest import TestCase, mock
+from slackclient import SlackClient
 
 from app import create_app
 from api.models.base import db
@@ -200,9 +201,10 @@ class BaseTestCase(TestCase):
                                   return_value=(None, None, None))
         self.patcher.start()
 
+        slack_token = os.getenv('SLACK_API_TOKEN')
+        self.sc = SlackClient(slack_token)
+
         self.app = create_app()
-        # import pdb;
-        # pdb.set_trace()
         self.app_context = self.app.app_context()
         self.app_context.push()
         db.drop_all()

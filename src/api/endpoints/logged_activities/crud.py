@@ -89,7 +89,6 @@ class LoggedActivitiesAPI(Resource, SlackNotification):
                 else:
                     pass
 
-
             return response_builder(dict(
                 data=single_logged_activity_schema.dump(logged_activity).data,
                 message='Activity logged successfully'
