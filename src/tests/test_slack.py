@@ -1,10 +1,10 @@
 from api.services.slack_notify import SlackNotification
-from .base_test import BaseTestCase, ActivityType
+from .base_test import BaseTestCase
 
 class SlackNotifyTestCase(BaseTestCase, SlackNotification):
     """Test notifications."""
     
-    
+
     def setUp(self):
         """Initialize extended attributes"""
         BaseTestCase.setUp(self)
