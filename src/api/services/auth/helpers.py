@@ -59,7 +59,6 @@ def store_user_details(payload, token):
     roles = payload["UserInfo"]["roles"]
 
     user = User.query.get(user_id)
-    print("this is the new print", user)
     # save user to db if they haven't been saved yet
     if not user:
         user = User(
