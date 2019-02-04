@@ -10,8 +10,6 @@ class SlackNotification(object):
         slack_token = os.getenv('SLACK_API_TOKEN')
         if slack_token:
             self.sc = SlackClient(slack_token)
-        else:
-            pass
 
 
 
