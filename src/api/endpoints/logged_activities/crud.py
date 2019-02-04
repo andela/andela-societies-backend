@@ -23,6 +23,7 @@ class LoggedActivitiesAPI(Resource, SlackNotification):
         self.ActivityType = kwargs['ActivityType']
         self.LoggedActivity = kwargs['LoggedActivity']
         SlackNotification.__init__(self)
+        # self.all_users = User.query.all()
 
     def post(self):
         """Log a new activity."""
@@ -79,6 +80,8 @@ class LoggedActivitiesAPI(Resource, SlackNotification):
             #send notification to the society secretary about logged points
 
             roles = User.query.filter(User.roles.any(Role.name=="society secretary")).all()
+            # for user in self.all_users:
+            #     users = filter(lambda x: x.society_id==society_id, self.all_users)
             users = User.query.filter_by(society_id=society_id).all()
             message = "New activities logged. Go to https://societies.andela.com to approve points"
             for role in roles:
@@ -86,8 +89,6 @@ class LoggedActivitiesAPI(Resource, SlackNotification):
                     user_email = role.email
                     slack_id = SlackNotification.get_slack_id(self, user_email)
                     SlackNotification.send_message(self, message, slack_id)
-                else:
-                    pass
 
             return response_builder(dict(
                 data=single_logged_activity_schema.dump(logged_activity).data,
