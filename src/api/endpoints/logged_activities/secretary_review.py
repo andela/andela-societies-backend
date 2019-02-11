@@ -19,15 +19,6 @@ class SecretaryReviewLoggedActivityAPI(Resource, SlackNotification):
         self.LoggedActivity = kwargs['LoggedActivity']
         SlackNotification.__init__(self)
 
-
-    # def send_notification(self, roles, users):
-    #     for role in roles:
-    #         if role in users:
-    #             user_email = role.email
-    #             print("the success ops member is: ", user_email)
-    #             slack_id = SlackNotification.get_slack_id(self, user_email)
-    #             SlackNotification.send_message(self, message, slack_id)
-
     @roles_required(['society secretary'])
     def put(self, logged_activity_id):
         """Put method on logged Activity resource."""
@@ -56,7 +47,7 @@ class SecretaryReviewLoggedActivityAPI(Resource, SlackNotification):
 
         roles = User.query.filter(User.roles.any(Role.name=="success ops")).all()
         users = User.query.all()
-        message = "New society points approved. Go to https://societies.andela.com to give redemption approval"
+        message = "New society points approved by society secretary. Go to https://societies.andela.com/u/verify-activities to review points" # noqa: E501
 
         logged_activity.status = payload.get('status')
         if logged_activity.status == "pending":
