@@ -84,11 +84,7 @@ class LoggedActivitiesAPI(Resource, SlackNotification):
             #     users = filter(lambda x: x.society_id==society_id, self.all_users)
             users = User.query.filter_by(society_id=society_id).all()
             message = "New activities logged. Go to https://societies.andela.com to approve points"
-            for role in roles:
-                if role in users:
-                    user_email = role.email
-                    slack_id = SlackNotification.get_slack_id(self, user_email)
-                    SlackNotification.send_message(self, message, slack_id)
+            SlackNotification.send_notification(self, roles, users, message)
 
             return response_builder(dict(
                 data=single_logged_activity_schema.dump(logged_activity).data,
