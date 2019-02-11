@@ -47,7 +47,8 @@ class SecretaryReviewLoggedActivityAPI(Resource, SlackNotification):
 
         roles = User.query.filter(User.roles.any(Role.name=="success ops")).all()
         users = User.query.all()
-        message = "New society points approved by society secretary. Go to https://societies.andela.com/u/verify-activities to review points" # noqa: E501
+        message = f"The society secretary for {logged_activity.society.name} has approved an activity " + \
+                  f"worth {logged_activity.value} points. Go to https://societies.andela.com/u/verify-activities to approve or reject these points" # noqa: E501
 
         logged_activity.status = payload.get('status')
         if logged_activity.status == "pending":
