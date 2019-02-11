@@ -44,3 +44,10 @@ class SlackNotification(object):
             as_user=True,
             icon_emoji=':ninja:',
         )
+
+    def send_notification(self, roles, users, message):
+        for role in roles:
+            if role in users:
+                user_email = role.email
+                slack_id = self.get_slack_id(user_email)
+                self.send_message(message, slack_id)
