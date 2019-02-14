@@ -54,6 +54,23 @@ class SecretaryReviewLoggedActivityAPI(Resource, SlackNotification):
         if logged_activity.status == "pending":
             SlackNotification.send_notification(self, roles, users, message)
 
+
+        """
+        Send notification to a fellow incase
+        their logged points are rejected by their
+        society secretary
+        """
+        if logged_activity.status == "rejected":
+            user_id = logged_activity.user_id
+            fellows = User.query.filter_by(uuid=user_id).all()
+            message = f"Your logged society points worth {logged_activity.value} regarding " + \
+                      f""
+            for fellow in fellows:
+                print(fellow.email)
+                user_email = fellow.email
+                slack_id = SlackNotification.get_slack_id(self, user_email)
+                SlackNotification.send_message(self, message, slack_id)
+
         logged_activity.save()
 
         return response_builder(
