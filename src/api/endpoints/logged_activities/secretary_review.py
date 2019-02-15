@@ -45,6 +45,11 @@ class SecretaryReviewLoggedActivityAPI(Resource, SlackNotification):
             return response_builder(dict(message='Invalid status value.'),
                                     400)
 
+        """
+        Send a notification to Success Ops
+        incase a society secretary approves
+        logged points
+        """
         roles = User.query.filter(User.roles.any(Role.name=="success ops")).all()
         users = User.query.all()
         message = f"The society secretary for {logged_activity.society.name} has approved an activity " + \
@@ -63,10 +68,10 @@ class SecretaryReviewLoggedActivityAPI(Resource, SlackNotification):
         if logged_activity.status == "rejected":
             user_id = logged_activity.user_id
             fellows = User.query.filter_by(uuid=user_id).all()
-            message = f"Your logged society points worth {logged_activity.value} regarding " + \
-                      f""
+
+            message = f"Your logged society points worth {logged_activity.value} described as " + \
+                      f"{logged_activity.description} have been rejected by your Society's Secretary"
             for fellow in fellows:
-                print(fellow.email)
                 user_email = fellow.email
                 slack_id = SlackNotification.get_slack_id(self, user_email)
                 SlackNotification.send_message(self, message, slack_id)
