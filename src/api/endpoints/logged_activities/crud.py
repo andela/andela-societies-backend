@@ -23,7 +23,6 @@ class LoggedActivitiesAPI(Resource, SlackNotification):
         self.ActivityType = kwargs['ActivityType']
         self.LoggedActivity = kwargs['LoggedActivity']
         SlackNotification.__init__(self)
-        # self.all_users = User.query.all()
 
     def post(self):
         """Log a new activity."""

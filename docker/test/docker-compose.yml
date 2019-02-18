@@ -18,7 +18,7 @@ services:
       - FLASK_APP=manage.py
       - COVERALLS_REPO_TOKEN=${COVERALLS_REPO_TOKEN}
     # env_file:
-      # - ../../src/.env
+      - ../../src/.env
     volumes:
       - build:/build
       - cache:/cache
