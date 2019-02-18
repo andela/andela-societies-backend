@@ -35,6 +35,7 @@ function addEnvFile() {
 PRIVATE_KEY_TEST=${PRIVATE_KEY_TEST}
 PUBLIC_KEY_TEST=${PUBLIC_KEY_TEST}
 SENDER_CREDS=${SENDER_CREDS}
+SLACK_API_TOKEN=${SLACK_API_TOKEN}
 
 EOF
         success "lsEnvironment file has been created successfully"
