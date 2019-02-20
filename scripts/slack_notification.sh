@@ -55,6 +55,9 @@ declare_env_variables() {
         develop-V2)
           ENVIRONMENT="Staging V2"
             ;;
+        master-v2)
+          ENVIRONMENT="Production V2"
+            ;;
         *)
             echo "Err: This branch should not deploy."
             exit 1
