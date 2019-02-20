@@ -28,6 +28,14 @@ set_variables(){
             INSTANCE_NAME=${STAGING_INSTANCE_NAME}
             DATABASE_NAME=${STAGING_V2_DATABASE_NAME}
             ;;
+        master-v2)
+            APP_SETTINGS="Production"
+            VERSION="-v2"
+            CLOUDSQL_CONNECTION_NAME=${PRODUCTION_CLOUD_SQL_CONNECTION_NAME}
+            DATABASE_URL=${PRODUCTION_DATABASE_URL}
+            INSTANCE_NAME=${PRODUCTION_INSTANCE_NAME}
+            DATABASE_NAME=${PRODUCTION_V2_DATABASE_NAME}
+            ;;
         *)
             echo "Err: This branch should not deploy."
             exit 1

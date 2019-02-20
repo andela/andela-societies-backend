@@ -85,6 +85,7 @@ workflows:
                 - develop
                 - master
                 - develop-V2
+                - master-v2
       - deploy:
           requires:
             - upgrade-database
