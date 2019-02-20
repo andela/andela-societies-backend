@@ -45,6 +45,21 @@ declare_env_variables() {
   else
       ENVIRONMENT="Staging"
   fi
+    case "$CIRCLE_BRANCH" in
+        master)
+          ENVIRONMENT="Production"
+            ;;
+        develop)
+          ENVIRONMENT="Staging"
+            ;;
+        develop-V2)
+          ENVIRONMENT="Staging V2"
+            ;;
+        *)
+            echo "Err: This branch should not deploy."
+            exit 1
+            ;;
+    esac
 
   if [ "$CIRCLE_JOB" == "upgrade-database" ]; then
     upgrade_env_variables "$@"
