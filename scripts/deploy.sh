@@ -27,6 +27,13 @@ set_variables() {
             GOOGLE_CLUSTER_NAME=${STAGING_CLUSTER_NAME}
             DEPLOYMENT_NAME="staging-v2-${PROJECT_NAME}"
             ;;
+        master-V2)
+            IMAGE_TAG="production-v2-${COMMIT_HASH}"
+            ENVIRONMENT=production
+            GOOGLE_COMPUTE_ZONE=${PRODUCTION_ZONE}
+            GOOGLE_CLUSTER_NAME=${PRODUCTION_CLUSTER_NAME}
+            DEPLOYMENT_NAME="production-v2-${PROJECT_NAME}"
+            ;;
         *)
             echo "Err: This branch should not deploy."
             exit 1

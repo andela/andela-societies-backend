@@ -28,7 +28,7 @@ set_variables(){
             INSTANCE_NAME=${STAGING_INSTANCE_NAME}
             DATABASE_NAME=${STAGING_V2_DATABASE_NAME}
             ;;
-        master-v2)
+        master-V2)
             APP_SETTINGS="Production"
             VERSION="-v2"
             CLOUDSQL_CONNECTION_NAME=${PRODUCTION_CLOUD_SQL_CONNECTION_NAME}
