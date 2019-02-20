@@ -3,19 +3,36 @@ set -o errexit
 set -o pipefail
 
 set_variables(){
-    if [ "$CIRCLE_BRANCH" == 'master' ]; then
-        APP_SETTINGS="Production"
-        CLOUDSQL_CONNECTION_NAME=${PRODUCTION_CLOUD_SQL_CONNECTION_NAME}
-        DATABASE_URL=${PRODUCTION_DATABASE_URL}
-        INSTANCE_NAME=${PRODUCTION_INSTANCE_NAME}
-        DATABASE_NAME=${PRODUCTION_DATABASE_NAME}
-    else
-        APP_SETTINGS="Staging"
-        CLOUDSQL_CONNECTION_NAME=${STAGING_CLOUD_SQL_CONNECTION_NAME}
-        DATABASE_URL=${STAGING_DATABASE_URL}
-        INSTANCE_NAME=${STAGING_INSTANCE_NAME}
-        DATABASE_NAME=${STAGING_DATABASE_NAME}
-    fi
+    case "$CIRCLE_BRANCH" in
+        master)
+            APP_SETTINGS="Production"
+            VERSION=""
+            CLOUDSQL_CONNECTION_NAME=${PRODUCTION_CLOUD_SQL_CONNECTION_NAME}
+            DATABASE_URL=${PRODUCTION_DATABASE_URL}
+            INSTANCE_NAME=${PRODUCTION_INSTANCE_NAME}
+            DATABASE_NAME=${PRODUCTION_DATABASE_NAME}
+            ;;
+        develop)
+            APP_SETTINGS="Staging"
+            VERSION=""
+            CLOUDSQL_CONNECTION_NAME=${STAGING_CLOUD_SQL_CONNECTION_NAME}
+            DATABASE_URL=${STAGING_DATABASE_URL}
+            INSTANCE_NAME=${STAGING_INSTANCE_NAME}
+            DATABASE_NAME=${STAGING_DATABASE_NAME}
+            ;;
+        develop-V2)
+            APP_SETTINGS="Staging"
+            VERSION="-v2"
+            CLOUDSQL_CONNECTION_NAME=${STAGING_CLOUD_SQL_CONNECTION_NAME}
+            DATABASE_URL=${STAGING_DATABASE_URL}
+            INSTANCE_NAME=${STAGING_INSTANCE_NAME}
+            DATABASE_NAME=${STAGING_V2_DATABASE_NAME}
+            ;;
+        *)
+            echo "Err: This branch should not deploy."
+            exit 1
+            ;;
+    esac
 }
 
 install_google_cloud_sdk(){
@@ -34,7 +51,7 @@ authenticate_google_cloud() {
 }
 
 export_data() {
-    DUMP_NAME=$(echo "${APP_SETTINGS}" | tr '[:upper:]' '[:lower:]')-sqldumpfile-$(date '+%Y-%m-%d-%H-%M-%S').gz
+    DUMP_NAME=$(echo "${APP_SETTINGS}" | tr '[:upper:]' '[:lower:]')${VERSION}-sqldumpfile-$(date '+%Y-%m-%d-%H-%M-%S').gz
     gcloud sql export sql ${INSTANCE_NAME} gs://${SOCIETIES_GCP_BUCKET}/${DUMP_NAME} \
                             --database=${DATABASE_NAME}
 }
