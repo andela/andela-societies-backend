@@ -6,14 +6,16 @@ from flask_restful import Resource
 from api.services.auth import token_required, roles_required
 from api.utils.helpers import response_builder
 from api.utils.marshmallow_schemas import basic_info_schema
+from api.services.slack_notify import SlackNotification
 
 
 # import from this package
 from .helpers import serialize_redmp
 from .marshmallow_schemas import edit_redemption_request_schema
+from api.models import Role, User
 
 
-class RedemptionRequestNumeration(Resource):
+class RedemptionRequestNumeration(Resource, SlackNotification):
     """
     Approve or reject Redemption Requests.
 
@@ -28,6 +30,7 @@ class RedemptionRequestNumeration(Resource):
         self.Society = kwargs['Society']
         self.email = kwargs['email']
         self.mail = kwargs['mail']
+        SlackNotification.__init__(self)
 
     @token_required
     @roles_required(["success ops", "cio"])
@@ -111,7 +114,6 @@ class RedemptionRequestNumeration(Resource):
                 payload=email_payload,
                 mail=self.mail
             )
-
         elif status == "rejected":
             redemp_request.status = status
             redemp_request.rejection = rejection_reason
@@ -123,6 +125,15 @@ class RedemptionRequestNumeration(Resource):
                         f" reason: {rejection_reason}",
                 recipients=[redemp_request.user.email]
             )
+
+            # Send Slack notification to Society President
+            message = f"Redemption Request for" + \
+                      f" {redemp_request.user.society.name}" + \
+                      f" has been rejected for this" + \
+                      f" reason: *{rejection_reason}*"
+            user_email = redemp_request.user.email
+            slack_id = SlackNotification.get_slack_id(self, user_email)
+            SlackNotification.send_message(self, message, slack_id)
 
             self.email.send(
                 current_app._get_current_object(),
