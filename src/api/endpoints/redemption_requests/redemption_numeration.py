@@ -12,7 +12,6 @@ from api.services.slack_notify import SlackNotification
 # import from this package
 from .helpers import serialize_redmp
 from .marshmallow_schemas import edit_redemption_request_schema
-from api.models import Role, User
 
 
 class RedemptionRequestNumeration(Resource, SlackNotification):
