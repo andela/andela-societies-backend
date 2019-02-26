@@ -93,11 +93,11 @@ class RedemptionRequestNumeration(Resource, SlackNotification):
                 recipients=[finance_email]
             )
 
-            self.email.send(
-                current_app._get_current_object(),
-                payload=email_payload,
-                mail=self.mail
-            )
+            # self.email.send(
+            #     current_app._get_current_object(),
+            #     payload=email_payload,
+            #     mail=self.mail
+            # )
 
             email_payload = dict(
                 sender=current_app.config["SENDER_CREDS"],
@@ -108,11 +108,21 @@ class RedemptionRequestNumeration(Resource, SlackNotification):
                 recipients=[redemp_request.user.email]
             )
 
-            self.email.send(
-                current_app._get_current_object(),
-                payload=email_payload,
-                mail=self.mail
-            )
+            # Send Slack notification to Society President
+            message = f"Redemption Request on" + \
+                      f" *{redemp_request.name}*" + \
+                      f" has been approved." + \
+                      f" Finance will be in touch"
+            user_email = redemp_request.user.email
+            print(user.email)
+            slack_id = SlackNotification.get_slack_id(self, user_email)
+            SlackNotification.send_message(self, message, slack_id)
+
+            # self.email.send(
+            #     current_app._get_current_object(),
+            #     payload=email_payload,
+            #     mail=self.mail
+            # )
         elif status == "rejected":
             redemp_request.status = status
             redemp_request.rejection = rejection_reason
