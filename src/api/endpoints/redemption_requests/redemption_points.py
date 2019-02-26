@@ -88,11 +88,11 @@ class PointRedemptionAPI(Resource):
                     recipients=[user.email for user in CIO.users]
                 )
 
-                # self.email.send(
-                #     current_app._get_current_object(),
-                #     payload=email_payload,
-                #     mail=self.mail
-                # )
+                self.email.send(
+                    current_app._get_current_object(),
+                    payload=email_payload,
+                    mail=self.mail
+                )
 
             return response_builder(dict(
                 message="Redemption request created. Success Ops will be in"
