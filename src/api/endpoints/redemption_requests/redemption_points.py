@@ -6,6 +6,7 @@ from flask_restful import Resource
 from api.utils.helpers import find_item, paginate_items, response_builder
 from api.services.auth import token_required, roles_required
 from api.utils.marshmallow_schemas import basic_info_schema
+from api.services.slack_notify import SlackNotification
 
 # from within this package
 from .marshmallow_schemas import (
@@ -18,7 +19,7 @@ from .helpers import (
     non_paginated_redemptions)
 
 
-class PointRedemptionAPI(Resource):
+class PointRedemptionAPI(Resource, SlackNotification):
     """Resource handling all point redemption requests.
 
     Only made by society presidents.
@@ -32,6 +33,7 @@ class PointRedemptionAPI(Resource):
         self.email = kwargs['email']
         self.mail = kwargs['mail']
         self.Role = kwargs['Role']
+        SlackNotification.__init__(self)
 
     @token_required
     @roles_required(["society president"])
@@ -76,6 +78,7 @@ class PointRedemptionAPI(Resource):
             data["center"], _ = basic_info_schema.dump(center)
 
             CIO = self.Role.query.filter_by(name='cio').first()
+            user_list = [user.email for user in CIO.users]
 
             if CIO and CIO.users.all():  # TODO Add logging here
                 email_payload = dict(
@@ -85,14 +88,22 @@ class PointRedemptionAPI(Resource):
                     message="Redemption Request reason:{}."
                             "Redemption Request value: {} points".format(
                         redemp_request.name, redemp_request.value),
-                    recipients=[user.email for user in CIO.users]
+                    recipients=user_list
                 )
 
-                self.email.send(
-                    current_app._get_current_object(),
-                    payload=email_payload,
-                    mail=self.mail
-                )
+                # self.email.send(
+                #     current_app._get_current_object(),
+                #     payload=email_payload,
+                #     mail=self.mail
+                # )
+                
+            # Send a slack notification to a CIO regarding new redemption request.
+            for user in user_list:
+                message = f"Redemption Request for {g.current_user.society.name}," + \
+                          f" worth {redemp_request.value} points has been created." + \
+                          f" Redemption Request reason: *{redemp_request.name}*"
+                slack_id = SlackNotification.get_slack_id(self, user)
+                SlackNotification.send_message(self, message, slack_id)
 
             return response_builder(dict(
                 message="Redemption request created. Success Ops will be in"
