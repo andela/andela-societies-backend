@@ -91,12 +91,12 @@ class PointRedemptionAPI(Resource, SlackNotification):
                     recipients=user_list
                 )
 
-                # self.email.send(
-                #     current_app._get_current_object(),
-                #     payload=email_payload,
-                #     mail=self.mail
-                # )
-                
+                self.email.send(
+                    current_app._get_current_object(),
+                    payload=email_payload,
+                    mail=self.mail
+                )
+
             # Send a slack notification to a CIO regarding new redemption request.
             for user in user_list:
                 message = f"Redemption Request for {g.current_user.society.name}," + \
