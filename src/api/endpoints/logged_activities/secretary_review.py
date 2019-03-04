@@ -54,7 +54,7 @@ class SecretaryReviewLoggedActivityAPI(Resource, SlackNotification):
         logged_activity.status = payload.get('status')
         if logged_activity.status == "pending":
             # Send approved notification to success-ops
-            # SlackNotification.send_notification(self, roles, users, message)
+            SlackNotification.send_notification(self, roles, users, message)
 
             # Send approved notification to the respective fellow
             user_email = logged_activity.user.email
