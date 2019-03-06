@@ -59,8 +59,8 @@ class SecretaryReviewLoggedActivityAPI(Resource, SlackNotification):
             # Send approved notification to the respective fellow
             user_email = logged_activity.user.email
 
-            message = f"Your logged society points worth {logged_activity.value} described as " + \
-                      f"{logged_activity.description} have been approved by your Society's Secretary"
+            message = f"APPROVED. Your activity points for {logged_activity.description} logged " + \
+                      f"on {logged_activity.activity_date} have been approved by your Society's Secretary."
             slack_id = SlackNotification.get_slack_id(self, user_email)
             SlackNotification.send_message(self, message, slack_id)
 
