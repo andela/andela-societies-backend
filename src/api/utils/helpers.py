@@ -1,5 +1,6 @@
 """Contain utility functions and constants."""
 
+import requests, os
 from collections import namedtuple
 from flask import current_app, jsonify, request, url_for
 
@@ -113,3 +114,24 @@ def response_builder(data, status_code=200):
     response = jsonify(data)
     response.status_code = status_code
     return response
+
+def find_d_level(token, user_id):
+    """ Returns The D-level information
+
+        token(str) - token supplied by the user
+        user_id(UUID) - the user Id
+        returns a dictonary object containing the d level
+    """
+    url=os.environ.get('ANDELA_API_URL')
+    Bearer = 'Bearer '
+    headers = {'Authorization': Bearer + token}
+
+    try:
+        api_response = requests.get(url + f"users/{user_id}", headers=headers).json().get('level')
+        return api_response
+    except requests.exceptions.ConnectionError:
+        response = jsonify({"Error": "Network Error."})
+        response.status_code = 503
+        return response
+    except Exception:
+        return None
