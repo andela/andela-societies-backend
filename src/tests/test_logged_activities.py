@@ -326,6 +326,25 @@ class LogActivityTestCase(BaseTestCase):
             json.loads(response.get_data(as_text=True))['message'],
             'You\'re late. That activity happened more than 30 days ago'
         )
+    def test_fellow_level_information_is_present(self):
+        """
+        Test fellow D-level information is fetched in th user's logged activities.
+
+        When this is done by an authenticated user it should not fail.
+        """
+        test_user_id = self.test_user.uuid
+        response = self.client.get(
+            f'/api/v1/users/{test_user_id}/logged-activities',
+            headers=self.header
+        )
+
+        # test that request was successful
+        self.assertEqual(response.status_code, 200)
+
+        response_content = json.loads(response.get_data(as_text=True))
+        # test that response data matches database query results
+        self.assertEqual(len(response_content), 7)
+        self.assertIn('level', response_content)
 
 
 class EditLoggedActivityTestCase(BaseTestCase):
