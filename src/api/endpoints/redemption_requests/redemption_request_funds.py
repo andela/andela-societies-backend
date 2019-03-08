@@ -6,12 +6,13 @@ from flask_restful import Resource
 from api.services.auth import token_required, roles_required
 from api.utils.helpers import response_builder
 from api.utils.marshmallow_schemas import basic_info_schema
+from api.services.slack_notify import SlackNotification
 
 # import from this package
 from .helpers import serialize_redmp
 
 
-class RedemptionRequestFunds(Resource):
+class RedemptionRequestFunds(Resource, SlackNotification):
     """
     Mark Redemption Requests are complete.
 
@@ -27,6 +28,7 @@ class RedemptionRequestFunds(Resource):
         self.email = kwargs['email']
         self.mail = kwargs['mail']
         self.Role = kwargs['Role']
+        SlackNotification.__init__(self)
 
     @roles_required(["finance"])
     def put(self, redeem_id=None):
@@ -80,6 +82,13 @@ class RedemptionRequestFunds(Resource):
                 status="Failed",
                 message="Invalid status.",
             ), 400)
+
+        user_email = redemp_request.user.email
+        message = f"FUNDS RELEASED! Your redemption request {redemp_request.name} " + \
+                  f"worth {redemp_request.value} points has been completed by FINANCE. Funds " + \
+                  f"have been wired!"
+        slack_id = SlackNotification.get_slack_id(self, user_email)
+        SlackNotification.send_message(self, message, slack_id)
 
         redemp_request.save()
         mes = f"Redemption request status changed to {redemp_request.status}."
