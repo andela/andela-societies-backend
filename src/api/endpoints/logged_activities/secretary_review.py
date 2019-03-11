@@ -53,20 +53,26 @@ class SecretaryReviewLoggedActivityAPI(Resource, SlackNotification):
 
         logged_activity.status = payload.get('status')
         if logged_activity.status == "pending":
+            # Send approved notification to success-ops
             SlackNotification.send_notification(self, roles, users, message)
+
+            # Send approved notification to the respective fellow
+            user_email = logged_activity.user.email
+
+            message = f"APPROVED. Your activity points for {logged_activity.description} logged " + \
+                      f"on {logged_activity.activity_date} have been approved by your Society's Secretary."
+            slack_id = SlackNotification.get_slack_id(self, user_email)
+            SlackNotification.send_message(self, message, slack_id)
 
 
        # Send notification to a fellow
         if logged_activity.status == "rejected":
-            user_id = logged_activity.user_id
-            fellows = User.query.filter_by(uuid=user_id).all()
+            user_email = logged_activity.user.email
 
             message = f"Your logged society points worth {logged_activity.value} described as " + \
                       f"{logged_activity.description} have been rejected by your Society's Secretary"
-            for fellow in fellows:
-                user_email = fellow.email
-                slack_id = SlackNotification.get_slack_id(self, user_email)
-                SlackNotification.send_message(self, message, slack_id)
+            slack_id = SlackNotification.get_slack_id(self, user_email)
+            SlackNotification.send_message(self, message, slack_id)
 
         logged_activity.save()
 
