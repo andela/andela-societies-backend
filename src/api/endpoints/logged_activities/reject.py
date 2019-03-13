@@ -42,11 +42,13 @@ class LoggedActivityRejectionAPI(Resource, SlackNotification):
                 'name': user_logged_activity['society']
             }
             del user_logged_activity['societyId']
-            
+
             # Send notification via Slack to the society Secretary
             society_id = logged_activity.society_id
             message = f"REJECTED! Success Ops have rejected {logged_activity.society.name}'s activity "  + \
-                      f"points worth {logged_activity.value}, logged on {logged_activity.activity_date}"
+                      f"points worth {logged_activity.value}. Logged on {logged_activity.activity_date}, and " + \
+                      f"described as *{logged_activity.description}* which " + \
+                      f"you had previously approved"
             roles = User.query.filter(User.roles.any(Role.name=="society secretary")).all()
             users = User.query.filter_by(society_id=society_id).all()
             SlackNotification.send_notification(self, roles, users, message)
