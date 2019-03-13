@@ -2,11 +2,13 @@ from flask_restful import Resource
 
 from api.services.auth import token_required, roles_required
 from api.utils.helpers import response_builder
+from api.models import Role, User
+from api.services.slack_notify import SlackNotification
 
 from .marshmallow_schemas import single_logged_activity_schema
 
 
-class LoggedActivityRejectionAPI(Resource):
+class LoggedActivityRejectionAPI(Resource, SlackNotification):
     """Allows success-ops to reject at least one Logged Activities."""
 
     decorators = [token_required]
@@ -14,6 +16,7 @@ class LoggedActivityRejectionAPI(Resource):
     def __init__(self, **kwargs):
         """Inject dependency for resource."""
         self.LoggedActivity = kwargs['LoggedActivity']
+        SlackNotification.__init__(self)
 
     @roles_required(["success ops"])
     def put(self, logged_activity_id=None):
@@ -39,6 +42,14 @@ class LoggedActivityRejectionAPI(Resource):
                 'name': user_logged_activity['society']
             }
             del user_logged_activity['societyId']
+            
+            # Send notification via Slack to the society Secretary
+            society_id = logged_activity.society_id
+            message = f"REJECTED! Success Ops have rejected {logged_activity.society.name}'s activity "  + \
+                      f"points worth {logged_activity.value}, logged on {logged_activity.activity_date}"
+            roles = User.query.filter(User.roles.any(Role.name=="society secretary")).all()
+            users = User.query.filter_by(society_id=society_id).all()
+            SlackNotification.send_notification(self, roles, users, message)
 
             return response_builder(dict(
                 data=user_logged_activity,
