@@ -343,8 +343,10 @@ class LogActivityTestCase(BaseTestCase):
 
         response_content = json.loads(response.get_data(as_text=True))
         # test that response data matches database query results
-        self.assertEqual(len(response_content), 7)
+        self.assertEqual(len(response_content), 9)
         self.assertIn('level', response_content)
+        self.assertIn('usedPoints', response_content)
+        self.assertIn('remainingPoints', response_content)
 
 
 class EditLoggedActivityTestCase(BaseTestCase):
