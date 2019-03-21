@@ -51,6 +51,7 @@ six = "==1.10.0"
 sqlalchemy = "==1.1.14"
 werkzeug = "==0.12.2"
 flask-mail = "*"
+slackclient = "==1.3.0"
 
 [dev-packages]
 yapf = "*"
