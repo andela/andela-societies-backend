@@ -6,6 +6,7 @@ from api.utils.helpers import response_builder, find_d_level
 
 from .marshmallow_schemas import user_logged_activities_schema
 from .models import db
+from api.endpoints.societies.models import Society
 
 
 class UserLoggedActivitiesAPI(Resource):
@@ -37,9 +38,11 @@ class UserLoggedActivitiesAPI(Resource):
             self.LoggedActivity.status == 'approved'
         ).scalar()
 
-        data=user_logged_activities_schema.dump(
+        data = user_logged_activities_schema.dump(
                 user_logged_activities
             ).data
+        # Fetch societies data
+        society = Society.query.get(user.society_id)
 
         # Fetch D-level info
         user_level = find_d_level(g.current_user_token, user_id)
@@ -50,5 +53,7 @@ class UserLoggedActivitiesAPI(Resource):
             activitiesLogged=len(user_logged_activities),
             level=user_level,
             pointsEarned=points_earned if points_earned else 0,
+            usedPoints=society.used_points,
+            remainingPoints=society.remaining_points,
             message=message
         ), 200)
