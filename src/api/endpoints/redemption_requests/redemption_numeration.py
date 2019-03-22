@@ -7,6 +7,7 @@ from api.services.auth import token_required, roles_required
 from api.utils.helpers import response_builder
 from api.utils.marshmallow_schemas import basic_info_schema
 from api.services.slack_notify import SlackNotification
+from api.models import Role, User
 
 
 # import from this package
@@ -71,6 +72,21 @@ class RedemptionRequestNumeration(Resource, SlackNotification):
             society.used_points = redemp_request
             redemp_request.status = status
 
+            # Send slack notification to finance users
+            finance_users = User.query.filter(User.roles.any(Role.name=="finance")).all()
+            for user in finance_users:
+                if user.center_id == redemp_request.center_id:
+                    user_email = user.email
+                    message = f"Redemption Request on *{redemp_request.name}* for " + \
+                              f"*{redemp_request.society.name}* has been " + \
+                              f"approved. Click the link: " + \
+                              f"{request.host_url + 'api/v1/societies/redeem/' + redeem_id} " + \
+                              f"to view more details"
+                    slack_id = SlackNotification.get_slack_id(self, user_email)
+                    SlackNotification.send_message(self, message, slack_id)
+                else:
+                    pass
+   
             # Get the relevant Finance Center to respond on RedemptionRequest
             center_emails = {"kampala": ".finance@andela.com"}
             finance_email = redemp_request.center.name.lower() + \
