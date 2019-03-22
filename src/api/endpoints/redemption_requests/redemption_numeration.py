@@ -86,7 +86,7 @@ class RedemptionRequestNumeration(Resource, SlackNotification):
                     SlackNotification.send_message(self, message, slack_id)
                 else:
                     pass
-   
+
             # Get the relevant Finance Center to respond on RedemptionRequest
             center_emails = {"kampala": ".finance@andela.com"}
             finance_email = redemp_request.center.name.lower() + \
