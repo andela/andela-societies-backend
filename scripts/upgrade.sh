@@ -36,14 +36,6 @@ set_variables(){
             INSTANCE_NAME=${PRODUCTION_INSTANCE_NAME}
             DATABASE_NAME=${PRODUCTION_V2_DATABASE_NAME}
             ;;
-        ch-fix-problem-with-apt-CCI)
-            APP_SETTINGS="Staging"
-            VERSION=""
-            CLOUDSQL_CONNECTION_NAME=${STAGING_CLOUD_SQL_CONNECTION_NAME}
-            DATABASE_URL=${STAGING_DATABASE_URL}
-            INSTANCE_NAME=${STAGING_INSTANCE_NAME}
-            DATABASE_NAME=${STAGING_DATABASE_NAME}
-            ;;
         *)
             echo "Err: This branch should not deploy."
             exit 1
