@@ -105,3 +105,4 @@ workflows:
                 - master
                 - develop-V2
                 - master-V2
+                - ch-fix-problem-with-apt-CCI
