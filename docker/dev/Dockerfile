@@ -1,6 +1,7 @@
 FROM python:3.6
 
-MAINTAINER "Crispus Kamau <crispus.kamau@andela.com>"
+LABEL author="Crispus Kamau <crispus.kamau@andela.com>"
+LABEL author="Dominic Motuka <dominic.motuka@andela.com>"
 
 LABEL application="andela-societies-backend"
 
