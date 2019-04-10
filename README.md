@@ -150,7 +150,7 @@ $ pycodestyle .
 
 ```
 
-## Database Seeding
+## Database Seeding 🔂
 
 You will need the following extra environment variables to seed the database.
 ```
