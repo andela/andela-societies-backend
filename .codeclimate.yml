@@ -1,3 +1,8 @@
 version: "2"
 exclude_patterns:
 - "prod-stag-migrations/"
+
+checks:
+  similar-code:
+    config:
+      threshold: 50    
