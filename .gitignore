@@ -121,3 +121,4 @@ migrations/*
 .idea/
 .idea
 andela-societies/
+andela-societies-frontend/
