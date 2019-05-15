@@ -1,0 +1,8 @@
+FROM node:carbon
+WORKDIR /app
+COPY ./andela-societies-frontend /app
+RUN rm -f /app/config.js
+RUN rm -f /app/webpack.config.dev.js
+COPY ./frontend_config/config.js /app/config.js
+COPY ./frontend_config/webpack.config.dev.js /app/webpack.config.dev.js
+RUN yarn install

@@ -1,7 +1,6 @@
-version: '3.3'
+version: "3.3"
 
 services:
-
   python-web-api-dev:
     build:
       context: .
@@ -35,6 +34,24 @@ services:
       - "5001:5432"
     networks:
       - andela-soc-dev-network
+
+  front-end-client-dev:
+    build:
+      context: .
+      dockerfile: ./frontend_config/Dockerfile-frontend
+
+    depends_on:
+      - python-web-api-dev
+
+    environment:
+      PORT: 3000
+      NODE_ENV: development
+      HOST: 0.0.0.0
+
+    ports:
+      - "3000:3000"
+
+    command: yarn start
 
 networks:
   andela-soc-dev-network:
