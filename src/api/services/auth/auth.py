@@ -6,6 +6,7 @@ communicate with the API.
 """
 import base64
 from functools import wraps
+import logging
 
 from flask import current_app, g, request
 from jose import ExpiredSignatureError, JWTError, jwt
@@ -14,9 +15,10 @@ from .helpers import store_user_details
 from api.models import Role, User
 from api.utils.helpers import response_builder
 
-
+# logger = logging.getLogger(__name__)
 def verify_token(authorization_token, public_key, audience=None, issuer=None):
     """Validate token."""
+    from manage import app
     try:
         payload = jwt.decode(
             authorization_token,
@@ -37,6 +39,8 @@ def verify_token(authorization_token, public_key, audience=None, issuer=None):
                 'verify_signature': True,
                 'verify_exp': True
             })
+        app.logger.warning('Token NOT validated')
+    app.logger.info('Token SUCCESSFULLY validated')
     return payload
 
 
