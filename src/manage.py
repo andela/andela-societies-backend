@@ -5,6 +5,7 @@
 import csv
 import os
 import sys
+import logging
 
 from flask_migrate import Migrate
 from flask.cli import FlaskGroup
@@ -19,6 +20,11 @@ from run_tests import test
 
 app = create_app()
 cli = FlaskGroup(app)
+
+if __name__ != "__main__":
+    gunicorn_logger = logging.getLogger('gunicorn.error')
+    app.logger.handlers = gunicorn_logger.handlers
+    app.logger.setLevel(gunicorn_logger.level)
 
 
 @cli.command()
@@ -140,3 +146,6 @@ migrate = Migrate(app, db)
 
 if __name__ == "__main__":
     cli()
+    # gunicorn_logger = logging.getLogger('gunicorn.error')
+    # app.logger.handlers = gunicorn_logger.handlers
+    # app.logger.setLevel(gunicorn_logger.level)
