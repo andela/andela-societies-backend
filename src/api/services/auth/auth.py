@@ -6,7 +6,7 @@ communicate with the API.
 """
 import base64
 from functools import wraps
-import logging
+import datetime
 
 from flask import current_app, g, request
 from jose import ExpiredSignatureError, JWTError, jwt
@@ -15,7 +15,8 @@ from .helpers import store_user_details
 from api.models import Role, User
 from api.utils.helpers import response_builder
 
-# logger = logging.getLogger(__name__)
+access_time = str(datetime.datetime.utcnow().time())
+
 def verify_token(authorization_token, public_key, audience=None, issuer=None):
     """Validate token."""
     from manage import app
@@ -39,8 +40,7 @@ def verify_token(authorization_token, public_key, audience=None, issuer=None):
                 'verify_signature': True,
                 'verify_exp': True
             })
-        app.logger.warning('Token NOT validated')
-    app.logger.info('Token SUCCESSFULLY validated')
+    app.logger.info('Token SUCCESSFULLY validated: The ACCESS time is UTC {}'.format(access_time)) # Noqa E501
     return payload
 
 
@@ -49,6 +49,7 @@ def token_required(f):
     """Authenticate that a valid Token is present."""
     @wraps(f)
     def decorated(*args, **kwargs):
+        from manage import app
         # check that the Authorization header is set
         authorization_token = request.headers.get('Authorization')
         if not authorization_token:
@@ -69,8 +70,10 @@ def token_required(f):
                                    current_app.config['API_ISSUER'])
         except ExpiredSignatureError:
             expired_response = "The authorization token supplied is expired"
+            app.logger.warning('Token HAS EXPIRED!')
             return response_builder(dict(message=expired_response), 401)
         except JWTError:
+            app.logger.info('Token Authentication FAILED!: The ACCESS time is UTC {}'.format(access_time)) # Noqa E501
             return response_builder(dict(message=unauthorized_message), 401)
 
         # confirm that payload and UserInfo has required keys
@@ -90,6 +93,7 @@ def token_required(f):
             if not g.current_user.society and g.current_user.cohort:
                 user.society = g.current_user.cohort.society
                 user.save()
+            app.logger.info('Token Authentication SUCCESSFUL! The CURRENT USER is {}'.format(user))
         return f(*args, **kwargs)
     return decorated
 
