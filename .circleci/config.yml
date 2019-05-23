@@ -100,7 +100,7 @@ workflows:
           filters:
             branches:
               only:
-                - ft-add-logger-to-auth-service
+                - develop
                 - master
                 - develop-V2
                 - master-V2
@@ -110,7 +110,7 @@ workflows:
           filters:
             branches:
               only:
-                - ft-add-logger-to-auth-service
+                - develop
                 - master
                 - develop-V2
                 - master-V2
