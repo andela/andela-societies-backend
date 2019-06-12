@@ -1,4 +1,6 @@
 """Activities Module."""
+import datetime
+
 from flask import g, request
 from flask_restful import Resource
 
@@ -6,6 +8,8 @@ from api.services.auth import roles_required, token_required
 from api.utils.helpers import response_builder
 
 from .marshmallow_schemas import activity_schema
+
+access_time = str(datetime.datetime.utcnow().time())
 
 
 class ActivitiesAPI(Resource):
@@ -19,6 +23,7 @@ class ActivitiesAPI(Resource):
     @roles_required(["success ops", "society president"])
     def post(self):
         """Create an activity."""
+        from manage import app
         payload = request.get_json(silent=True)
 
         if payload:
@@ -31,13 +36,15 @@ class ActivitiesAPI(Resource):
                 return response_builder(errors, validation_status_code)
             else:
                 activity = self.Activity(
-                            name=result['name'],
-                            description=result['description'],
-                            activity_type_id=result['activity_type_id'],
-                            activity_date=result['activity_date'],
-                            added_by_id=g.current_user.uuid
-                                    )
+                    name=result['name'],
+                    description=result['description'],
+                    activity_type_id=result['activity_type_id'],
+                    activity_date=result['activity_date'],
+                    added_by_id=g.current_user.uuid
+                )
                 activity.save()
+                app.logger.info(
+                    'Activity SUCCESSFULLY created. The ACCESS time is UTC {}'.format(access_time))
 
                 return response_builder(dict(
                                         message='Activity created'

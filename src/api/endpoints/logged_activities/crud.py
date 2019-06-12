@@ -1,3 +1,5 @@
+import datetime
+
 from flask_restful import Resource
 from flask import g, request
 
@@ -11,6 +13,9 @@ from .marshmallow_schemas import (
     logged_activities_schema
 )
 from api.models import Role, User
+
+access_time = str(datetime.datetime.utcnow().time())
+
 
 class LoggedActivitiesAPI(Resource, SlackNotification):
     """Logged Activities Resources."""
@@ -26,6 +31,7 @@ class LoggedActivitiesAPI(Resource, SlackNotification):
 
     def post(self):
         """Log a new activity."""
+        from manage import app
         payload = request.get_json(silent=True)
 
         if payload:
@@ -72,13 +78,22 @@ class LoggedActivitiesAPI(Resource, SlackNotification):
                     logged_activity.no_of_participants = result[
                         'no_of_participants'
                     ]
-
             logged_activity.save()
+            logged = {
+                "name": logged_activity.activity_type.name,
+                "description": logged_activity.description,
+                "user": g.current_user.name,
+                "points": logged_activity.value
+            }
+            app.logger.info(
+                'Activity {} logged SUCCESSFULLY. The log time is UTC {}'.format(logged, access_time))
+
             society_id = g.current_user.society_id
 
-            #send notification to the society secretary about logged points
+            # send notification to the society secretary about logged points
 
-            roles = User.query.filter(User.roles.any(Role.name=="society secretary")).all()
+            roles = User.query.filter(User.roles.any(
+                Role.name == "society secretary")).all()
             # for user in self.all_users:
             #     users = filter(lambda x: x.society_id==society_id, self.all_users)
             users = User.query.filter_by(society_id=society_id).all()
@@ -182,11 +197,14 @@ class LoggedActivitiesAPI(Resource, SlackNotification):
 
     def delete(self, logged_activity_id=None):
         """Delete a logged activity."""
+        from manage import app
         logged_activity = self.LoggedActivity.query.filter_by(
             uuid=logged_activity_id,
             user_id=g.current_user.uuid).one_or_none()
 
         if not logged_activity:
+            app.logger.warning('Activity id {} not found! Delete attempt time UTC {} User: {}'.format(
+                logged_activity_id, access_time, g.current_user.name))
             return response_builder(dict(
                 message='Logged Activity does not exist!'
             ), 404)
@@ -197,4 +215,6 @@ class LoggedActivitiesAPI(Resource, SlackNotification):
             ), 403)
 
         logged_activity.delete()
+        app.logger.info('Activity id {} deleted Successfully! Delete time is {} User: {}'.format(
+            logged_activity_id, acces_time, g.current_user.name))
         return response_builder(dict(), 204)
