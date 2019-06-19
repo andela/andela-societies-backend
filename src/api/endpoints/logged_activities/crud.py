@@ -23,7 +23,12 @@ class LoggedActivitiesAPI(Resource, SlackNotification):
     decorators = [token_required]
 
     def __init__(self, **kwargs):
-        """Inject dependencies for resource."""
+        """
+        Inject dependencies for resource.
+
+        Currently, app imports have been  done on the specific methods,
+        TO DO: Find a way to inject  app import into the constructor of the view.
+        """
         self.Activity = kwargs['Activity']
         self.ActivityType = kwargs['ActivityType']
         self.LoggedActivity = kwargs['LoggedActivity']
@@ -216,5 +221,5 @@ class LoggedActivitiesAPI(Resource, SlackNotification):
 
         logged_activity.delete()
         app.logger.info('Activity id {} deleted Successfully! Delete time is {} User: {}'.format(
-            logged_activity_id, acces_time, g.current_user.name))
+            logged_activity_id, access_time, g.current_user.name))
         return response_builder(dict(), 204)
