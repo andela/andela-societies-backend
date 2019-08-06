@@ -76,3 +76,18 @@ class UserAPI(Resource):
                                      for role in user_information['roles']}
 
         return dict(data=user_information), status_code
+
+
+class UsersAPI(Resource):
+    """Users Resource"""
+    
+    def __init__(self, **kwargs):
+        """Inject dependencies for resource."""
+        self.User = kwargs['User']
+
+    @token_required
+    def get(self):
+        """Get all users in the system."""
+        users = self.User.query.all()
+        user_list = list(map(lambda x: {"id": x.uuid, "name":x.name, "email":x.email}, users))
+        return user_list

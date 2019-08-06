@@ -4,7 +4,7 @@
 def users_bp(Api, Blueprint):
     from api.models import Center, Cohort
     from .models import User
-    from .users import UserAPI
+    from .users import UserAPI, UsersAPI
 
     users_bp_service = Blueprint('users_api', __name__)
     users_api = Api(users_bp_service)
@@ -19,6 +19,16 @@ def users_bp(Api, Blueprint):
             'User': User,
             'Center': Center,
             'Cohort': Cohort
+        }
+    )
+
+    users_api.add_resource(
+        UsersAPI,
+        '/users/all',
+        '/users/all/',
+        endpoint='users_info',
+        resource_class_kwargs={
+            'User': User
         }
     )
     return users_bp_service
