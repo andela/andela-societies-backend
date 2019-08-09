@@ -14,6 +14,7 @@ class BaseSchema(Schema):
             'required': {'message': 'A name is required.'}
         })
     photo = fields.String()
+    email = fields.String()
     created_at = fields.DateTime(
         dump_only=True, dump_to='createdAt', load_from='createdAt'
     )

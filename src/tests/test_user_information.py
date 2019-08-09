@@ -22,12 +22,17 @@ class UserInformationTestCase(BaseTestCase):
 
     def setUp(self):
         """Set up patch information for every test."""
-        super().setUp()
+        # super().setUp()
+        BaseTestCase.setUp(self)
         self.nairobi.save()
         self.cohort_12_Ke.save()
+        self.successops_role.save()
         self.society = Society(name="iStelle")
         self.society.cohorts.append(self.cohort_12_Ke)
         self.society.save()
+        self.successops_token = {"Authorization":
+                                 self.generate_token(
+                                  self.test_successops_payload)}
 
         cohort = self.cohort_12_Ke
         self.patcher = mock.patch('api.services.auth.helpers.add_extra_user_info',
@@ -48,6 +53,14 @@ class UserInformationTestCase(BaseTestCase):
                                    headers=self.header,
                                    content_type='application/json')
         self.assertEqual(response.status_code, 200)
+        response1 = self.client.get('/api/v1/users/all',
+                                   headers=self.header,
+                                   content_type='application/json')
+        self.assertEqual(response1.status_code, 401)
+        response2 = self.client.get('/api/v1/users/all',
+                                   headers=self.successops_token,
+                                   content_type='application/json')
+        self.assertEqual(response2.status_code, 200)
 
         response_data = json.loads(response.data)
 
