@@ -81,7 +81,7 @@ class UserAPI(Resource):
 
 class UsersAPI(Resource):
     """Users Resource"""
-    
+
     def __init__(self, **kwargs):
         """Inject dependencies for resource."""
         self.User = kwargs['User']
