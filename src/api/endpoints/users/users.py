@@ -1,12 +1,13 @@
 """Module for Users in platform."""
-from flask import g
+from flask import g, request
 from flask_restful import Resource
 
-from api.services.auth import token_required
+from api.services.auth import roles_required, token_required
+from api.utils.helpers import response_builder, paginate_items
 from api.services.auth.helpers import add_extra_user_info
 from api.utils.marshmallow_schemas import basic_info_schema
 
-from .marshmallow_schema import user_schema
+from .marshmallow_schema import user_schema, users_schema
 
 
 class UserAPI(Resource):
@@ -86,8 +87,33 @@ class UsersAPI(Resource):
         self.User = kwargs['User']
 
     @token_required
+    @roles_required(["success ops"])
     def get(self):
         """Get all users in the system."""
-        users = self.User.query.all()
-        user_list = list(map(lambda x: {"id": x.uuid, "name":x.name, "email":x.email}, users))
-        return user_list
+        paginate = request.args.get("paginate", "true")
+        message = "all existing users fetched successfully"
+
+        if paginate.lower() == "false":
+            users = self.User.query.all()
+            count = self.User.query.count()
+            data = {"count": count}
+        else:
+            users = self.User.query
+            pagination_result = paginate_items(users,
+                                               serialize=False)
+            users = pagination_result.data
+            data = {
+                "count": pagination_result.count,
+                "page": pagination_result.page,
+                "pages": pagination_result.pages,
+                "previous_url": pagination_result.previous_url,
+                "next_url": pagination_result.next_url
+            }
+        data.update(dict(
+            users=users_schema.dump(
+                users
+            ).data))
+
+        return response_builder(dict(data=data, message=message,
+                                     status="success"), 200)
+        
