@@ -22,7 +22,6 @@ class UserInformationTestCase(BaseTestCase):
 
     def setUp(self):
         """Set up patch information for every test."""
-        # super().setUp()
         BaseTestCase.setUp(self)
         self.nairobi.save()
         self.cohort_12_Ke.save()
