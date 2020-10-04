@@ -18,7 +18,7 @@ class RequestMoreInfoLoggedActivityTestCase(BaseTestCase):
 
     def test_request_for_info_successful(self):
         """
-        Test requesting more informaton on a logged activity.
+        Test requesting more information on a logged activity.
 
         When the request is made it should not fail.
         """
@@ -38,7 +38,7 @@ class RequestMoreInfoLoggedActivityTestCase(BaseTestCase):
 
     def test_request_for_info_fails_without_payload(self):
         """
-        Test requesting more informaton on a logged activity.
+        Test requesting more information on a logged activity.
 
         When the request is made without content it should fail.
         """
@@ -57,7 +57,7 @@ class RequestMoreInfoLoggedActivityTestCase(BaseTestCase):
 
     def test_request_for_info_fails_without_loggedactivity_id(self):
         """
-        Test requesting more informaton on a logged activity.
+        Test requesting more information on a logged activity.
 
         When the request is made without LoggedActivity ID it should fail.
         """
@@ -74,7 +74,7 @@ class RequestMoreInfoLoggedActivityTestCase(BaseTestCase):
 
     def test_request_for_info_fails_for_nonexistent_loggedactivity(self):
         """
-        Test requesting more informaton on a logged activity.
+        Test requesting more information on a logged activity.
 
         When the request is made for a logged_activity that doesn't exist, it
         should fail.
@@ -95,7 +95,7 @@ class RequestMoreInfoLoggedActivityTestCase(BaseTestCase):
 
     def test_request_for_info_fails_with_wrong_keys(self):
         """
-        Test requesting more informaton on a logged activity.
+        Test requesting more information on a logged activity.
 
         When the request is made it should fail when the context is provided
         with different keys.
@@ -116,7 +116,7 @@ class RequestMoreInfoLoggedActivityTestCase(BaseTestCase):
 
     def test_request_for_info_fails_without_context(self):
         """
-        Test requesting more informaton on a logged activity.
+        Test requesting more information on a logged activity.
 
         When the request is made it should fail when the context is not
         provided.
